@@ -1,0 +1,10 @@
+routine main () : int is 
+    var human : record{
+        var height : int is 170;
+        var weight : int is 70;
+    } end;
+    print(human.height);
+    var health : int is (human.height - 100) / human.weight;
+    print(health);
+    return 0;
+end

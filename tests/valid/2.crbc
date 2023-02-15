@@ -1,0 +1,6 @@
+type int is integer;
+routine main () : int is
+   var x : int is (7 + 9);
+   print(x);
+   return 0;
+end
