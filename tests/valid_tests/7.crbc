@@ -1,10 +1,12 @@
+type int is integer;
 routine main () : int is 
     var human : record{
-        var height : int is 170;
-        var weight : int is 70;
+        var height : real is 170.0;
+        var weight : real is 70.0;
     } end;
     print(human.height);
     var health : int is (human.height - 100) / human.weight;
+    print('\n');
     print(health);
     return 0;
 end

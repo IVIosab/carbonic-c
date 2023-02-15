@@ -1,12 +1,12 @@
 type int is integer;
 routine main () : int is
     var i : int is 7;
-    while (i < 15)
+    while (i < 13)
     loop
         if (i >= 9) then
-            print("I is bigger than or equal 9");
+            print("I is bigger than or equal 9\n");
         else
-            print("I is not bigger than 9");
+            print("I is not bigger than 9\n");
         end
         i := (i + 1);
     end
