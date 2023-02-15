@@ -20,6 +20,7 @@ extern "C" int yywrap() { }
 "array"                 return TOKEN(TK_ARRAY);
 "record"                return TOKEN(TK_RECORD);
 "routine"               return TOKEN(TK_ROUTINE);
+"return"                return TOKEN(TK_RETURN);
 "is"                    return TOKEN(TK_IS);
 "not"                   return TOKEN(TK_NOT); // TODO: "print" return TOKEN(TK_PRINT);
 "while"                 return TOKEN(TK_WHILE);

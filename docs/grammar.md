@@ -110,7 +110,6 @@ __Summand :__ Primary | ( Expression )
 **ModifiablePrimary** : Identifier { . Identifier | [ Expression ] }
 
 ## Collaboration
-You can share this doc using https://writemd.xyz/d/63eb8c0ac23439156.
 - Asem Abdelhady
 - Jaafar Totanji
 - Menna Awadallah
@@ -128,7 +127,3 @@ routine main () : int is
  end
 end
 ```
-## Variables (new)
-
---var family_name: Dursley
-When Mr and Mrs {{family_name}} woke up
