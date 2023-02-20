@@ -1,0 +1,17 @@
+type int is integer;
+routine main () : int is
+    var a : array [6] int is [5, 2, 3, 3, 2, 5];
+    
+    var palindrome : boolean is true;
+
+    for var i : int in 1 .. 3
+    loop
+        if (a[i] /= a[7 - i]) then
+            palindrome := false;
+        end
+    end
+
+    print(palindrome);
+    
+   return 0;
+end

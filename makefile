@@ -1,8 +1,9 @@
-say_hello:
-		@echo "Hello World"
-
-flex: 
+lexer: 
 	flex -o lexer.cpp -i lexer.l
+	g++ lexer.cpp -o lexer.out
+
+test: 
+	bash tests.sh
 
 clean:
-	rm a.out lexer.cpp
+	rm lexer.out lexer.cpp

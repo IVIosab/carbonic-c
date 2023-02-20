@@ -1,0 +1,17 @@
+type int is integer;
+routine main () : int is
+    var x : int is 20;
+    var y : int is 15;
+    var gcd : int is 1;
+
+    for var i : int in 1 .. x
+    loop
+        if (x % i = 0 and y % i = 0) then
+            gcd := i;
+        end
+    end
+
+    print(gcd);
+    
+   return 0;
+end

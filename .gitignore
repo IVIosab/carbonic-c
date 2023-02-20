@@ -1,4 +1,9 @@
 .vscode
+parser.cpp
+parser.hpp
+tokens.cpp
+parser
+*.o
 lexer.cpp
-a.out
+lexer.out
 output
