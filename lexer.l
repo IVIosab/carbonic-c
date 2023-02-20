@@ -56,6 +56,7 @@ enum token_type {
     TK_MINUS,
     TK_MUL,
     TK_DIV,
+    TK_NEWLINE,
     TK_MOD,
     TK_POW,
     TK_AND,
@@ -130,7 +131,8 @@ Token newToken(token_type type, string value) {
 "+"                     cout << "TK_PLUS" << " ";
 "-"                     cout << "TK_MINUS" << " ";
 "*"                     cout << "TK_MUL" << " "; 
-"/"                     cout << "TK_DIV" << " "; 
+"/"                     cout << "TK_DIV" << " ";
+"\\n"                   cout << "TK_NEWLINE" << " "; 
 "%"                     cout << "TK_MOD" << " "; 
 "**"                    cout << "TK_POW" << " "; 
 "and"                   cout << "TK_AND" << " "; 
@@ -140,7 +142,7 @@ Token newToken(token_type type, string value) {
 [0-9]+\.[0-9]+          cout << "TK_DOUBLE_LITERAL" << " "; 
 [0-9]+                  cout << "TK_INTEGER_LITERAL" << " "; 
 '.'                     cout << "TK_CHARACTER_LITERAL" << " "; 
-.                       cout << "LEXICAL ERROR: INVALID PARAMETER" << yytext << " ";
+.                       cout << "LEXICAL ERROR: INVALID PARAMETER FOR THE LEXEME -> " << yytext << " ";
 %%
 
 int main(int argc, char** argv) {
