@@ -7,7 +7,7 @@ routine main () : int is
     for var i : int in 1 .. x
     loop
         if (x % i = 0 and y % i = 0) then
-            gcd := i
+            gcd := i;
         end
     end
 
