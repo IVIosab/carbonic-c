@@ -12,5 +12,10 @@ routine main () : int is
             end
        end 
     end
+    for var i : int in 1 .. 6
+    loop
+        print(a[i]);
+        print('\n');
+    end
    return 0;
 end
