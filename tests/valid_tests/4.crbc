@@ -3,9 +3,9 @@ routine main () : int is
    for var i : int in [reverse] 7 .. 12
    loop
         if (i >= 9) then
-            print("I is bigger than or equal 9\n");
+            print('I is bigger than or equal 9\n');
         else
-            print("I is not bigger than 9\n");
+            print('I is not bigger than 9\n');
         end
     end
    return 0;
