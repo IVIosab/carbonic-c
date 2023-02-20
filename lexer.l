@@ -32,6 +32,7 @@ enum token_type {
     TK_CHARACTER_LITERAL,
     TK_TRUE,
     TK_FALSE,
+    TK_PRINT,
     TK_ASSIGN,
     TK_CEQ,
     TK_CNEQ,
@@ -83,61 +84,63 @@ Token newToken(token_type type, string value) {
 
 %%
 
-[ \t\n]                 ;
-"var"                   cout << "TK_VAR" << endl; 
-"type"                  cout << "TK_TYPE" << endl;
-"integer"               cout << "TK_INT" << endl; 
-"real"                  cout << "TK_DOUBLE" << endl;
-"boolean"               cout << "TK_BOOL" << endl;
-"char"                  cout << "TK_CHAR" << endl;
-"array"                 cout << "TK_ARRAY" << endl;
-"record"                cout << "TK_RECORD" << endl;
-"routine"               cout << "TK_ROUTINE" << endl;
-"return"                cout << "TK_RETURN" << endl;
-"is"                    cout << "TK_IS" << endl;
-"not"                   cout << "TK_NOT" << endl; 
-"while"                 cout << "TK_WHILE" << endl;
-"loop"		        	cout << "TK_LOOP" << endl;
-"end"                   cout << "TK_END" << endl; 
-"for"                   cout << "TK_FOR" << endl; 
-"if"                    cout << "TK_IF" << endl;
-"then"                  cout << "TK_THEN" << endl;
-"else"                  cout << "TK_ELSE" << endl;
-"in"                    cout << "TK_IN" << endl;
-"reverse"               cout << "TK_REVERSE" << endl;
-"true"                  cout << "TK_TRUE" << endl;
-"false"                 cout << "TK_FALSE" << endl;
-":="                    cout << "TK_ASSIGN" << endl;
-"="                     cout << "TK_CEQ" << endl; 
-"/="                    cout << "TK_CNEQ" << endl;
-"<"                     cout << "TK_CLT" << endl; 
-"<="                    cout << "TK_CLE" << endl; 
-">"                     cout << "TK_CGT" << endl; 
-">="                    cout << "TK_CGE" << endl; 
-"("                     cout << "TK_LPAREN" << endl;
-")"                     cout << "TK_RPAREN" << endl;
-"["                     cout << "TK_LSQBRK" << endl;
-"]"                     cout << "TK_RSQBRK" << endl;
-"'"                     cout << "TK_SQUOT" << endl;
-"."                     cout << "TK_DOT" << endl; 
-","                     cout << "TK_COMMA" << endl;
-":"                     cout << "TK_COLON" << endl;
-";"                     cout << "TK_SCOLON" << endl;
-".."                    cout << "TK_DDOT" << endl;
-"+"                     cout << "TK_PLUS" << endl;
-"-"                     cout << "TK_MINUS" << endl;
-"*"                     cout << "TK_MUL" << endl; 
-"/"                     cout << "TK_DIV" << endl; 
-"%"                     cout << "TK_MOD" << endl; 
-"**"                    cout << "TK_POW" << endl; 
-"and"                   cout << "TK_AND" << endl; 
-"or"                    cout << "TK_OR" << endl; 
-"xor"                   cout << "TK_XOR" << endl;
-[a-zA-Z_][a-zA-Z0-9_]*  cout << "TK_IDENTIFIER" << endl; 
-[0-9]+\.[0-9]+          cout << "TK_DOUBLE_LITERAL" << endl; 
-[0-9]+                  cout << "TK_INTEGER_LITERAL" << endl; 
-'.'                     cout << "TK_CHARACTER_LITERAL" << endl; 
-.                       cout << "Unknown lexeme: " << yytext << endl;
+[ \t]                    ;
+[\n]                    cout << endl;
+"var"                   cout << "TK_VAR" << " "; 
+"type"                  cout << "TK_TYPE" << " ";
+"integer"               cout << "TK_INT" << " "; 
+"real"                  cout << "TK_DOUBLE" << " ";
+"boolean"               cout << "TK_BOOL" << " ";
+"char"                  cout << "TK_CHAR" << " ";
+"array"                 cout << "TK_ARRAY" << " ";
+"record"                cout << "TK_RECORD" << " ";
+"routine"               cout << "TK_ROUTINE" << " ";
+"return"                cout << "TK_RETURN" << " ";
+"is"                    cout << "TK_IS" << " ";
+"not"                   cout << "TK_NOT" << " "; 
+"while"                 cout << "TK_WHILE" << " ";
+"loop"		        	cout << "TK_LOOP" << " ";
+"end"                   cout << "TK_END" << " "; 
+"for"                   cout << "TK_FOR" << " "; 
+"if"                    cout << "TK_IF" << " ";
+"then"                  cout << "TK_THEN" << " ";
+"else"                  cout << "TK_ELSE" << " ";
+"in"                    cout << "TK_IN" << " ";
+"reverse"               cout << "TK_REVERSE" << " ";
+"true"                  cout << "TK_TRUE" << " ";
+"false"                 cout << "TK_FALSE" << " ";
+"print"                 cout << "TK_PRINT" << " ";
+":="                    cout << "TK_ASSIGN" << " ";
+"="                     cout << "TK_CEQ" << " "; 
+"/="                    cout << "TK_CNEQ" << " ";
+"<"                     cout << "TK_CLT" << " "; 
+"<="                    cout << "TK_CLE" << " "; 
+">"                     cout << "TK_CGT" << " "; 
+">="                    cout << "TK_CGE" << " "; 
+"("                     cout << "TK_LPAREN" << " ";
+")"                     cout << "TK_RPAREN" << " ";
+"["                     cout << "TK_LSQBRK" << " ";
+"]"                     cout << "TK_RSQBRK" << " ";
+"'"                     cout << "TK_SQUOT" << " ";
+"."                     cout << "TK_DOT" << " "; 
+","                     cout << "TK_COMMA" << " ";
+":"                     cout << "TK_COLON" << " ";
+";"                     cout << "TK_SCOLON" << " ";
+".."                    cout << "TK_DDOT" << " ";
+"+"                     cout << "TK_PLUS" << " ";
+"-"                     cout << "TK_MINUS" << " ";
+"*"                     cout << "TK_MUL" << " "; 
+"/"                     cout << "TK_DIV" << " "; 
+"%"                     cout << "TK_MOD" << " "; 
+"**"                    cout << "TK_POW" << " "; 
+"and"                   cout << "TK_AND" << " "; 
+"or"                    cout << "TK_OR" << " "; 
+"xor"                   cout << "TK_XOR" << " ";
+[a-zA-Z_][a-zA-Z0-9_]*  cout << "TK_IDENTIFIER" << " "; 
+[0-9]+\.[0-9]+          cout << "TK_DOUBLE_LITERAL" << " "; 
+[0-9]+                  cout << "TK_INTEGER_LITERAL" << " "; 
+'.'                     cout << "TK_CHARACTER_LITERAL" << " "; 
+.                       cout << "LEXICAL ERROR: INVALID PARAMETER" << yytext << " ";
 %%
 
 int main(int argc, char** argv) {
