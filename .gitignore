@@ -5,5 +5,4 @@ tokens.cpp
 parser
 *.o
 lexer.cpp
-lexer.out
 output
