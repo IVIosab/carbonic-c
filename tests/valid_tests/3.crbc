@@ -2,9 +2,9 @@ type int is integer;
 routine main () : int is
    var x : int is (7 + 9);
    if (x > 9) then
-        print("X is bigger than 9");
+        print('X is bigger than 9');
     else
-        print("X is not bigger than 9");
+        print('X is not bigger than 9');
     end
    return 0;
 end
