@@ -1,11 +1,12 @@
 # Carbonic-C Grammar
  A brief overview of the language specifications
 
-
+# Program start
+Program automatically starts from main, unless another routine was specified to start with. Carbonic-C supports starting from any routine as well as some global statements (not specified in routines). Global statments are limited to declerations and would not support loops, if conditions, or print statments.
 
 ## Formal grammar
-**Program :**  {SimpleDeclaration | RoutineDecleration}
-**SimpleDecleration :** {VariableDecleration| TypeDecleration}
+**Program :**  SimpleDeclaration | RoutineDecleration
+**SimpleDecleration :** VariableDecleration | TypeDecleration
 **VariableDeclaration :**
 ```
 var Identifier : Type [ is Expression ]
@@ -47,13 +48,13 @@ record { VariableDeclaration } end
 ```
 array [ Expression ] Type
 ```
-**Body : ** { SimpleDeclaration | Statement }
+**Body : **  SimpleDeclaration | Statement
 **Statement :**
 > Assignment
 RoutineCall
 WhileLoop
 ForLoop
-/* ForeachLoop*/
+ForeachLoop
 IfStatement
 
 **Assignment :**
@@ -82,11 +83,14 @@ end
 ```
 in [ reverse ] Expression .. Expression
 ```
-/*
-ForeachLoop : foreach Identifier from ModifiablePrimary loop
+
+**ForeachLoop :** 
+```
+foreach Identifier from ModifiablePrimary loop
  Body
  end
-*/
+```
+
 **IfStatement :**
 ```
 if Expression
@@ -111,7 +115,7 @@ __Summand :__ Primary | ( Expression )
 
 ## Collaboration
 - Asem Abdelhady
-- Jaafar Totanji
+- Jaffar Totanji
 - Menna Awadallah
 - Mosab Mohamed
 ## Code example:
@@ -121,9 +125,9 @@ type int is integer;
 routine main () : int is
  var x : int is (7 + 9);
  if (x >= 9) then
-  print("x is bigger than 9\n");
+  print('x is bigger than 9\n');
  else
-  print("x is not bigger than 9\n");
+  print('x is not bigger than 9\n');
  end
 end
 ```
