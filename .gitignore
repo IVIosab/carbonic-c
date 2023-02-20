@@ -4,3 +4,5 @@ parser.hpp
 tokens.cpp
 parser
 *.o
+lexer.cpp
+output
