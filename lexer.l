@@ -21,6 +21,8 @@ enum token_type {
     TK_LOOP,
     TK_END,
     TK_FOR,
+    TK_FOREACH,
+    TK_FROM,
     TK_IF,
     TK_THEN,
     TK_ELSE,
@@ -103,6 +105,8 @@ Token newToken(token_type type, string value) {
 "loop"		        	cout << "TK_LOOP" << " ";
 "end"                   cout << "TK_END" << " "; 
 "for"                   cout << "TK_FOR" << " "; 
+"foreach"               cout << "TK_FOREACH" << " ";
+"from"                  cout << "TK_FROM" << " ";
 "if"                    cout << "TK_IF" << " ";
 "then"                  cout << "TK_THEN" << " ";
 "else"                  cout << "TK_ELSE" << " ";
@@ -122,6 +126,8 @@ Token newToken(token_type type, string value) {
 ")"                     cout << "TK_RPAREN" << " ";
 "["                     cout << "TK_LSQBRK" << " ";
 "]"                     cout << "TK_RSQBRK" << " ";
+"{"                     cout << "TK_LBRACK" << " ";
+"}"                     cout << "TK_RBRACK" << " ";
 "'"                     cout << "TK_SQUOT" << " ";
 "."                     cout << "TK_DOT" << " "; 
 ","                     cout << "TK_COMMA" << " ";
