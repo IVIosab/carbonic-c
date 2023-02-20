@@ -1,7 +1,7 @@
 %{
 #include <string>
-#include "node.h" // TODO: add when we start using bison
-#include "parser.hpp" //TODO: add for bison
+// #include "node.h" // TODO: add when we start using bison
+// #include "parser.hpp" //TODO: add for bison
 #define SAVE_TOKEN yylval.string = new std::string(yytext, yyleng)
 #define TOKEN(t) (yylval.token = t)
 extern "C" int yywrap() { }
@@ -32,11 +32,6 @@ extern "C" int yywrap() { }
 "else"                  return TOKEN(TK_ELSE);
 "in"                    return TOKEN(TK_IN);
 "reverse"               return TOKEN(TK_REVERSE);
-
-[a-zA-Z_][a-zA-Z0-9_]*  SAVE_TOKEN; return (TK_IDENTIFIER);
-[0-9]+.[0-9]*           SAVE_TOKEN; return (TK_DOUBLE);
-[0-9]+                  SAVE_TOKEN; return (TK_INTEGER);
-[ -~]                   SAVE_TOKEN; return(TK_CHARACTER);
 "true"                  return TOKEN(TK_TRUE);
 "false"                 return TOKEN(TK_FALSE);
 ":="                    return TOKEN(TK_ASSIGN);
@@ -64,9 +59,13 @@ extern "C" int yywrap() { }
 "/"                     return TOKEN(TK_DIV);
 "%"                     return TOKEN(TK_MOD);
 "^"                     return TOKEN(TK_POW);
-"and" return TOKEN(TK_AND);
-"or" return TOKEN(TK_OR);
-"XOR" return(TK_XOR);
+"and"                   return TOKEN(TK_AND);
+"or"                    return TOKEN(TK_OR);
+"XOR"                   return(TK_XOR);
+[a-zA-Z_][a-zA-Z0-9_]*  SAVE_TOKEN; return (TK_IDENTIFIER);
+[0-9]+.[0-9]*           SAVE_TOKEN; return (TK_DOUBLE);
+[0-9]+                  SAVE_TOKEN; return (TK_INTEGER);
+[ -~]                   SAVE_TOKEN; return(TK_CHARACTER);
 .                       printf("Unknown token!n"); yyterminate();
 
 %%
