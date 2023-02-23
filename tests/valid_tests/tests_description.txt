@@ -5,6 +5,5 @@
 3. If else condition was added in addition to 2.
 4. For loop was added in addition to 3.
 5. While loop replaced the for loop in 4 and variable assignment was added.
-6. For each will replace the while loop in 5.
 7. Simple record decleration with printing its content and performing arithmetic operations on them.
 8. Simple array decleration that uses for loop to print its content. 
