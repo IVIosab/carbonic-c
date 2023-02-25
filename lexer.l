@@ -28,6 +28,7 @@ enum token_type {
     TK_ELSE,
     TK_IN,
     TK_REVERSE,
+    TK_STRING_LITERAL,
     TK_IDENTIFIER,
     TK_DOUBLE_LITERAL,
     TK_INTEGER_LITERAL,
@@ -128,7 +129,6 @@ Token newToken(token_type type, string value) {
 "]"                     cout << "TK_RSQBRK" << " ";
 "{"                     cout << "TK_LBRACK" << " ";
 "}"                     cout << "TK_RBRACK" << " ";
-"'"                     cout << "TK_SQUOT" << " ";
 "."                     cout << "TK_DOT" << " "; 
 ","                     cout << "TK_COMMA" << " ";
 ":"                     cout << "TK_COLON" << " ";
@@ -144,7 +144,10 @@ Token newToken(token_type type, string value) {
 "and"                   cout << "TK_AND" << " "; 
 "or"                    cout << "TK_OR" << " "; 
 "xor"                   cout << "TK_XOR" << " ";
-[a-zA-Z_][a-zA-Z0-9_]*  cout << "TK_IDENTIFIER" << " "; 
+\"([^\\\"]|\\.)*\"      cout << "TK_STRING_LITERAL" << " "; /*TODO: new_token*/
+\'([^\\\"]|\\.)*\'      cout << "TK_STRING_LITERAL" << " "; /*TODO: new_token*/
+\/\/(.*)                cout << "TK_COMMENT" << " "; /*TODO: will ignore and do nothing*/
+[a-zA-Z_][a-zA-Z0-9_]*  cout << "TK_IDENTIFIER" << " ";   /*TODO: new_token*/
 [0-9]+\.[0-9]+          cout << "TK_DOUBLE_LITERAL" << " "; 
 [0-9]+                  cout << "TK_INTEGER_LITERAL" << " "; 
 '.'                     cout << "TK_CHARACTER_LITERAL" << " "; 
