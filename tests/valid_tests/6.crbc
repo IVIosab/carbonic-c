@@ -2,7 +2,7 @@ type int is integer;
 routine main () : int is
     var a : array [6] int is [1, 2, 3, 4, 5, 6];
     // please note that i value is read only and not modifable
-    for each i from a:
+    foreach i from a:
     loop
         if (i >= 3) then
             print("I is bigger than or equal 3\n");
