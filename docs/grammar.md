@@ -48,7 +48,7 @@ record { VariableDeclaration } end
 ```
 array [ Expression ] Type
 ```
-**Body : **  SimpleDeclaration | Statement
+**Body :**  SimpleDeclaration | Statement
 **Statement :**
 > Assignment
 RoutineCall
@@ -61,7 +61,7 @@ IfStatement
 ```
 ModifiablePrimary := Expression
 ```
-**RoutineCall : **
+**RoutineCall :**
 ```
 Identifier [ ( Expression { , Expression } ) ]
 ```
@@ -72,7 +72,7 @@ loop
 Body
 end
 ```
-**ForLoop : **
+**ForLoop :**
 ```
 for Identifier Range
 loop
@@ -119,7 +119,7 @@ __Summand :__ Primary | ( Expression )
 - Menna Awadallah
 - Mosab Mohamed
 ## Code example:
-
+PS: 
 ```
 type int is integer;
 routine main () : int is
