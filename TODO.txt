@@ -1,0 +1,3 @@
+1- Complete lexer.h to have our namespace(carbonic_c) and our own flexlexer (Lexer)
+2- Update lexer.l to use our flexlexer (Lexer)
+3- Complete the parser.y
