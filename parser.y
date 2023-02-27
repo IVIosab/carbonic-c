@@ -7,6 +7,9 @@ using namespace std;
 %}
 %union{
     //define the AST here later on
+    string stringLtrl;
+    double doubleLtrl;
+    long long int intLtrl;
 }
 %token TK_VAR TK_TYPE
 %token TK_INT TK_DOUBLE TK_BOOL TK_CHAR TK_ARRAY TK_RECORD TK_ROUTINE TK_IS TK_NOT
@@ -26,12 +29,10 @@ using namespace std;
 %left '*' '/'
 %right '^'
 
-/*
-TODO: uncomment when you define types later on
-%type <string> TK_IDENTIFIER TK_STRING_LITERAL
-%type <long long int> TK_INTEGER_LITERAL
-%type <double> TK_DOUBLE_LITERAL
-*/
+%type <stringLtrl> TK_IDENTIFIER TK_STRING_LITERAL
+%type <intLtrl> TK_INTEGER_LITERAL
+%type <doubleLtrl> TK_DOUBLE_LITERAL
+
 %define api.namespace { carbonic_c }
 %code requires
 {

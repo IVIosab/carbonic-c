@@ -1,13 +1,9 @@
-<<<<<<< HEAD
 #ifndef LEXER_H
 #define LEXER_H
 
 #ifndef yyFlexLexerOnce
 // #undef yyFlexLexer
 // #define yyFlexLexer carbonic_c_FlexLexer
-=======
-#define LEXER_H
->>>>>>> 203c240 (preliminary organization for parser)
 #include <FlexLexer.h>
 #endif
 
@@ -15,7 +11,6 @@
 #undef YY_DECL
 #define YY_DECL carbonic_c::Parser::symbol_type carbonic_c::Lexer::get_next_token()
 //#include "parser.hpp"
-
 // Define token types
 enum token_type {
     TK_VAR,
@@ -81,10 +76,27 @@ enum token_type {
 };
 
 struct variableNames{
-    char* name;
+    std::string name;
     struct variableNames* next;
 };
 typedef struct variableNames variableNames;
+variableNames* variableTable = (variableNames *)0;
+variableNames* addVariable(std::string newId){
+    variableNames* newNode;
+    newNode = (variableNames *) malloc(sizeof(variableNames));
+    newNode->name = newId;
+    newNode->next = (variableNames *) variableTable;
+    variableTable = newNode;
+    return newNode;
+}
+variableNames* getVariable(std::string id){
+    variableNames* currentNode = variableTable;
+    do{
+        if(currentNode->name == id){
+            return currentNode;
+        }
+        currentNode = (variableNames*) currentNode->next;
+    }while(currentNode != (variableNames*)0);
 
 #include "parser.hpp"
 #include <fstream>
