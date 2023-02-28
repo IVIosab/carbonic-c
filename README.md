@@ -17,6 +17,14 @@ To compile the lexer an run the tests, run the following in your terminal:
     make test
     make clean
 
-## Dependencies:
-- `flex` **2.6.4**
-- `g++` **11.3.0**
+## Linux:
+- Unix:
+    - `flex` **2.6.4**
+    - `g++` **11.2.0**
+    - `make` **4.3**
+
+    Installing dependencies:
+
+        sudo apt install make=4.3-4.1build1
+        sudo apt install flex=2.6.4-8build2
+        sudo apt install g++=4:11.2.0-1ubuntu1
