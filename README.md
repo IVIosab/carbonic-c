@@ -18,7 +18,7 @@ To compile the lexer an run the tests, run the following in your terminal:
     make clean
 
 ## Linux:
-- Unix:
+- Linux:
     - `flex` **2.6.4**
     - `g++` **11.2.0**
     - `make` **4.3**
