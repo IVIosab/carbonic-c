@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include "lexer.h"
+#include <identifierTable.h>
 using namespace std;
 %}
 %union{
@@ -47,8 +48,52 @@ using namespace std;
 %start program
 %%
 //TODO: Grammar rules and actions
+PROGRAM:
+    SIMPLE_DECLERATION |
+    ROUTINE_DECLERATION ;
+SIMPLE_DECLERATION: 
+    VARIABLE_DECLERATION |
+    TYPE_DECLERATION;
+ROUTINE_DECLERATION:
+    TK_ROUTINE TK_IDENTIFIER TK_LPAREN PARAMETERS TK_RPAREN TK_COLON TYPE TK_IS BODY TK_END |
+    TK_ROUTINE TK_IDENTIFIER TK_LPAREN PARAMETERS TK_RPAREN TK_IS BODY TK_END ;
+PARAMETER: 
+    TK_IDENTIFIER TK_IS TYPE {}|
+    TK_IDENTIFIER TK_IS TYPE TK_COMMA PARAMETER{};
+PARAMETERS:
+    %empty |
+    PARAMETER;
+ BODY:
+    VARIABLE_DECLERATION |
+    STATEMENT;
+STATEMENT:
+    ;
+VARIABLE_DECLERATION: 
+    TK_VAR TK_IDENTIFIER TK_IS EXPRESSION {}|
+    TK_VAR TK_IDENTIFIER TK_COLON TYPE TK_IS EXPRESSION {}; 
+TYPE_DECLERATION: 
+    TK_TYPE TK_IDENTIFIER TK_IS PRIMITIVE_TYPE TK_SCOLON {}; // primitive type or also previously defined types too?
+TYPE:
+    PRIMITIVE_TYPE | 
+    ARRAY_TYPE |
+    RECORD_TYPE |
+    TK_IDENTIFIER {};
+PRIMITIVE_TYPE:
+    TK_INT {} |
+    TK_DOUBLE {} |
+    TK_BOOL {} |
+    TK_CHAR {};
+ARRAY_TYPE:
+    TK_ARRAY TK_LSQBRK EXPRESSION TK_RSQBRK PRIMITIVE_TYPE {};
+RECORD_TYPE:
+    TK_RECORD TK_LBRACK VARIABLE_DECLERATIONS TK_RBRACK {};
+EXPRESSION: {};
+VARIABLE_DECLERATIONS: {};
+
+
 %%
 // C++ functions
+
 // Called by yyparser when errors are faced.
 void yyerror(string error_message){
     cout << "PARSING ERROR: " << error_message << '\n';
