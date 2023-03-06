@@ -1,6 +1,11 @@
+%option noyywrap c++
+%option yyclass="Lexer"
 %{
 #include <string>
 #include <iostream>
+#include "lexer.h"
+#include "driver.hpp"
+#include "parser.hpp"
 using namespace std;
 
 // Define token types
@@ -81,10 +86,9 @@ Token newToken(token_type type, string value) {
     return t;
 }
 
- FlexLexer *lexer = new yyFlexLexer;
+ //FlexLexer *lexer = new yyFlexLexer;
 
 %}
-%option noyywrap c++
 
 %%
 
@@ -149,13 +153,9 @@ Token newToken(token_type type, string value) {
 \/\/(.*)                cout << "TK_COMMENT" << " "; /*TODO: will ignore and do nothing*/
 [a-zA-Z_][a-zA-Z0-9_]*  cout << "TK_IDENTIFIER" << " ";   /*TODO: new_token*/
 [0-9]+\.[0-9]+          cout << "TK_DOUBLE_LITERAL" << " "; 
-[0-9]+                  cout << "TK_INTEGER_LITERAL" << " "; 
+[0-9]+                  {cout << "TK_INTEGER_LITERAL" << " "; return carbonic_c::Parser::make_TK_INTEGER_LITERAL(atoi(yytext));} 
 '.'                     cout << "TK_CHARACTER_LITERAL" << " "; 
 .                       cout << "LEXICAL ERROR: INVALID PARAMETER FOR THE LEXEME -> " << yytext << " ";
 %%
 
-int main(int argc, char** argv) {
-    while (lexer->yylex() != 0)
-    return 0;
-}
 

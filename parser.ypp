@@ -1,0 +1,55 @@
+%language "C++"
+%skeleton "lalr1.cc"
+%require "3.2"
+
+%define api.value.type variant
+%define api.token.constructor
+%define parse.assert
+%define api.parser.class { Parser }
+%define api.namespace    { carbonic_c }
+
+%lex-param   { carbonic_c::Lexer &lexer }
+%lex-param   { carbonic_c::Driver &driver }
+%parse-param { carbonic_c::Lexer &lexer }
+%parse-param { carbonic_c::Driver &driver }
+
+%token TK_INTEGER_LITERAL 
+
+
+%type <long long> TK_INTEGER_LITERAL
+
+%code requires {
+    #include <iostream>
+    #include <string>
+    #include <vector>
+
+    namespace carbonic_c {
+    class Lexer;
+    class Driver;
+    }
+}
+
+%code top {
+    #include "lexer.h"
+    #include "driver.hpp"
+
+    static carbonic_c::Parser::symbol_type yylex( carbonic_c::Lexer &lexer , carbonic_c::Driver &driver) {
+        return lexer.get_next_token();
+    }
+
+
+    
+    // ast::node_ptr<ast::Program> program = std::make_shared<ast::Program>();  // Points to the whole program node.
+}
+
+
+%start Expression_P
+
+%%
+Expression_P: %empty
+| TK_INTEGER_LITERAL{std::cout<<$1;};
+%%
+
+void carbonic_c::Parser::error(const std::string& msg) {
+    std::cerr << msg << '\n';
+}
