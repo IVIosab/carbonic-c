@@ -36,9 +36,6 @@
     static carbonic_c::Parser::symbol_type yylex( carbonic_c::Lexer &lexer , carbonic_c::Driver &driver) {
         return lexer.get_next_token();
     }
-
-
-    
     // ast::node_ptr<ast::Program> program = std::make_shared<ast::Program>();  // Points to the whole program node.
 }
 
