@@ -1,18 +1,18 @@
 #include "driver.hpp"
 
-namespace carbonic_c
+namespace carbonic_c //wtf is this ?
 {
 
-    Driver::Driver() : lexer(*this), parser(lexer, *this) {}
+    Driver::Driver() : lexer(*this), parser(lexer, *this) {} //wtf is this ?
 
-    int Driver::parse_program()
+    int Driver::parse_program() //wtf is this ?
     {
-        return parser.parse();
+        return parser.parse(); //wtf is this ?
     }
 
-    void Driver::readFrom(std::istream *is)
+    void Driver::readFrom(std::istream *is) //wtf is this ?
     {
-        lexer.switch_streams(is, nullptr);
+        lexer.switch_streams(is, nullptr); //wtf is this ?
     }
 
     // int Driver::parse_args(int argc, char **argv)

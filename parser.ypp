@@ -1,24 +1,49 @@
 %language "C++"
-%skeleton "lalr1.cc"
-%require "3.2"
+%skeleton "lalr1.cc" //wtf is this?
+%require "3.2" //3.2 for what? 
 
-%define api.value.type variant
-%define api.token.constructor
-%define parse.assert
-%define api.parser.class { Parser }
-%define api.namespace    { carbonic_c }
+%define api.value.type variant //wtf is this?
+%define api.token.constructor //wtf is this? 
+%define parse.assert //wtf is this ? 
+%define api.parser.class { Parser } //wtf is this ?
+%define api.namespace    { carbonic_c } //wtf is this ?
 
-%lex-param   { carbonic_c::Lexer &lexer }
-%lex-param   { carbonic_c::Driver &driver }
-%parse-param { carbonic_c::Lexer &lexer }
-%parse-param { carbonic_c::Driver &driver }
+%lex-param   { carbonic_c::Lexer &lexer } //wtf is this ?
+%lex-param   { carbonic_c::Driver &driver } //wtf is this ?
+%parse-param { carbonic_c::Lexer &lexer } //wtf is this ?
+%parse-param { carbonic_c::Driver &driver } //wtf is this ?
 
-%token TK_INTEGER_LITERAL 
+%token TK_VAR TK_TYPE
+%token TK_INT TK_DOUBLE TK_BOOL TK_CHAR TK_ARRAY TK_RECORD TK_ROUTINE TK_IS TK_NOT
+%token TK_WHILE TK_LOOP TK_END TK_FOR TK_FOREACH TK_FROM TK_RETURN
+%token TK_IF TK_THEN TK_ELSE TK_IN TK_REVERSE 
+%token TK_IDENTIFIER TK_ASSIGN
+%token TK_STRING_LITERAL TK_DOUBLE_LITERAL,TK_INTEGER_LITERAL TK_CHARACTER_LITERAL TK_TRUE TK_FALSE
+%token TK_PRINT
+%token TK_CEQ TK_CNEQ TK_CLT TK_CLE TK_CGT TK_CGE
+%token TK_LPAREN TK_RPAREN TK_LBRACK TK_RBRACK TK_LSQBRK TK_RSQBRK 
+%token TK_SQUOT TK_DOT TK_COMMA TK_COLON TK_SCOLON TK_DDOT
+%token TK_PLUS TK_MINUS TK_MUL TK_DIV
+%token TK_NEWLINE
+%token TK_MOD TK_POW TK_AND TK_OR TK_XOR
+%right '='
+%left '+' '-'
+%left '*' '/'
+%right '^'
 
+%union{
+    //define the AST here later on 
+    //Why ? 
+    string stringLtrl;
+    double doubleLtrl;
+    long long int intLtrl;
+}
 
-%type <long long> TK_INTEGER_LITERAL
+%type <long long> TK_INTEGER_LITERAL //wtf is this ?
+%type <stringLtrl> TK_IDENTIFIER TK_STRING_LITERAL // let's stick to one representation either this or the one above
+%type <doubleLtrl> TK_DOUBLE_LITERAL // same here
 
-%code requires {
+%code requires { //wtf is this ?
     #include <iostream>
     #include <string>
     #include <vector>
@@ -29,7 +54,7 @@
     }
 }
 
-%code top {
+%code top { //wtf is this ?
     #include "lexer.h"
     #include "driver.hpp"
 
@@ -40,13 +65,69 @@
 }
 
 
-%start Expression_P
-
-%%
-Expression_P: %empty
-| TK_INTEGER_LITERAL{std::cout<<$1;};
+%start PROGRAM
 %%
 
-void carbonic_c::Parser::error(const std::string& msg) {
+PROGRAM:
+    SIMPLE_DECLERATION |
+    ROUTINE_DECLERATION ;
+
+SIMPLE_DECLERATION: 
+    VARIABLE_DECLERATION |
+    TYPE_DECLERATION;
+
+ROUTINE_DECLERATION:
+    TK_ROUTINE TK_IDENTIFIER TK_LPAREN PARAMETERS TK_RPAREN TK_COLON TYPE TK_IS BODY TK_END |
+    TK_ROUTINE TK_IDENTIFIER TK_LPAREN PARAMETERS TK_RPAREN TK_IS BODY TK_END ;
+
+PARAMETERS:
+    TK_LPAREN TK_RPAREN|
+    TK_LPAREN PARAMETERLIST TK_RPAREN;
+
+PARAMETERLIST:
+    PARAMETER|
+    PARAMETERLIST TK_COMMA PARAMETER{};
+
+PARAMETER:
+    TK_IDENTIFIER TK_IS TYPE;
+
+BODY:
+    VARIABLE_DECLERATION |
+    STATEMENT;
+STATEMENT:
+    ;
+
+VARIABLE_DECLERATION: 
+    TK_VAR TK_IDENTIFIER TK_IS EXPRESSION {}|
+    TK_VAR TK_IDENTIFIER TK_COLON TYPE TK_IS EXPRESSION {}; 
+
+TYPE_DECLERATION: 
+    TK_TYPE TK_IDENTIFIER TK_IS PRIMITIVE_TYPE TK_SCOLON {}; // primitive type or also previously defined types too?
+
+TYPE:
+    PRIMITIVE_TYPE | 
+    ARRAY_TYPE |
+    RECORD_TYPE |
+    TK_IDENTIFIER {};
+
+PRIMITIVE_TYPE:
+    TK_INT {} |
+    TK_DOUBLE {} |
+    TK_BOOL {} |
+    TK_CHAR {};
+
+ARRAY_TYPE:
+    TK_ARRAY TK_LSQBRK EXPRESSION TK_RSQBRK PRIMITIVE_TYPE {};
+
+RECORD_TYPE:
+    TK_RECORD TK_LBRACK VARIABLE_DECLERATIONS TK_RBRACK {};
+
+EXPRESSION: {};
+
+VARIABLE_DECLERATIONS: {};
+
+%%
+
+void carbonic_c::Parser::error(const std::string& msg) { //wtf is this ?
     std::cerr << msg << '\n';
 }

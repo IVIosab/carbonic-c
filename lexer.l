@@ -1,15 +1,15 @@
-%option noyywrap c++
-%option yyclass="Lexer"
+%option noyywrap c++ /*???*/
+%option yyclass="Lexer" /*???*/
 %{
-#include <string>
-#include <iostream>
-#include "lexer.h"
-#include "driver.hpp"
-#include "parser.hpp"
-using namespace std;
+#include <string> /*???*/
+#include <iostream> /*???*/
+#include "lexer.h" /*???*/
+#include "driver.hpp" /*???*/
+#include "parser.hpp" /*???*/
+using namespace std; /*???*/
 
 // Define token types
-enum token_type {
+enum token_type { 
     TK_VAR,
     TK_TYPE,
     TK_INT,
@@ -73,27 +73,27 @@ enum token_type {
 };
 
 // Define token struct
-struct Token {
-    token_type type;
-    string value;
+struct Token { /*???*/
+    token_type type; /*???*/
+    string value; /*???*/
 };
 
 // Function to create a new Token struct
-Token newToken(token_type type, string value) {
-    Token t;
-    t.type = type;
-    t.value = value;
-    return t;
+Token newToken(token_type type, string value) { /*???*/
+    Token t; /*???*/
+    t.type = type; /*???*/
+    t.value = value; /*???*/
+    return t; /*???*/
 }
 
  //FlexLexer *lexer = new yyFlexLexer;
-
+ /*???*/
 %}
 
 %%
 
-[ \t]                    ;
-[\n]                    cout << endl;
+[ \t]                    ; /*???*/
+[\n]                    cout << endl; 
 "var"                   cout << "TK_VAR" << " "; 
 "type"                  cout << "TK_TYPE" << " ";
 "integer"               cout << "TK_INT" << " "; 
@@ -148,14 +148,14 @@ Token newToken(token_type type, string value) {
 "and"                   cout << "TK_AND" << " "; 
 "or"                    cout << "TK_OR" << " "; 
 "xor"                   cout << "TK_XOR" << " ";
-\"([^\\\"]|\\.)*\"      cout << "TK_STRING_LITERAL" << " "; /*TODO: new_token*/
-\'([^\\\"]|\\.)*\'      cout << "TK_STRING_LITERAL" << " "; /*TODO: new_token*/
+\"([^\\\"]|\\.)*\"      cout << "TK_STRING_LITERAL" << " "; /*TODO: new_token*/ /*???*/
+\'([^\\\"]|\\.)*\'      cout << "TK_STRING_LITERAL" << " "; /*TODO: new_token*/ /*???*/
 \/\/(.*)                cout << "TK_COMMENT" << " "; /*TODO: will ignore and do nothing*/
 [a-zA-Z_][a-zA-Z0-9_]*  cout << "TK_IDENTIFIER" << " ";   /*TODO: new_token*/
 [0-9]+\.[0-9]+          cout << "TK_DOUBLE_LITERAL" << " "; 
 [0-9]+                  {cout << "TK_INTEGER_LITERAL" << " "; return carbonic_c::Parser::make_TK_INTEGER_LITERAL(atoi(yytext));} 
-'.'                     cout << "TK_CHARACTER_LITERAL" << " "; 
-.                       cout << "LEXICAL ERROR: INVALID PARAMETER FOR THE LEXEME -> " << yytext << " ";
+'.'                     cout << "TK_CHARACTER_LITERAL" << " ";  /*???*/
+.                       cout << "LEXICAL ERROR: INVALID PARAMETER FOR THE LEXEME -> " << yytext << " "; /*???*/
 %%
 
 

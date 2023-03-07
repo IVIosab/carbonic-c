@@ -1,13 +1,25 @@
+# Stages 
 lexer: 
 	flex -o lexer.cpp -i lexer.l
-test: 
-	bash tests.sh
 parser:
 	bison -d parser.ypp -o parser.cpp
-test_parser:
+
+# Full execution
+full_lexer:
+	flex -o lexer.cpp -i lexer.l
+	g++ lexer.cpp -o lexer.out
+full_parser:
 	flex -o lexer.cpp -i lexer.l
 	bison -d parser.ypp -o parser.cpp
-	g++ -g main.cpp lexer.cpp parser.cpp driver.cpp -o a.out
-	./a.out < ./test.crbc
+	g++ -g main.cpp lexer.cpp parser.cpp driver.cpp -o output.out
+    ./output.out < ./test.crbc #remove later
+
+# Tests 
+test_lexer: 
+	bash test_lexer.sh
+test_parser:
+	bash test_parser.sh
+
+# Cleaning
 clean:
-	rm lexer.out lexer.cpp
+	rm lexer.cpp parser.cpp parser.hpp output.out

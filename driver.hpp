@@ -6,29 +6,29 @@
 #include "lexer.h"
 #include "parser.hpp"
 
-namespace carbonic_c
+namespace carbonic_c //wtf is this ?
 {
-    class Driver
+    class Driver //wtf is this ?
     {
-    public:
-        Driver();
+    public: //wtf is this ?
+        Driver(); //wtf is this ?
 
-        friend class Parser;
-        friend class Lexer;
+        friend class Parser; //wtf is this ?
+        friend class Lexer; //wtf is this ?
 
-        bool debug = false;
-        std::ifstream infile;
-        std::string outfile = "a.out";
+        bool debug = false; //wtf is this ?
+        std::ifstream infile; //wtf is this ?
+        std::string outfile = "output.out"; //wtf is this ?
 
-        int parse_program();
-        int parse_args(int argc, char **argv);
-        int print_ast();
-        void readFrom(std::istream *is);
-        void show_help();
+        int parse_program(); //wtf is this ?
+        int parse_args(int argc, char **argv); //wtf is this ?
+        int print_ast(); //wtf is this ?
+        void readFrom(std::istream *is); //wtf is this ?
+        void show_help(); //wtf is this ?
 
-    private:
-        Lexer lexer;
-        Parser parser;
+    private: //wtf is this ?
+        Lexer lexer; //wtf is this ?
+        Parser parser; //wtf is this ?
     };
 } // namespace carbonic_c
 
