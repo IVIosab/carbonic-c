@@ -14,7 +14,7 @@
 %parse-param { carbonic_c::Driver &driver }
 
 %token TK_VAR TK_TYPE
-%token TK_INT TK_DOUBLE TK_BOOL TK_CHAR TK_ARRAY TK_RECORD TK_ROUTINE TK_IS TK_NOT
+%token TK_INT TK_DOUBLE TK_BOOL TK_STRING TK_CHAR TK_ARRAY TK_RECORD TK_ROUTINE TK_IS TK_NOT
 %token TK_WHILE TK_LOOP TK_END TK_FOR TK_FOREACH TK_FROM TK_RETURN
 %token TK_IF TK_THEN TK_ELSE TK_IN TK_REVERSE 
 %token TK_IDENTIFIER TK_ASSIGN
@@ -44,6 +44,7 @@
     #include <iostream>
     #include <string>
     #include <vector>
+    #include "lexer.h"
 
     namespace carbonic_c {
     class Lexer;
@@ -65,165 +66,166 @@
 %start Program
 
 %%
-Program:
+Program: //Good
     %empty |
     SimpleDeclaration Program {}| // TOOD: Check which type of recursion is better (left or right)
     RoutineDeclaration Program {}
     ;
-SimpleDeclaration: 
+SimpleDeclaration: //Good
     VariableDeclaration {}|
     TypeDeclaration {}
     ;
-RoutineDeclaration:
-    TK_ROUTINE TK_IDENTIFIER Parameters TK_COLON Type TK_IS Body TK_END {}|
-    TK_ROUTINE TK_IDENTIFIER Parameters TK_IS Body TK_END {}
+RoutineDeclaration: //Good
+    TK_ROUTINE TK_IDENTIFIER TK_LPAREN Parameters TK_RPAREN TK_COLON Type TK_IS Body TK_END {}|
+    TK_ROUTINE TK_IDENTIFIER TK_LPAREN Parameters TK_RPAREN TK_IS Body TK_END {}
     ;    
-Parameters:
-    TK_LPAREN TK_RPAREN {}|
-    TK_LPAREN ParameterList TK_RPAREN {}
-    ;
-ParameterList:
+Parameters: //Good
+    %empty {}|
     Parameter {}|
-    ParameterList TK_COMMA Parameter {}
+    Parameters TK_COMMA Parameter {}
     ;
-Parameter:
+Parameter: //Good
     TK_IDENTIFIER TK_IS Type {}
     ;
-Body:
+Body: //Good
     %empty {}|
     SimpleDeclaration Body {}|
     Statement Body {}
     ;
-Statement:
+Statement: //Okay
     Assignment {}|
     Print {}|
     IfStatement {}|
     WhileLoop {}|
     ForLoop {}|
     ForEachLoop {}|
-    RoutineCall TK_SCOLON {}|
-    ReturnStatement {}
+    RoutineCall TK_SCOLON {}| 
+    ReturnStatement {} 
     ;
-VariableDeclaration:
+VariableDeclaration: //Good
     TK_VAR TK_IDENTIFIER TK_COLON Type TK_SCOLON {}|
     TK_VAR TK_IDENTIFIER TK_COLON Type TK_IS Expression TK_SCOLON {}|
     TK_VAR TK_IDENTIFIER TK_IS Expression TK_SCOLON {}
     ; 
-TypeDeclaration: 
+TypeDeclaration: //Good
     TK_TYPE TK_IDENTIFIER TK_IS Type TK_SCOLON {}
     ;
-Type:
+Type: //Good
     PrimitiveType {}| 
     ArrayType {}|
     RecordType {}|
     TK_IDENTIFIER {}
     ;
-PrimitiveType:
+PrimitiveType: //Good 
     TK_INT {}|
     TK_DOUBLE {}|
     TK_BOOL {}|
-    TK_CHAR {}
+    TK_CHAR {}| 
+    TK_STRING {}
     ;
-ArrayType:
+ArrayType: //Good
     TK_ARRAY TK_LSQBRK Expression TK_RSQBRK Type {} // TODO: Look into nested arrays
     ;
-RecordType:
-    TK_RECORD TK_LBRACK VariableDeclarations TK_RBRACK {}
+RecordType: //Good
+    TK_RECORD VariableDeclarations TK_END {}
     ;
-VariableDeclarations: 
+VariableDeclarations: //Okay 
     VariableDeclaration {}|
     VariableDeclaration VariableDeclarations {}
     ;
-Assignment: 
+Assignment: //Good
     ModifiablePrimary TK_ASSIGN Expression TK_SCOLON {}
     ;
-Print: 
-    TK_PRINT TK_LPAREN TK_STRING_LITERAL TK_RPAREN TK_SCOLON {std::cout<<$3<<" ";}|
+Print: //Good
+    TK_PRINT TK_LPAREN TK_STRING_LITERAL TK_RPAREN TK_SCOLON {std::cout<<$3<<" ";}| 
+    TK_PRINT TK_LPAREN TK_CHARACTER_LITERAL TK_RPAREN TK_SCOLON {std::cout<<$3<<" ";}| 
+    TK_PRINT TK_LPAREN TK_NEWLINE TK_RPAREN TK_SCOLON {}|
     TK_PRINT TK_LPAREN ModifiablePrimary TK_RPAREN TK_SCOLON {}
     ;
-IfStatement: 
+IfStatement: //Good
     TK_IF Expression TK_THEN Body TK_END {}|
     TK_IF Expression TK_THEN Body TK_ELSE Body TK_END {}
     ;    
-WhileLoop: 
-   TK_WHILE Expression TK_LOOP Body TK_END {}
+WhileLoop: //Good
+    TK_WHILE Expression TK_LOOP Body TK_END {}
    ;
-ForLoop: 
+ForLoop: //Good
     TK_FOR TK_IDENTIFIER Range TK_LOOP Body TK_END {}
     ;
-Range: 
+Range: //Good 
     TK_IN Expression TK_DDOT Expression {}|
     TK_IN TK_REVERSE Expression TK_DDOT Expression {}
     ;
-ForEachLoop:
+ForEachLoop: //Okay
    TK_FOREACH TK_IDENTIFIER TK_FROM ModifiablePrimary TK_LOOP Body TK_END {}
    ;
-RoutineCall: 
-    TK_IDENTIFIER TK_LPAREN Parameter TK_RPAREN {} // Semi colon in statement no semi colon in expression
+RoutineCall: //Okay
+    TK_IDENTIFIER TK_LPAREN Parameters TK_RPAREN {} // Semi colon in statement no semi colon in expression
     ;
-ReturnStatement: 
+ReturnStatement: //Okay
     TK_RETURN Expression TK_SCOLON {}
     ;
-NestedAccess:
+NestedAccess: //...
     %empty {}|
     TK_DOT TK_IDENTIFIER NestedAccess {}|
-    TK_LSQBRK Expression TK_RBRACK NestedAccess {}
+    TK_LSQBRK Expression TK_RSQBRK NestedAccess {}
     ;
-ModifiablePrimary : 
+ModifiablePrimary : //... 
     TK_IDENTIFIER {}|
     TK_IDENTIFIER NestedAccess {}|
     ;
-Expression: 
+Expression: //Good 
     Relation {}|
     Relation TK_AND Expression {}|
     Relation TK_OR Expression {}|
     Relation TK_XOR Expression {}
     ;
-Relation: 
+Relation: //Good
     Complex {}|
     Complex TK_CEQ Complex {}|
     Complex TK_CNEQ Complex {}|
     Complex TK_CGE Complex {}|
     Complex TK_CGT Complex {}|
     Complex TK_CLT Complex {}|
-    Complex TK_CLE Complex {}|
-    Complex TK_NOT Complex {}
+    Complex TK_CLE Complex {}
     ;
-Complex:
+Complex: //Okay
     Simple {}|
     Simple TK_POW Simple {}
     ;
-Simple:
+Simple: //Good
     Factor {}|
     Factor TK_MUL Simple {}|
     Factor TK_DIV Simple {}|
     Factor TK_MOD Simple {}
     ;
-Factor:
+Factor: //Good
     Summand {}|
     Summand TK_PLUS Factor {}|
-    Summand TK_MINUS Factor {}|
-    ;
-Summand:
+    Summand TK_MINUS Factor {}
+    ; 
+Summand: //Good
     Primary {}|
-    Expression {}
-    ;
-Primary:
+    TK_LPAREN Primary {}|
+    Primary TK_RPAREN {}|
+    TK_LPAREN Primary TK_RPAREN {}
+;
+Primary: //...
     TK_TRUE {}|
     TK_FALSE {}|
     TK_INTEGER_LITERAL {std::cout<<$1<<" ";}|
-    TK_NOT TK_INTEGER_LITERAL {std::cout<<$2<<" ";}|
-    Sign TK_INTEGER_LITERAL {std::cout<<$2<<" ";}|
+    TK_NOT TK_INTEGER_LITERAL {std::cout<<$2<<" ";}| //wtf does this even mean? 
+    Sign TK_INTEGER_LITERAL {std::cout<<$2<<" ";}| //Sign token is flawed, we should either remove it and only support positive numbers or do something about it in the lexer
     Sign TK_DOUBLE_LITERAL {}|
     TK_DOUBLE_LITERAL {}|
     TK_IDENTIFIER {}|
     ModifiablePrimary {}|
     RoutineCall {}
     ;
-Sign:
+Sign: //...
     TK_PLUS {}|
     TK_MINUS {}
-    ; // TODO: add () to equations?
+    ; 
 %%
 
 void carbonic_c::Parser::error(const std::string& msg) {

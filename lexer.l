@@ -7,87 +7,6 @@
 #include "driver.hpp"
 #include "parser.hpp"
 using namespace std;
-
-// Define token types
-enum token_type {
-    TK_VAR,
-    TK_TYPE,
-    TK_INT,
-    TK_DOUBLE,
-    TK_BOOL,
-    TK_CHAR,
-    TK_ARRAY,
-    TK_RECORD,
-    TK_ROUTINE,
-    TK_RETURN,
-    TK_IS,
-    TK_NOT,
-    TK_WHILE,
-    TK_LOOP,
-    TK_END,
-    TK_FOR,
-    TK_FOREACH,
-    TK_FROM,
-    TK_IF,
-    TK_THEN,
-    TK_ELSE,
-    TK_IN,
-    TK_REVERSE,
-    TK_STRING_LITERAL,
-    TK_IDENTIFIER,
-    TK_DOUBLE_LITERAL,
-    TK_INTEGER_LITERAL,
-    TK_CHARACTER_LITERAL,
-    TK_TRUE,
-    TK_FALSE,
-    TK_PRINT,
-    TK_ASSIGN,
-    TK_CEQ,
-    TK_CNEQ,
-    TK_CLT,
-    TK_CLE,
-    TK_CGT,
-    TK_CGE,
-    TK_LPAREN,
-    TK_RPAREN,
-    TK_LBRACK,
-    TK_RBRACK,
-    TK_LSQBRK,
-    TK_RSQBRK,
-    TK_SQUOT,
-    TK_DOT,
-    TK_COMMA,
-    TK_COLON,
-    TK_SCOLON,
-    TK_DDOT,
-    TK_PLUS,
-    TK_MINUS,
-    TK_MUL,
-    TK_DIV,
-    TK_NEWLINE,
-    TK_MOD,
-    TK_POW,
-    TK_AND,
-    TK_OR,
-    TK_XOR
-};
-
-// Define token struct
-struct Token {
-    token_type type;
-    string value;
-};
-
-// Function to create a new Token struct
-Token newToken(token_type type, string value) {
-    Token t;
-    t.type = type;
-    t.value = value;
-    return t;
-}
-
- //FlexLexer *lexer = new yyFlexLexer;
-
 %}
 
 %%
@@ -100,6 +19,7 @@ Token newToken(token_type type, string value) {
 "real"                  {cout << "TK_DOUBLE" << " "; return carbonic_c::Parser::make_TK_DOUBLE();}
 "boolean"               {cout << "TK_BOOL" << " "; return carbonic_c::Parser::make_TK_BOOL();}
 "char"                  {cout << "TK_CHAR" << " "; return carbonic_c::Parser::make_TK_CHAR();}
+"string"                {cout << "TK_STRING" << " "; return carbonic_c::Parser::make_TK_STRING();}
 "array"                 {cout << "TK_ARRAY" << " "; return carbonic_c::Parser::make_TK_ARRAY();}
 "record"                {cout << "TK_RECORD" << " "; return carbonic_c::Parser::make_TK_RECORD();}
 "routine"               {cout << "TK_ROUTINE" << " "; return carbonic_c::Parser::make_TK_ROUTINE();}
@@ -117,9 +37,10 @@ Token newToken(token_type type, string value) {
 "else"                  {cout << "TK_ELSE" << " "; return carbonic_c::Parser::make_TK_ELSE();}
 "in"                    {cout << "TK_IN" << " "; return carbonic_c::Parser::make_TK_IN();}
 "reverse"               {cout << "TK_REVERSE" << " "; return carbonic_c::Parser::make_TK_REVERSE();}
+"print"                 {cout << "TK_PRINT" << " "; return carbonic_c::Parser::make_TK_PRINT();}
+"newline"               {cout << "TK_NEWLINE" << " "; return carbonic_c::Parser::make_TK_NEWLINE();} 
 true                    {cout << "TK_TRUE" << " "; return carbonic_c::Parser::make_TK_TRUE(true);}
 false                   {cout << "TK_FALSE" << " "; return carbonic_c::Parser::make_TK_FALSE(false);}
-"print"                 {cout << "TK_PRINT" << " "; return carbonic_c::Parser::make_TK_PRINT();}
 ":="                    {cout << "TK_ASSIGN" << " "; return carbonic_c::Parser::make_TK_ASSIGN();}
 "="                     {cout << "TK_CEQ" << " "; return carbonic_c::Parser::make_TK_CEQ();} 
 "/="                    {cout << "TK_CNEQ" << " "; return carbonic_c::Parser::make_TK_CNEQ();}
@@ -142,7 +63,6 @@ false                   {cout << "TK_FALSE" << " "; return carbonic_c::Parser::m
 "-"                     {cout << "TK_MINUS" << " "; return carbonic_c::Parser::make_TK_MINUS();}
 "*"                     {cout << "TK_MUL" << " "; return carbonic_c::Parser::make_TK_MUL();} 
 "/"                     {cout << "TK_DIV" << " "; return carbonic_c::Parser::make_TK_DIV();}
-"\\n"                   {cout << "TK_NEWLINE" << " "; return carbonic_c::Parser::make_TK_NEWLINE();} 
 "%"                     {cout << "TK_MOD" << " "; return carbonic_c::Parser::make_TK_MOD();} 
 "**"                    {cout << "TK_POW" << " "; return carbonic_c::Parser::make_TK_POW();} 
 "and"                   {cout << "TK_AND" << " "; return carbonic_c::Parser::make_TK_AND();} 
