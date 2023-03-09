@@ -26,6 +26,6 @@ namespace carbonic_c
         Lexer lexer;
         Parser parser;
     };
-} // namespace carbonic_c
+}
 
-#endif // DRIVER_H
+#endif

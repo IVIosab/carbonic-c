@@ -148,13 +148,12 @@ Token newToken(token_type type, string value) {
 "and"                   cout << "TK_AND" << " "; 
 "or"                    cout << "TK_OR" << " "; 
 "xor"                   cout << "TK_XOR" << " ";
+'.'                     cout << "TK_CHARACTER_LITERAL" << " "; 
 \"([^\\\"]|\\.)*\"      cout << "TK_STRING_LITERAL" << " "; /*TODO: new_token*/
-\'([^\\\"]|\\.)*\'      cout << "TK_STRING_LITERAL" << " "; /*TODO: new_token*/
 \/\/(.*)                cout << "TK_COMMENT" << " "; /*TODO: will ignore and do nothing*/
 [a-zA-Z_][a-zA-Z0-9_]*  cout << "TK_IDENTIFIER" << " ";   /*TODO: new_token*/
 [0-9]+\.[0-9]+          cout << "TK_DOUBLE_LITERAL" << " "; 
 [0-9]+                  {cout << "TK_INTEGER_LITERAL" << " "; return carbonic_c::Parser::make_TK_INTEGER_LITERAL(atoi(yytext));} 
-'.'                     cout << "TK_CHARACTER_LITERAL" << " "; 
 .                       cout << "LEXICAL ERROR: INVALID PARAMETER FOR THE LEXEME -> " << yytext << " ";
 %%
 

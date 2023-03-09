@@ -14,9 +14,13 @@
 %parse-param { carbonic_c::Driver &driver }
 
 %token TK_INTEGER_LITERAL 
+%token TK_STRING_LITERAL 
+%token TK_CHARACTER_LITERAL
 
 
 %type <long long> TK_INTEGER_LITERAL
+%type <char> TK_CHARACTER_LITERAL
+%type <char*> TK_STRING_LITERAL
 
 %code requires {
     #include <iostream>
@@ -44,7 +48,10 @@
 
 %%
 Expression_P: %empty
-| TK_INTEGER_LITERAL{std::cout<<$1;};
+| TK_INTEGER_LITERAL{std::cout<<$1;}
+| TK_CHARACTER_LITERAL{std::cout<<$1;}
+| TK_STRING_LITERAL{std::cout<<$1;}
+;
 %%
 
 void carbonic_c::Parser::error(const std::string& msg) {
