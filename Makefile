@@ -7,7 +7,7 @@ parser:
 test_parser:
 	flex -o lexer.cpp -i lexer.l
 	bison -d parser.ypp -o parser.cpp
-	g++ -g main.cpp lexer.cpp parser.cpp driver.cpp -o a.out
+	g++ -g main.cpp lexer.cpp parser.cpp driver.cpp
 	./a.out < ./test.crbc
 clean:
 	rm lexer.out lexer.cpp
