@@ -13,14 +13,32 @@
 %parse-param { carbonic_c::Lexer &lexer }
 %parse-param { carbonic_c::Driver &driver }
 
-%token TK_INTEGER_LITERAL 
-%token TK_STRING_LITERAL 
-%token TK_CHARACTER_LITERAL
+%token TK_VAR TK_TYPE
+%token TK_INT TK_DOUBLE TK_BOOL TK_CHAR TK_ARRAY TK_RECORD TK_ROUTINE TK_IS TK_NOT
+%token TK_WHILE TK_LOOP TK_END TK_FOR TK_FOREACH TK_FROM TK_RETURN
+%token TK_IF TK_THEN TK_ELSE TK_IN TK_REVERSE 
+%token TK_IDENTIFIER TK_ASSIGN
+%token TK_STRING_LITERAL TK_DOUBLE_LITERAL TK_INTEGER_LITERAL TK_CHARACTER_LITERAL TK_TRUE TK_FALSE
+%token TK_PRINT
+%token TK_CEQ TK_CNEQ TK_CLT TK_CLE TK_CGT TK_CGE
+%token TK_LPAREN TK_RPAREN TK_LBRACK TK_RBRACK TK_LSQBRK TK_RSQBRK 
+%token TK_SQUOT TK_DOT TK_COMMA TK_COLON TK_SCOLON TK_DDOT
+%token TK_PLUS TK_MINUS TK_MUL TK_DIV
+%token TK_NEWLINE
+%token TK_MOD TK_POW TK_AND TK_OR TK_XOR
+%right '='
+%left '+' '-'
+%left '*' '/'
+%right '^'
 
 
 %type <long long> TK_INTEGER_LITERAL
 %type <char> TK_CHARACTER_LITERAL
-%type <char*> TK_STRING_LITERAL
+%type <std::string> TK_STRING_LITERAL
+%type <long double> TK_DOUBLE_LITERAL
+%type <bool> TK_TRUE TK_FALSE
+
+
 
 %code requires {
     #include <iostream>
@@ -44,14 +62,168 @@
 }
 
 
-%start Expression_P
+%start Program
 
 %%
-Expression_P: %empty
-| TK_INTEGER_LITERAL{std::cout<<$1;}
-| TK_CHARACTER_LITERAL{std::cout<<$1;}
-| TK_STRING_LITERAL{std::cout<<$1;}
-;
+Program:
+    %empty |
+    SimpleDeclaration Program {}| // TOOD: Check which type of recursion is better (left or right)
+    RoutineDeclaration Program {}
+    ;
+SimpleDeclaration: 
+    VariableDeclaration {}|
+    TypeDeclaration {}
+    ;
+RoutineDeclaration:
+    TK_ROUTINE TK_IDENTIFIER Parameters TK_COLON Type TK_IS Body TK_END {}|
+    TK_ROUTINE TK_IDENTIFIER Parameters TK_IS Body TK_END {}
+    ;    
+Parameters:
+    TK_LPAREN TK_RPAREN {}|
+    TK_LPAREN ParameterList TK_RPAREN {}
+    ;
+ParameterList:
+    Parameter {}|
+    ParameterList TK_COMMA Parameter {}
+    ;
+Parameter:
+    TK_IDENTIFIER TK_IS Type {}
+    ;
+Body:
+    %empty {}|
+    SimpleDeclaration Body {}|
+    Statement Body {}
+    ;
+Statement:
+    Assignment {}|
+    Print {}|
+    IfStatement {}|
+    WhileLoop {}|
+    ForLoop {}|
+    ForEachLoop {}|
+    RoutineCall TK_SCOLON {}|
+    ReturnStatement {}
+    ;
+VariableDeclaration:
+    TK_VAR TK_IDENTIFIER TK_COLON Type TK_SCOLON {}|
+    TK_VAR TK_IDENTIFIER TK_COLON Type TK_IS Expression TK_SCOLON {}|
+    TK_VAR TK_IDENTIFIER TK_IS Expression TK_SCOLON {}
+    ; 
+TypeDeclaration: 
+    TK_TYPE TK_IDENTIFIER TK_IS Type TK_SCOLON {}
+    ;
+Type:
+    PrimitiveType {}| 
+    ArrayType {}|
+    RecordType {}|
+    TK_IDENTIFIER {}
+    ;
+PrimitiveType:
+    TK_INT {}|
+    TK_DOUBLE {}|
+    TK_BOOL {}|
+    TK_CHAR {}
+    ;
+ArrayType:
+    TK_ARRAY TK_LSQBRK Expression TK_RSQBRK Type {} // TODO: Look into nested arrays
+    ;
+RecordType:
+    TK_RECORD TK_LBRACK VariableDeclarations TK_RBRACK {}
+    ;
+VariableDeclarations: 
+    VariableDeclaration {}|
+    VariableDeclaration VariableDeclarations {}
+    ;
+Assignment: 
+    ModifiablePrimary TK_ASSIGN Expression TK_SCOLON {}
+    ;
+Print: 
+    TK_PRINT TK_LPAREN TK_STRING_LITERAL TK_RPAREN TK_SCOLON {std::cout<<$3<<" ";}|
+    TK_PRINT TK_LPAREN ModifiablePrimary TK_RPAREN TK_SCOLON {}
+    ;
+IfStatement: 
+    TK_IF Expression TK_THEN Body TK_END {}|
+    TK_IF Expression TK_THEN Body TK_ELSE Body TK_END {}
+    ;    
+WhileLoop: 
+   TK_WHILE Expression TK_LOOP Body TK_END {}
+   ;
+ForLoop: 
+    TK_FOR TK_IDENTIFIER Range TK_LOOP Body TK_END {}
+    ;
+Range: 
+    TK_IN Expression TK_DDOT Expression {}|
+    TK_IN TK_REVERSE Expression TK_DDOT Expression {}
+    ;
+ForEachLoop:
+   TK_FOREACH TK_IDENTIFIER TK_FROM ModifiablePrimary TK_LOOP Body TK_END {}
+   ;
+RoutineCall: 
+    TK_IDENTIFIER TK_LPAREN Parameter TK_RPAREN {} // Semi colon in statement no semi colon in expression
+    ;
+ReturnStatement: 
+    TK_RETURN Expression TK_SCOLON {}
+    ;
+NestedAccess:
+    %empty {}|
+    TK_DOT TK_IDENTIFIER NestedAccess {}|
+    TK_LSQBRK Expression TK_RBRACK NestedAccess {}
+    ;
+ModifiablePrimary : 
+    TK_IDENTIFIER {}|
+    TK_IDENTIFIER NestedAccess {}|
+    ;
+Expression: 
+    Relation {}|
+    Relation TK_AND Expression {}|
+    Relation TK_OR Expression {}|
+    Relation TK_XOR Expression {}
+    ;
+Relation: 
+    Complex {}|
+    Complex TK_CEQ Complex {}|
+    Complex TK_CNEQ Complex {}|
+    Complex TK_CGE Complex {}|
+    Complex TK_CGT Complex {}|
+    Complex TK_CLT Complex {}|
+    Complex TK_CLE Complex {}|
+    Complex TK_NOT Complex {}
+    ;
+Complex:
+    Simple {}|
+    Simple TK_POW Simple {}
+    ;
+Simple:
+    Factor {}|
+    Factor TK_MUL Simple {}|
+    Factor TK_DIV Simple {}|
+    Factor TK_MOD Simple {}
+    ;
+Factor:
+    Summand {}|
+    Summand TK_PLUS Factor {}|
+    Summand TK_MINUS Factor {}|
+    ;
+Summand:
+    Primary {}|
+    Expression {}
+    ;
+Primary:
+    TK_TRUE {}|
+    TK_FALSE {}|
+    TK_INTEGER_LITERAL {std::cout<<$1<<" ";}|
+    TK_NOT TK_INTEGER_LITERAL {std::cout<<$2<<" ";}|
+    Sign TK_INTEGER_LITERAL {std::cout<<$2<<" ";}|
+    Sign TK_DOUBLE_LITERAL {}|
+    TK_DOUBLE_LITERAL {}|
+    TK_IDENTIFIER {}|
+    ModifiablePrimary {}|
+    RoutineCall {}
+    ;
+Sign:
+    TK_PLUS {}|
+    TK_MINUS {}
+    ; // TODO: add () to equations?
 %%
 
 void carbonic_c::Parser::error(const std::string& msg) {

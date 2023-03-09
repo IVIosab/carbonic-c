@@ -5,6 +5,6 @@ do
     name=${f##*/}
     base=${name%.crbc}
     echo "Processing $base test..."
-    ./lexer.out<$f>./tests/lexer_outputs/${base}.txt
+    ./a.out<$f>./tests/lexer_outputs/${base}.txt
     
 done
