@@ -1,1 +1,4 @@
-// TODO
+var x : record 
+    var a : integer is 0;
+    var b : integer is 1;
+end;

@@ -1,1 +1,14 @@
-// TODO
+var x : record 
+    var a : integer is 0;
+    var b : integer is 1;
+end;
+
+var y : array [3] integer is [2, 3, 4];
+
+foreach i from x loop
+    print(i);
+end
+
+foreach i from y loop
+    print(i);
+end
