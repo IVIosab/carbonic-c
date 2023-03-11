@@ -1,0 +1,15 @@
+if true xor true then 
+    print("ERROR!");
+end
+
+if true xor false then 
+    print("Working!");
+end
+
+if false xor true then 
+    print("Working!");
+end
+
+if false xor false then 
+    print("ERROR!");
+end

@@ -1,0 +1,4 @@
+var x : integer is 0;
+if true then 
+    var x : integer is 1; //shadowing
+end

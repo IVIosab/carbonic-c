@@ -1,0 +1,5 @@
+var x : integer is 4;
+var y : integer is 2;
+var z : integer is x / y;
+
+print(z);

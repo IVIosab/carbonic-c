@@ -1,0 +1,7 @@
+if true then 
+    print("Working!");
+end
+
+if false then 
+    print("ERROR!");
+end

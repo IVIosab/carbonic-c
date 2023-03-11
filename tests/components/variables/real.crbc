@@ -1,0 +1,8 @@
+var x : real is 5.5;
+var y : real is 0.2;
+var pi : real is 3.14;
+
+print(x);
+print(y);
+print(pi);
+

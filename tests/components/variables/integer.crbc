@@ -1,0 +1,6 @@
+var x : integer is 5;
+var y : integer is 0;
+
+print(x);
+print(y);
+

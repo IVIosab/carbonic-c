@@ -1,0 +1,9 @@
+routine DoNothing () is 
+    //empty
+    return 0; 
+end
+
+routine main () integer is 
+    DoNothing();
+    return 0;
+end
