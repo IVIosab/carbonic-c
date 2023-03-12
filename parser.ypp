@@ -26,10 +26,10 @@
 %token TK_PLUS TK_MINUS TK_MUL TK_DIV
 %token TK_NEWLINE
 %token TK_MOD TK_POW TK_AND TK_OR TK_XOR
-%right '='
-%left '+' '-'
-%left '*' '/'
-%right '^'
+%right TK_CEQ
+%left TK_PLUS TK_MINUS
+%left TK_MUL TK_DIV
+%right TK_POW
 
 
 %type <long long> TK_INTEGER_LITERAL
@@ -68,7 +68,7 @@
 %%
 Program: //Good
     %empty |
-    SimpleDeclaration Program {}| // TOOD: Check which type of recursion is better (left or right)
+    SimpleDeclaration Program {}| // TODO: Check which type of recursion is better (left or right)
     RoutineDeclaration Program {}
     ;
 SimpleDeclaration: //Good
@@ -204,6 +204,7 @@ Factor: //Good
     Summand TK_PLUS Factor {}|
     Summand TK_MINUS Factor {}
     ; 
+// This doesn't care if we get unclosed paranthesis, is this a syntax error or a symantic error?
 Summand: //Good
     Primary {}|
     TK_LPAREN Primary {}|
@@ -231,3 +232,4 @@ Sign: //...
 void carbonic_c::Parser::error(const std::string& msg) {
     std::cerr << msg << '\n';
 }
+added

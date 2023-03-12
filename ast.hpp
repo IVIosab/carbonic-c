@@ -2,30 +2,65 @@
 // we'll use the visitor pattern when parsing semantics
 #include <iostream>
 #include <vector>
+#include <unordered_map>
+#include <stack>
+#define first f
+#define second s
+
+std::unordered_map <std::string, bool> VariableList;
+// pair < variable name, scope number > 
+// -> when a new scope is introduced, its id is (lastScopeId + 1).
+// what to do with parallel scopes? do we pop before we push again?
+std::stack <std::pair<std::string, int>> variableScope;
 typedef std::vector<ExpressionNode> ExpressionList;
-typedef std::vector<SimpleDeclerationNode> VariableList;
+std::unordered_map<std::string, TypeNode> TypeList;
 typedef std::vector<StatementNode> StatementList;
 
 class Node{
-
+    Node* right = NULL;
+    Node* lfet  = NULL;
 };
 class SimpleDeclerationNode : Node{
+    
+};
+// type inherits from type decleration?
+class TypeDeclerationNode : SimpleDeclerationNode{
+    //link new type to typeNode and store in type list
+};
+class TypeNode : TypeDeclerationNode{
 
 };
-class TypeDeclerationNode : SimpleDeclerationNode{
+class IntNode : TypeNode{
+
+};
+class ReelNode : TypeNode{
+
+};
+class boolNode : TypeNode{
+
+};
+class arrayNode : TypeNode{
+
+};
+class recordNode : TypeNode{
+
+};
+class CharNode : TypeNode{
+
+};
+class StringNode : TypeNode{
 
 };
 class VariableDeclerationNode : SimpleDeclerationNode{
-
+    // add to variablelist
 };
-// type inherits from type decleration?
 class RoutineDeclerationNode : Node{
-
+    // statementList
 };
 class StatementNode : Node{
 
 };
-/// if we can't have global statements, add 'routine decleration' in between.
+/// if we can't have global statements, add 'routine decleration' in between the following classes.
 class AssignmentNode : StatementNode {
 
 };
@@ -44,10 +79,10 @@ class ForNode : StatementNode{
 class ForEachNode : StatementNode{
 
 };
-class RoutineCall : StatementNode{
+class ReturnNode : StatementNode{
 
 };
-// return where?
+
 class ExpressionNode : Node {
 
 };
@@ -70,5 +105,21 @@ class ModifablePrimaryNode : ExpressionNode{
 
 };
 class operatorNode : ExpressionNode{
+
+};
+class arithmeticOperatorNode : operatorNode{
+
+};
+class relationalOperatorNode : operatorNode{
+
+};
+class logicalOperatorNode : operatorNode{
+
+};
+
+class NodeVisitor{
+
+};
+class Interpreter : NodeVisitor{
 
 };
