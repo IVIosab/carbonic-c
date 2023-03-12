@@ -7,24 +7,36 @@
 #define first f
 #define second s
 
-std::unordered_map <std::string, bool> VariableList;
+// variable -> scope number
+typedef std::unordered_map <std::string, int> VariableList;
 // pair < variable name, scope number > 
 // -> when a new scope is introduced, its id is (lastScopeId + 1).
-// what to do with parallel scopes? do we pop before we push again?
-std::stack <std::pair<std::string, int>> variableScope;
-typedef std::vector<ExpressionNode> ExpressionList;
-std::unordered_map<std::string, TypeNode> TypeList;
+// start - end
+// treat it like an iterable stack
+typedef std::vector <std::pair<VariableDeclerationNode, int>> VariableScope;
+//typedef std::vector<ExpressionNode> ExpressionList;
+typedef std::unordered_map<std::string, TypeNode> TypeList;
+typedef std::vector <std::pair<TypeDeclerationNode, int>> TypeScope;
 typedef std::vector<StatementNode> StatementList;
-
+typedef std::vector<RoutineDeclerationNode> RoutineList;
 class Node{
     Node* right = NULL;
-    Node* lfet  = NULL;
+    Node* left  = NULL;
 };
-class SimpleDeclerationNode : Node{
-    
+/// This will hold the entire program tree and the lists of everything declared
+class Program : Node{
+    VariableList variableList;
+    VariableScope variableScope;
+    TypeList typeList;
+    TypeScope typeScope;
+    RoutineList routineList;
 };
 // type inherits from type decleration?
-class TypeDeclerationNode : SimpleDeclerationNode{
+class TypeDeclerationNode : Node{
+    TypeDeclerationNode(std::string typeAlias, TypeNode type){
+        
+
+    }
     //link new type to typeNode and store in type list
 };
 class TypeNode : TypeDeclerationNode{
@@ -33,7 +45,7 @@ class TypeNode : TypeDeclerationNode{
 class IntNode : TypeNode{
 
 };
-class ReelNode : TypeNode{
+class RealNode : TypeNode{
 
 };
 class boolNode : TypeNode{
@@ -51,7 +63,7 @@ class CharNode : TypeNode{
 class StringNode : TypeNode{
 
 };
-class VariableDeclerationNode : SimpleDeclerationNode{
+class VariableDeclerationNode : Node{
     // add to variablelist
 };
 class RoutineDeclerationNode : Node{
