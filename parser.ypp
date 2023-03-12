@@ -218,7 +218,7 @@ Primary: //...
     Sign TK_INTEGER_LITERAL {std::cout<<$2<<" ";}| //Sign token is flawed, we should either remove it and only support positive numbers or do something about it in the lexer
     Sign TK_DOUBLE_LITERAL {}|
     TK_DOUBLE_LITERAL {}|
-    TK_IDENTIFIER {}|
+    TK_IDENTIFIER {}| // TODO: redundant, consider removing: ALready covered in modifable primary.
     ModifiablePrimary {}|
     RoutineCall {}
     ;
