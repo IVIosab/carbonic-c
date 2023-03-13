@@ -3,99 +3,123 @@
 #include <iostream>
 #include <vector>
 #include <unordered_map>
-#include <stack>
 #define first f
 #define second s
 
-// variable -> scope number
-typedef std::unordered_map <std::string, int> VariableList;
-// pair < variable name, scope number > 
-// -> when a new scope is introduced, its id is (lastScopeId + 1).
-// start - end
-// treat it like an iterable stack
-typedef std::vector <std::pair<VariableDeclerationNode, int>> VariableScope;
-//typedef std::vector<ExpressionNode> ExpressionList;
-typedef std::unordered_map<std::string, TypeNode> TypeList;
-typedef std::vector <std::pair<TypeDeclerationNode, int>> TypeScope;
+/// variable list connected to scope. each scope has start and end, new scope is previous scope +1
+typedef std::vector <std::pair<VariableDeclerationNode, int>> VariableList;
+typedef std::unordered_map<std::string, TypeNode> TypeMap;
 typedef std::vector<StatementNode> StatementList;
 typedef std::vector<RoutineDeclerationNode> RoutineList;
+template <typename Node> using node_ptr = std::shared_ptr<Node>;
+
 class Node{
-    Node* right = NULL;
-    Node* left  = NULL;
+    std::vector< Node* > children;
 };
 /// This will hold the entire program tree and the lists of everything declared
 class Program : Node{
     VariableList variableList;
-    VariableScope variableScope;
-    TypeList typeList;
-    TypeScope typeScope;
+    TypeMap typeMap;
     RoutineList routineList;
 };
-// type inherits from type decleration?
 class TypeDeclerationNode : Node{
     TypeDeclerationNode(std::string typeAlias, TypeNode type){
-        
 
     }
-    //link new type to typeNode and store in type list
 };
-class TypeNode : TypeDeclerationNode{
+class TypeNode {
+public:
+    TypeNode(){}
 
 };
 class IntNode : TypeNode{
-
+    IntNode(){}
 };
 class RealNode : TypeNode{
+    RealNode(){}
+};
+class BoolNode : TypeNode{
+    BoolNode(){}
+};
+class ArrayNode : TypeNode{
+    ArrayNode(node_ptr<TypeNode> arrayType, node_ptr<ExpressionNode> size){
+        
+    }
 
 };
-class boolNode : TypeNode{
+class RecordNode : TypeNode{
+    RecordNode(std::vector<node_ptr<VariableDeclerationNode>> recordVariables){
 
-};
-class arrayNode : TypeNode{
-
-};
-class recordNode : TypeNode{
-
+    }
 };
 class CharNode : TypeNode{
-
+    CharNode(){}
 };
 class StringNode : TypeNode{
-
+    StringNode(){}
 };
 class VariableDeclerationNode : Node{
-    // add to variablelist
+    VariableDeclerationNode(node_ptr<TypeNode> variableType, node_ptr<IdentifierNode> identifier){
+
+    }
 };
 class RoutineDeclerationNode : Node{
-    // statementList
+    StatementList statementList;
+    
+    RoutineDeclerationNode(std::vector<node_ptr<VariableDeclerationNode> > parameters, node_ptr<TypeNode> routineType, StatementList statementList){
+
+    }
+    RoutineDeclerationNode(std::vector<node_ptr<VariableDeclerationNode> > parameters, StatementList statementList){
+
+    }
 };
 class StatementNode : Node{
-
+public:
+    StatementNode(){
+    }
 };
-/// if we can't have global statements, add 'routine decleration' in between the following classes.
 class AssignmentNode : StatementNode {
+    AssignmentNode(node_ptr<IdentifierNode> identifier, node_ptr<ExpressionNode> expression){
 
+    }
 };
-class printNode : StatementNode{
+class PrintNode : StatementNode{
+    PrintNode(std::string stringLiteral){
 
+    }
+    PrintNode(node_ptr<ExpressionNode> expression){
+
+    }
 };
 class IfStatementNode : StatementNode {
+    StatementList ifStatementList, elseStatementList;
+    IfStatementNode(node_ptr<ExpressionNode> condition, StatementList ifStatementList, StatementList elseStatementList){
 
+    }
 };
 class WhileNode : StatementNode{
+    StatementList loopBody;
+    WhileNode(node_ptr<ExpressionNode> condition, StatementList loopBody){
 
+    }
 };
 class ForNode : StatementNode{
+    ForNode(node_ptr<ExpressionNode> condition, StatementList loopBody){
 
+    }
 };
 class ForEachNode : StatementNode{
+    ForEachNode(node_ptr<IdentifierNode> identifier, node_ptr<ModifablePrimaryNode> modifablePrimary, StatementList loopBody){
 
+    }
 };
 class ReturnNode : StatementNode{
+    ReturnNode(node_ptr<ExpressionNode> returnValue){
 
+    }
 };
 
-class ExpressionNode : Node {
+class ExpressionNode : Node{
 
 };
 class IntegerLiteralNode : ExpressionNode{

@@ -59,7 +59,7 @@
     static carbonic_c::Parser::symbol_type yylex( carbonic_c::Lexer &lexer , carbonic_c::Driver &driver) {
         return lexer.get_next_token();
     }
-    // ast::node_ptr<ast::Program> program = std::make_shared<ast::Program>();  // Points to the whole program node.
+    ast::node_ptr<ast::Program> program = std::make_shared<ast::Program>();  // Points to the whole program node.
 }
 
 
@@ -76,8 +76,12 @@ SimpleDeclaration: //Good
     TypeDeclaration {}
     ;
 RoutineDeclaration: //Good
-    TK_ROUTINE TK_IDENTIFIER TK_LPAREN Parameters TK_RPAREN TK_COLON Type TK_IS Body TK_END {}|
-    TK_ROUTINE TK_IDENTIFIER TK_LPAREN Parameters TK_RPAREN TK_IS Body TK_END {}
+    TK_ROUTINE TK_IDENTIFIER TK_LPAREN Parameters TK_RPAREN TK_COLON Type TK_IS Body TK_END {
+        // add to routineList of program
+    }|
+    TK_ROUTINE TK_IDENTIFIER TK_LPAREN Parameters TK_RPAREN TK_IS Body TK_END {
+        // add to routineList of program
+    }
     ;    
 Parameters: //Good
     %empty {}|
@@ -89,8 +93,12 @@ Parameter: //Good
     ;
 Body: //Good
     %empty {}|
-    SimpleDeclaration Body {}|
-    Statement Body {}
+    SimpleDeclaration Body {
+        // add to statementList of routine
+    }|
+    Statement Body {
+        // add to statementList of routine
+    }
     ;
 Statement: //Okay
     Assignment {}|
@@ -103,12 +111,20 @@ Statement: //Okay
     ReturnStatement {} 
     ;
 VariableDeclaration: //Good
-    TK_VAR TK_IDENTIFIER TK_COLON Type TK_SCOLON {}|
-    TK_VAR TK_IDENTIFIER TK_COLON Type TK_IS Expression TK_SCOLON {}|
-    TK_VAR TK_IDENTIFIER TK_IS Expression TK_SCOLON {}
+    TK_VAR TK_IDENTIFIER TK_COLON Type TK_SCOLON {
+        // add to variableList of program
+    }|
+    TK_VAR TK_IDENTIFIER TK_COLON Type TK_IS Expression TK_SCOLON {
+        // add to variableList of program
+    }|
+    TK_VAR TK_IDENTIFIER TK_IS Expression TK_SCOLON {
+        // add to variableList of program
+    }
     ; 
 TypeDeclaration: //Good
-    TK_TYPE TK_IDENTIFIER TK_IS Type TK_SCOLON {}
+    TK_TYPE TK_IDENTIFIER TK_IS Type TK_SCOLON {
+        // add to typeMap of program
+    }
     ;
 Type: //Good
     PrimitiveType {}| 
