@@ -13,6 +13,16 @@ typedef std::vector<StatementNode> StatementList;
 typedef std::vector<RoutineDeclerationNode> RoutineList;
 template <typename Node> using node_ptr = std::shared_ptr<Node>;
 
+enum class typeEnum{
+    INT, REAL, BOOL, CHAR, STRING
+};
+enum class arithmeticOperatorEnum {
+    PLUS, MINUS, MUL, DIV, POW
+};
+enum class relationalOperatorEnum{
+    EQ, NOTEQ, GEQ, GT, LEQ, LT
+};
+
 class Node{
     std::vector< Node* > children;
 };
@@ -104,7 +114,8 @@ class WhileNode : StatementNode{
     }
 };
 class ForNode : StatementNode{
-    ForNode(node_ptr<ExpressionNode> condition, StatementList loopBody){
+    ForNode(node_ptr<IdentifierNode> identifier, node_ptr<ExpressionNode> startRange, 
+    node_ptr<ExpressionNode> endRange, StatementList loopBody){
 
     }
 };
@@ -118,39 +129,57 @@ class ReturnNode : StatementNode{
 
     }
 };
-
 class ExpressionNode : Node{
+public:
+    ExpressionNode(){
 
+    }
+    ExpressionNode(node_ptr<TypeNode> type){
+
+    }
 };
 class IntegerLiteralNode : ExpressionNode{
+    IntegerLiteralNode(int64_t value){
 
+    }
 };
 class DoubleLiteralNode : ExpressionNode{
+    DoubleLiteralNode(long double value){
 
+    }
 };
 class BoolLiteralNode : ExpressionNode{
+    BoolLiteralNode(bool value){
 
+    }
 };
 class IdentifierNode : ExpressionNode{
+    IdentifierNode(std::string identifier){
 
+    }
+    IdentifierNode(std::string identifier, node_ptr<ExpressionNode> accessValue){
+
+    }
 };
 class RoutineCallNode : ExpressionNode{
+    RoutineCallNode(node_ptr<RoutineDeclerationNode> routine, std::vector<node_ptr<VariableDeclerationNode>> parameters){
 
+    }
 };
-class ModifablePrimaryNode : ExpressionNode{
+class ModifiablePrimaryNode : ExpressionNode{
+    ModifiablePrimaryNode(node_ptr<IdentifierNode> identifier, node_ptr<ExpressionNode> accessValue){
 
+    }
 };
-class operatorNode : ExpressionNode{
+class ArithmeticOperatorNode : ExpressionNode{
+    ArithmeticOperatorNode(node_ptr<ExpressionNode> left, arithmeticOperatorEnum op, node_ptr<ExpressionNode> right){
 
+    }
 };
-class arithmeticOperatorNode : operatorNode{
+class RelationalOperatorNode : ExpressionNode{
+    RelationalOperatorNode(node_ptr<ExpressionNode> left, arithmeticOperatorEnum op, node_ptr<ExpressionNode> right){
 
-};
-class relationalOperatorNode : operatorNode{
-
-};
-class logicalOperatorNode : operatorNode{
-
+    }
 };
 
 class NodeVisitor{
