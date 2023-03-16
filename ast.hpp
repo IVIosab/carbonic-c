@@ -289,10 +289,9 @@ public:
         this->parameters = parameters;
     }
 };
-// TODO: IMPORTANT TO THINK ABOUT
-// THIS IS WRONG.
-// so far I think for the accessValue we need a 'maybe' type like in haskell...
-// something that can maybe be an identifier(for record) or an expression for array :/
+// TODO: THIS IS WRONG. 
+// for the accessValue we need a list of variant type
+// list value be an identifier(for record) or an expression for array
 class ModifiablePrimaryNode : ExpressionNode{
 protected:
     node_ptr<IdentifierNode> identifier;
