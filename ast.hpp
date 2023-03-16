@@ -14,7 +14,7 @@ typedef std::vector<RoutineDeclerationNode> RoutineList;
 template <typename Node> using node_ptr = std::shared_ptr<Node>;
 
 enum class typeEnum{
-    INT, REAL, BOOL, CHAR, STRING
+    INT, REAL, BOOL, CHAR, STRING, ARRAY, RECORD
 };
 enum class arithmeticOperatorEnum {
     PLUS, MINUS, MUL, DIV, POW
@@ -32,55 +32,109 @@ class Program : Node{
     TypeMap typeMap;
     RoutineList routineList;
 };
+// you may need to override = operator for some classes
 class TypeDeclerationNode : Node{
+    std::string typeAlias;
+    TypeNode type;
     TypeDeclerationNode(std::string typeAlias, TypeNode type){
-
+        this->typeAlias = typeAlias;
+        this->type = type;
     }
 };
 class TypeNode {
 public:
     TypeNode(){}
-
+    virtual typeEnum getType();
 };
 class IntNode : TypeNode{
+public:
     IntNode(){}
+    typeEnum getType(){
+        return typeEnum::INT;
+    }
 };
 class RealNode : TypeNode{
+public:
     RealNode(){}
+    typeEnum getType(){
+        return typeEnum::REAL;
+    }
 };
 class BoolNode : TypeNode{
+public:    
     BoolNode(){}
+    typeEnum getType(){
+        return typeEnum::BOOL;
+    }
 };
 class ArrayNode : TypeNode{
+protected:
+    node_ptr<TypeNode> arrayType;
+    node_ptr<ExpressionNode> size;
+public:
     ArrayNode(node_ptr<TypeNode> arrayType, node_ptr<ExpressionNode> size){
-        
+        this->arrayType = arrayType;
+        this->size = size;
     }
-
+    typeEnum getType(){
+        return typeEnum::ARRAY;
+    }
 };
 class RecordNode : TypeNode{
+protected:
+    std::vector<node_ptr<VariableDeclerationNode>> recordVariables;
+public:
     RecordNode(std::vector<node_ptr<VariableDeclerationNode>> recordVariables){
-
+        this->recordVariables = recordVariables;
+    }
+    typeEnum getType(){
+        return typeEnum::RECORD;
     }
 };
 class CharNode : TypeNode{
+public:
     CharNode(){}
+    typeEnum getType(){
+        return typeEnum::CHAR;
+    }
 };
 class StringNode : TypeNode{
+public:
     StringNode(){}
+    typeEnum getType(){
+        return typeEnum::STRING;
+    }
 };
 class VariableDeclerationNode : Node{
+protected:
+    node_ptr<TypeNode> variableType;
+    node_ptr<IdentifierNode> idedntifier;
+public:
     VariableDeclerationNode(node_ptr<TypeNode> variableType, node_ptr<IdentifierNode> identifier){
-
+        this->variableType = variableType;
+        this->idedntifier = identifier;
     }
 };
 class RoutineDeclerationNode : Node{
+protected:
     StatementList statementList;
-    
+    node_ptr<TypeNode> routineType;
+    std::vector<node_ptr<VariableDeclerationNode>> parameters;
+public:
     RoutineDeclerationNode(std::vector<node_ptr<VariableDeclerationNode> > parameters, node_ptr<TypeNode> routineType, StatementList statementList){
-
+        this->parameters = parameters;
+        this->routineType = routineType;
+        this->statementList = statementList;
     }
     RoutineDeclerationNode(std::vector<node_ptr<VariableDeclerationNode> > parameters, StatementList statementList){
-
+        this->parameters = parameters;
+        this->routineType = inferType(statementList);
+        this->statementList = statementList;
+    }
+    node_ptr<TypeNode> inferType(StatementList StatementList){
+        // TODO: implement type inferring
+        std::shared_ptr<TypeNode> type = std::make_shared<IntNode>();
+        return type;
     }
 };
 class StatementNode : Node{
