@@ -1,4 +1,4 @@
-routine main () integer is 
+routine main () : integer is 
     type int is integer;
 
     var x : int is 5;

@@ -1,4 +1,4 @@
-routine main () integer is 
+routine main () : integer is 
     var x : array [3] integer is [1, 2, 3];
 
     for i in 0 .. 2 loop

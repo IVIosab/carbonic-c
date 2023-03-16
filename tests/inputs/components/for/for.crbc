@@ -1,4 +1,4 @@
-routine main () integer is 
+routine main () : integer is 
     for i in 0 .. 3 loop
         print(i);
     end

@@ -1,3 +1,4 @@
+type int as integer;
 routine main () : int is
    var a : array [6] int is [6, 5, 4, 3, 2, 1];
    var temp : int is 1;

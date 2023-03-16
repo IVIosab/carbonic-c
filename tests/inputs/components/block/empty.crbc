@@ -3,7 +3,7 @@ routine DoNothing () is
     return 0; 
 end
 
-routine main () integer is 
+routine main () : integer is 
     DoNothing();
     return 0;
 end

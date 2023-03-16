@@ -1,4 +1,4 @@
-routine main () integer is 
+routine main () : integer is 
     var i : integer is 3;
 
     while i > 0 loop

@@ -1,4 +1,4 @@
-routine main () integer is 
+routine main () : integer is 
     var x : integer is 1;
 
     if x < 2 then 

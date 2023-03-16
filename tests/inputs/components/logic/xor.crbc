@@ -1,4 +1,4 @@
-routine main () integer is 
+routine main () : integer is 
     if true xor true then 
         print("ERROR!");
     end

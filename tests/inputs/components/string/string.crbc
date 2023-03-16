@@ -1,4 +1,4 @@
-routine main () integer is 
+routine main () : integer is 
     var x : string is "Hello There!";
 
     print(x);

@@ -1,4 +1,4 @@
-routine main () integer is 
+routine main () : integer is 
     var x : array [3] integer is [1, 2, 3];
 
     return 0;
