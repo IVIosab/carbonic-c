@@ -187,8 +187,8 @@ NestedAccess: //...
     TK_LSQBRK Expression TK_RSQBRK NestedAccess {}
     ;
 ModifiablePrimary : //... 
-    TK_IDENTIFIER {}|
-    TK_IDENTIFIER NestedAccess {}|
+    // TK_IDENTIFIER {}| useless, covered in nested access
+    TK_IDENTIFIER NestedAccess {}
     ;
 Expression: //Good 
     Relation {}|
@@ -231,11 +231,11 @@ Primary: //...
     TK_TRUE {}|
     TK_FALSE {}|
     TK_INTEGER_LITERAL {std::cout<<$1<<" ";}|
-    TK_NOT TK_INTEGER_LITERAL {std::cout<<$2<<" ";}| //wtf does this even mean? 
+    TK_NOT TK_INTEGER_LITERAL {std::cout<<$2<<" ";}|
     Sign TK_INTEGER_LITERAL {std::cout<<$2<<" ";}| //Sign token is flawed, we should either remove it and only support positive numbers or do something about it in the lexer
     Sign TK_DOUBLE_LITERAL {}|
     TK_DOUBLE_LITERAL {}|
-    TK_IDENTIFIER {}| // TODO: redundant, consider removing: ALready covered in modifable primary.
+    // TK_IDENTIFIER {} redundant, removed because ALready covered in modifable primary.
     ModifiablePrimary {}|
     RoutineCall {}
     ;
