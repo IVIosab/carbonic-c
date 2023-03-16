@@ -1,8 +1,8 @@
-test_parser_test:
+test_parser:
 	flex -o lexer.cpp -i lexer.l
 	bison -d parser.ypp -o parser.cpp
-	g++ -g main.cpp lexer.cpp parser.cpp driver.cpp
-	./output.out < ./test.crbc
+	g++ -g main.cpp lexer.cpp parser.cpp driver.cpp -o output.out
+	./output.out < ./1.crbc
 
 # Stages 
 lexer: 
