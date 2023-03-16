@@ -137,102 +137,191 @@ public:
         return type;
     }
 };
+// TODO: I forgot what I wanted to add here...
 class StatementNode : Node{
 public:
     StatementNode(){
     }
 };
 class AssignmentNode : StatementNode {
+protected:
+    node_ptr<IdentifierNode> identifier;
+    node_ptr<ExpressionNode> expression;
+public:
     AssignmentNode(node_ptr<IdentifierNode> identifier, node_ptr<ExpressionNode> expression){
-
+        this->identifier = identifier;
+        this->expression = expression;
     }
 };
 class PrintNode : StatementNode{
-    PrintNode(std::string stringLiteral){
-
+protected:
+    std::string outputString;
+    node_ptr<ExpressionNode> outputExpression;
+    node_ptr<IdentifierNode> Identifier;
+    bool NEWLINE;
+public:
+    PrintNode(std::string outputString){
+        this->outputString = outputString;
+        this->NEWLINE = false;
     }
-    PrintNode(node_ptr<ExpressionNode> expression){
-
+    PrintNode(node_ptr<ExpressionNode> outputExpression){
+        this->outputExpression = outputExpression;
+        this->NEWLINE = false;
+    }
+    PrintNode(node_ptr<IdentifierNode> identifier){
+        this->Identifier = identifier;
+        this->NEWLINE = false;
+    }
+    PrintNode(bool NEWLINE){
+        this->NEWLINE = true;
     }
 };
 class IfStatementNode : StatementNode {
+protected:
+    node_ptr<ExpressionNode> condition;
     StatementList ifStatementList, elseStatementList;
+public:
     IfStatementNode(node_ptr<ExpressionNode> condition, StatementList ifStatementList, StatementList elseStatementList){
-
+        this->condition = condition;
+        this->ifStatementList = ifStatementList;
+        this->elseStatementList = elseStatementList;
     }
 };
 class WhileNode : StatementNode{
+protected:
+    node_ptr<ExpressionNode> condition;
     StatementList loopBody;
+public:
     WhileNode(node_ptr<ExpressionNode> condition, StatementList loopBody){
-
+        this->condition = condition;
+        this->loopBody = loopBody;
     }
 };
 class ForNode : StatementNode{
-    ForNode(node_ptr<IdentifierNode> identifier, node_ptr<ExpressionNode> startRange, 
+protected:
+    node_ptr<IdentifierNode> identifier;
+    node_ptr<ExpressionNode> startRange, endRange;
+    StatementList loopBody;
+public:
+    ForNode(node_ptr<IdentifierNode> identifier, node_ptr<ExpressionNode> startRange,
     node_ptr<ExpressionNode> endRange, StatementList loopBody){
-
+        this->identifier = identifier;
+        this->startRange = startRange;
+        this->endRange = endRange;
+        this->loopBody = loopBody;
     }
 };
 class ForEachNode : StatementNode{
+protected:
+    node_ptr<IdentifierNode> identifier;
+    node_ptr<ModifiablePrimaryNode> modifiablePrimary;
+    StatementList loopBody;
+public:
     ForEachNode(node_ptr<IdentifierNode> identifier, node_ptr<ModifablePrimaryNode> modifablePrimary, StatementList loopBody){
-
+        this->identifier = identifier;
+        this->modifiablePrimary = modifablePrimary;
+        this->loopBody = loopBody;
     }
 };
 class ReturnNode : StatementNode{
+protected:
+    node_ptr<ExpressionNode> returnValue;
+public:
     ReturnNode(node_ptr<ExpressionNode> returnValue){
-
+        this->returnValue = returnValue;
     }
 };
 class ExpressionNode : Node{
+protected:
+    node_ptr<TypeNode> type;
 public:
     ExpressionNode(){
-
+        // should we infer type here?
     }
     ExpressionNode(node_ptr<TypeNode> type){
-
+        this->type = type;
     }
 };
 class IntegerLiteralNode : ExpressionNode{
+protected:
+    int64_t value;
+public:
     IntegerLiteralNode(int64_t value){
-
+        this->value = value;
     }
 };
 class DoubleLiteralNode : ExpressionNode{
+protected:
+    long double value;
+public:
     DoubleLiteralNode(long double value){
-
+        this->value = value;
     }
 };
 class BoolLiteralNode : ExpressionNode{
+protected:
+    bool value;
+public:
     BoolLiteralNode(bool value){
 
     }
 };
 class IdentifierNode : ExpressionNode{
+protected:
+    std::string identifier;
+    node_ptr<ExpressionNode> accessValue;
+public:
     IdentifierNode(std::string identifier){
-
+        this->identifier = identifier;
     }
     IdentifierNode(std::string identifier, node_ptr<ExpressionNode> accessValue){
-
+        this->identifier = identifier;
+        this->accessValue = accessValue;
     }
 };
 class RoutineCallNode : ExpressionNode{
+protected:
+    node_ptr<RoutineDeclerationNode> routine;
+    std::vector<node_ptr<VariableDeclerationNode>> parameters;
+public:
     RoutineCallNode(node_ptr<RoutineDeclerationNode> routine, std::vector<node_ptr<VariableDeclerationNode>> parameters){
-
+        this->routine = routine;
+        this->parameters = parameters;
     }
 };
+// TODO: IMPORTANT TO THINK ABOUT
+// THIS IS WRONG.
+// so far I think for the accessValue we need a 'maybe' type like in haskell...
+// something that can maybe be an identifier(for record) or an expression for array :/
 class ModifiablePrimaryNode : ExpressionNode{
+protected:
+    node_ptr<IdentifierNode> identifier;
+    node_ptr<ExpressionNode> accessValue;
+public:
     ModifiablePrimaryNode(node_ptr<IdentifierNode> identifier, node_ptr<ExpressionNode> accessValue){
-
+        this->identifier = identifier;
+        this->accessValue = accessValue;
     }
 };
 class ArithmeticOperatorNode : ExpressionNode{
+protected:
+    node_ptr<ExpressionNode> left, right;
+    arithmeticOperatorEnum op;
+public:
     ArithmeticOperatorNode(node_ptr<ExpressionNode> left, arithmeticOperatorEnum op, node_ptr<ExpressionNode> right){
-
+        this->left = left;
+        this->op = op;
+        this->right = op;
     }
 };
 class RelationalOperatorNode : ExpressionNode{
-    RelationalOperatorNode(node_ptr<ExpressionNode> left, arithmeticOperatorEnum op, node_ptr<ExpressionNode> right){
-
+protected:
+    node_ptr<ExpressionNode> left, right;
+    relationalOperatorEnum op;
+    RelationalOperatorNode(node_ptr<ExpressionNode> left, relationalOperatorEnum op, node_ptr<ExpressionNode> right){
+        this->left = left;
+        this->op = op;
+        this->right = right;
     }
 };
 
