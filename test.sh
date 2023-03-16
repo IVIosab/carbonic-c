@@ -13,9 +13,9 @@ do
         do
             file_name=${file##*/} 
             file_base=${file_name%.crbc}
-            echo -e -n "\t\tProcessing {$file_base} test... "
-            ./output.out<$f>./tests/outputs/${type_name}/${dir_name}/${file_base}.txt
-            echo "Completed!"
+            echo -e "\t\tProcessing {$file_base} test... "
+            ./output.out<$file>./tests/outputs/${type_name}/${dir_name}/${file_base}.txt
+            echo -e "\t\tCompleted!"
         done
         echo -e "\tCompleted!"
     done
