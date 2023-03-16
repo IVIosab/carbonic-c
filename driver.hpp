@@ -13,7 +13,7 @@ namespace carbonic_c
 
         bool debug = false;
         std::ifstream infile;
-        std::string outfile = "a.out";
+        std::string outfile = "output.out";
 
         int parse_program();
         // The below section is commented for future usage while building the AST

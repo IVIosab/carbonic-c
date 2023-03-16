@@ -2,7 +2,7 @@ test_parser_test:
 	flex -o lexer.cpp -i lexer.l
 	bison -d parser.ypp -o parser.cpp
 	g++ -g main.cpp lexer.cpp parser.cpp driver.cpp
-	./a.out < ./test.crbc
+	./output.out < ./test.crbc
 
 # Stages 
 lexer: 
@@ -13,12 +13,12 @@ parser:
 # Full execution
 full_lexer:
 	flex -o lexer.cpp -i lexer.l
-	g++ lexer.cpp -o a.out
+	g++ lexer.cpp -o output.out
 full_parser:
 	flex -o lexer.cpp -i lexer.l
 	bison -d parser.ypp -o parser.cpp
-	g++ -g main.cpp lexer.cpp parser.cpp driver.cpp -o a.out
-	./a.out < ./test.crbc #remove later
+	g++ -g main.cpp lexer.cpp parser.cpp driver.cpp -o output.out
+	./output.out < ./test.crbc #remove later
 
 # Tests 
 test_lexer: 
@@ -28,4 +28,4 @@ test_parser:
 
 # Cleaning
 clean:
-	rm lexer.cpp parser.cpp parser.hpp a.out
+	rm lexer.cpp parser.cpp parser.hpp output.out
