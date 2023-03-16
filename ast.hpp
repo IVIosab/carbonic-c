@@ -14,7 +14,7 @@ typedef std::vector<RoutineDeclerationNode> RoutineList;
 template <typename Node> using node_ptr = std::shared_ptr<Node>;
 
 enum class typeEnum{
-    INT, REAL, BOOL, CHAR, STRING, ARRAY, RECORD
+    INT, DOUBLE, BOOL, CHAR, STRING, ARRAY, RECORD
 };
 enum class arithmeticOperatorEnum {
     PLUS, MINUS, MUL, DIV, POW
@@ -24,7 +24,7 @@ enum class relationalOperatorEnum{
 };
 
 class Node{
-    std::vector< Node* > children;
+    std::vector< std::shared_ptr<Node>>() children;
 };
 /// This will hold the entire program tree and the lists of everything declared
 class Program : Node{
@@ -35,8 +35,8 @@ class Program : Node{
 // you may need to override = operator for some classes
 class TypeDeclerationNode : Node{
     std::string typeAlias;
-    TypeNode type;
-    TypeDeclerationNode(std::string typeAlias, TypeNode type){
+    node_ptr<TypeNode> type;
+    TypeDeclerationNode(std::string typeAlias, node_ptr<TypeNode> type){
         this->typeAlias = typeAlias;
         this->type = type;
     }
@@ -53,11 +53,11 @@ public:
         return typeEnum::INT;
     }
 };
-class RealNode : TypeNode{
+class DoubleNode : TypeNode{
 public:
-    RealNode(){}
+    DoubleNode(){}
     typeEnum getType(){
-        return typeEnum::REAL;
+        return typeEnum::DOUBLE;
     }
 };
 class BoolNode : TypeNode{
@@ -72,7 +72,7 @@ protected:
     node_ptr<TypeNode> arrayType;
     node_ptr<ExpressionNode> size;
 public:
-    ArrayNode(node_ptr<TypeNode> arrayType, node_ptr<ExpressionNode> size){
+    ArrayNode(node_ptr<ExpressionNode> size, node_ptr<TypeNode> arrayType){
         this->arrayType = arrayType;
         this->size = size;
     }
@@ -105,14 +105,28 @@ public:
         return typeEnum::STRING;
     }
 };
+// TODO: do we infer types here?
 class VariableDeclerationNode : Node{
 protected:
     node_ptr<TypeNode> variableType;
     node_ptr<IdentifierNode> idedntifier;
+    node_ptr<ExpressionNode> value;
 public:
-    VariableDeclerationNode(node_ptr<TypeNode> variableType, node_ptr<IdentifierNode> identifier){
+    VariableDeclerationNode(node_ptr<IdentifierNode> identifier, node_ptr<TypeNode> variableType, node_ptr<ExpressionNode> expression){
         this->variableType = variableType;
         this->idedntifier = identifier;
+        this->value = expression;
+    }
+    VariableDeclerationNode(node_ptr<IdentifierNode> identifier, node_ptr<TypeNode> variableType){
+        this->variableType = variableType;
+        this->idedntifier = identifier;
+    }
+    VariableDeclerationNode(node_ptr<IdentifierNode> identifier, node_ptr<ExpressionNode> expression){
+       this->idedntifier = identifier;
+       this->value = expression;
+    }
+    node_ptr<TypeNode> inferType(node_ptr<ExpressionNode> expression){
+        // expression should potentially have type inference so you only need to imlement it once.    
     }
 };
 class RoutineDeclerationNode : Node{
@@ -263,7 +277,24 @@ protected:
     bool value;
 public:
     BoolLiteralNode(bool value){
-
+        this->value = value;
+    }
+};
+// The following classes are only for variable declerations.
+class CharLiteralNode : ExpressionNode{
+protected:
+    char value;
+public:
+    CharLiteralNode(char value){
+        this->value = value;
+    }
+};
+class StringLiteralNode : ExpressionNode{
+protected:
+    std::string value;
+public:
+    StringLiteralNode(std::string value){
+        this->value = value;
     }
 };
 class IdentifierNode : ExpressionNode{

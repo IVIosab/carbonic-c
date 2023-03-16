@@ -38,14 +38,16 @@
 %type <long double> TK_DOUBLE_LITERAL
 %type <bool> TK_TRUE TK_FALSE
 
-
+%type ast::node_ptr<ast::Node>() Program SimpleDeclaration VariableDeclaration TypeDeclaration 
+RoutineDeclaration Parameter Statement Type PrimitiveType ArrayType RecordType
+%type std::vector<ast::node_ptr<ast::Node>> Parameters Body VariableDeclarations
 
 %code requires {
     #include <iostream>
     #include <string>
     #include <vector>
     #include "lexer.h"
-
+    #include "ast.hpp"
     namespace carbonic_c {
     class Lexer;
     class Driver;
@@ -59,97 +61,154 @@
     static carbonic_c::Parser::symbol_type yylex( carbonic_c::Lexer &lexer , carbonic_c::Driver &driver) {
         return lexer.get_next_token();
     }
-    // ast::node_ptr<ast::Program> program = std::make_shared<ast::Program>();  // Points to the whole program node.
+    ast::node_ptr<ast::Program> program = std::make_shared<ast::Program>();  // Points to the whole program node.
 }
 
 
 %start Program
-
+// potential error: would parser try to make too many empty vectors and rte?
 %%
-Program: //Good
-    %empty |
-    SimpleDeclaration Program {}| // TODO: Check which type of recursion is better (left or right)
-    RoutineDeclaration Program {}
-    ;
-SimpleDeclaration: //Good
-    VariableDeclaration {}|
-    TypeDeclaration {}
-    ;
-RoutineDeclaration: //Good
+Program:
+    %empty {
+        $$ = program;
+    }|
+    SimpleDeclaration Program {
+        $2->variableDeclerations.push_back($1);
+        $$ = $2;
+    }| // TODO: Check which type of recursion is better (left or right)
+    RoutineDeclaration Program {
+        $2->routineList.push_back($1);
+        $$ = $2;
+    };
+SimpleDeclaration:
+    VariableDeclaration {
+        $$ = $1;
+    }|
+    TypeDeclaration {
+        $$ = $1;
+    };
+RoutineDeclaration:
     TK_ROUTINE TK_IDENTIFIER TK_LPAREN Parameters TK_RPAREN TK_COLON Type TK_IS Body TK_END {
-        // add to routineList of program
+        $$ = make_shared<ast::RoutineDeclerationNode>($4, $7, $9);
     }|
     TK_ROUTINE TK_IDENTIFIER TK_LPAREN Parameters TK_RPAREN TK_IS Body TK_END {
-        // add to routineList of program
+        $$ = make_shared<ast::RoutineDeclerationNode>($4, $7);
+    };    
+Parameters:
+    %empty {
+        $$ = std::vector<ast::shared_ptr<ast::VariableDeclerationNode>>();
+        }|
+    Parameter {
+        $$ = std::vector<ast::shared_ptr<ast::VariableDeclerationNode>>(1, $1);
+    }|
+    Parameter TK_COMMA Parameters {
+      $3.push_back($1);
+      $$ = $3;
     }
-    ;    
-Parameters: //Good
-    %empty {}|
-    Parameter {}|
-    Parameters TK_COMMA Parameter {}
     ;
-Parameter: //Good
-    TK_IDENTIFIER TK_IS Type {}
-    ;
-Body: //Good
-    %empty {}|
+Parameter:
+    TK_IDENTIFIER TK_IS Type {
+        $$ = std::make_shared<ast::VariableDeclerationNode>(
+        std::make_shared<ast::TypeNode>($3), std::make_shared<ast::IdentifierNode>($1) );
+        };
+Body:
+    %empty {
+        // tI want this to be statementNode but it needs to be this to work with SimpleDecleratoin :/
+        $$ = std::vector<ast::node_ptr<ast::Node>>();
+    }|
     SimpleDeclaration Body {
-        // add to statementList of routine
+        $2.push_back($1);
+        $$ = $2;
     }|
     Statement Body {
-        // add to statementList of routine
-    }
-    ;
-Statement: //Okay
-    Assignment {}|
-    Print {}|
-    IfStatement {}|
-    WhileLoop {}|
-    ForLoop {}|
-    ForEachLoop {}|
-    RoutineCall TK_SCOLON {}| 
-    ReturnStatement {} 
-    ;
-VariableDeclaration: //Good
+        $2.push_back($1);
+        $$ = $2;
+    };
+Statement:
+    Assignment {
+        $$ = $1;
+    }|
+    Print {
+        $$ = $1;
+    }|
+    IfStatement {
+        $$ = $1;
+    }|
+    WhileLoop {
+        $$ = $1;
+    }|
+    ForLoop {
+        $$ = $1;
+    }|
+    ForEachLoop {
+        $$ = $1;
+    }|
+    RoutineCall TK_SCOLON {
+        $$ = $1;
+    }| 
+    ReturnStatement {
+        $$ = $1;
+    };
+VariableDeclaration:
     TK_VAR TK_IDENTIFIER TK_COLON Type TK_SCOLON {
-        // add to variableList of program
+        $$ = std::make_shared<ast::node_ptr<ast::VariableDeclerationNode>>($2, $4);
     }|
     TK_VAR TK_IDENTIFIER TK_COLON Type TK_IS Expression TK_SCOLON {
-        // add to variableList of program
+        $$ = std::make_shared<ast::node_ptr<ast::VariableDeclerationNode>>($2, $4, $6);
     }|
     TK_VAR TK_IDENTIFIER TK_IS Expression TK_SCOLON {
-        // add to variableList of program
-    }
-    ; 
-TypeDeclaration: //Good
+        $$ = std::make_shared<ast::node_ptr<ast::VariableDeclerationNode>>($2, $4);
+    };
+TypeDeclaration:
     TK_TYPE TK_IDENTIFIER TK_IS Type TK_SCOLON {
-        // add to typeMap of program
-    }
-    ;
-Type: //Good
-    PrimitiveType {}| 
-    ArrayType {}|
-    RecordType {}|
-    TK_IDENTIFIER {}
-    ;
-PrimitiveType: //Good 
-    TK_INT {}|
-    TK_DOUBLE {}|
-    TK_BOOL {}|
-    TK_CHAR {}| 
-    TK_STRING {}
-    ;
-ArrayType: //Good
-    TK_ARRAY TK_LSQBRK Expression TK_RSQBRK Type {} // TODO: Look into nested arrays
-    ;
+        $$ = std::make_shared<ast::node_ptr<ast::TypeDeclerationNode>>($2, $4);
+    };
+Type:
+    PrimitiveType {
+        $$ = $1;
+    }| 
+    ArrayType {
+        $$ = $1;
+    }|
+    RecordType {
+        $$ = $1;
+    }|
+    TK_IDENTIFIER {
+        $$ = $1;
+    };
+PrimitiveType:
+    TK_INT {
+        $$ = std::make_shared<ast::IntNode>();
+    }|
+    TK_DOUBLE {
+        $$ = std::make_shared<ast::DoubleNode>();
+    }|
+    TK_BOOL {
+        $$ = std::make_shared<ast::BoolNode>();
+    }|
+    TK_CHAR {
+        $$ = std::make_shared<ast::CharNode>();
+    }| 
+    TK_STRING {
+        $$ = std::make_shared<ast::StringNode>();
+    };
+ArrayType:
+    TK_ARRAY TK_LSQBRK Expression TK_RSQBRK Type {
+        $$ = std::make_shared<ast::ArrayNode>($3, $5);
+    };
 RecordType: //Good
-    TK_RECORD VariableDeclarations TK_END {}
-    ;
-VariableDeclarations: //Okay 
-    VariableDeclaration {}|
-    VariableDeclaration VariableDeclarations {}
-    ;
-Assignment: //Good
+    TK_RECORD VariableDeclarations TK_END {
+        $$ = std::make_shared<ast::RecordNode($2);
+    };
+VariableDeclarations:
+    VariableDeclaration {
+        $$ = std::vector<ast::node_ptr<ast::VariableDecleration>>(1, $1);
+    }|
+    VariableDeclaration VariableDeclarations {
+        $2.push_back($1);
+        $$ = $2;
+    };
+Assignment:
     ModifiablePrimary TK_ASSIGN Expression TK_SCOLON {}
     ;
 Print: //Good
@@ -235,7 +294,7 @@ Primary: //...
     Sign TK_INTEGER_LITERAL {std::cout<<$2<<" ";}| //Sign token is flawed, we should either remove it and only support positive numbers or do something about it in the lexer
     Sign TK_DOUBLE_LITERAL {}|
     TK_DOUBLE_LITERAL {}|
-    // TK_IDENTIFIER {} redundant, removed because ALready covered in modifable primary.
+    // TK_IDENTIFIER {} redundant, removed because ALready covered in modifable primary.4
     ModifiablePrimary {}|
     RoutineCall {}
     ;
