@@ -1,13 +1,17 @@
-var x : integer is 1;
+routine main () integer is 
+    var x : integer is 1;
 
-if x < 2 then 
-    print("Working!");
-end
+    if x < 2 then 
+        print("Working!");
+    end
 
-if x < 1 then 
-    print("ERROR!");
-end
+    if x < 1 then 
+        print("ERROR!");
+    end
 
-if x < 0 then
-    print("ERROR!");
+    if x < 0 then
+        print("ERROR!");
+    end
+
+    return 0;
 end

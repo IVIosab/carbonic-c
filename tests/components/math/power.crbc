@@ -1,5 +1,9 @@
-var x : integer is 2;
-var y : integer is 3;
-var z : integer is x ^ y;
+routine main () integer is 
+    var x : integer is 2;
+    var y : integer is 3;
+    var z : integer is x ^ y;
 
-print(z);
+    print(z);
+
+    return 0;
+end

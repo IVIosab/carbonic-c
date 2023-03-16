@@ -1,4 +1,9 @@
-var x : integer is 0;
-if true then 
-    var x : integer is 1; //shadowing
+routine main () integer is 
+    var x : integer is 0;
+    
+    if true then 
+        var x : integer is 1; //shadowing
+    end
+
+    return 0;
 end

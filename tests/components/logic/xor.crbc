@@ -1,15 +1,19 @@
-if true xor true then 
-    print("ERROR!");
-end
+routine main () integer is 
+    if true xor true then 
+        print("ERROR!");
+    end
 
-if true xor false then 
-    print("Working!");
-end
+    if true xor false then 
+        print("Working!");
+    end
 
-if false xor true then 
-    print("Working!");
-end
+    if false xor true then 
+        print("Working!");
+    end
 
-if false xor false then 
-    print("ERROR!");
+    if false xor false then 
+        print("ERROR!");
+    end
+
+    return 0;
 end

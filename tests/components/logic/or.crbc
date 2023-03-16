@@ -1,15 +1,19 @@
-if true or true then 
-    print("Working!");
-end
+routine main () integer is 
+    if true or true then 
+        print("Working!");
+    end
 
-if true or false then 
-    print("Working!");
-end
+    if true or false then 
+        print("Working!");
+    end
 
-if false or true then 
-    print("Working!");
-end
+    if false or true then 
+        print("Working!");
+    end
 
-if false or false then 
-    print("ERROR!");
+    if false or false then 
+        print("ERROR!");
+    end
+
+    return 0;
 end

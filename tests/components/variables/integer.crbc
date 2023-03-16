@@ -1,6 +1,9 @@
-var x : integer is 5;
-var y : integer is 0;
+routine main () integer is 
+    var x : integer is 5;
+    var y : integer is 0;
 
-print(x);
-print(y);
+    print(x);
+    print(y);
 
+    return 0;
+end

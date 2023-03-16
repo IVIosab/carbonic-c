@@ -1,8 +1,11 @@
-var x : real is 5.5;
-var y : real is 0.2;
-var pi : real is 3.14;
+routine main () integer is 
+    var x : real is 5.5;
+    var y : real is 0.2;
+    var pi : real is 3.14;
 
-print(x);
-print(y);
-print(pi);
+    print(x);
+    print(y);
+    print(pi);
 
+    return 0;
+end

@@ -1,15 +1,18 @@
-var x : boolean is true;
-var y : boolean is false;
+routine main () integer is 
+    var x : boolean is true;
+    var y : boolean is false;
 
-if x then 
-    print("X is True");
-else
-    print("X is False");
-end 
+    if x then 
+        print("X is True");
+    else
+        print("X is False");
+    end 
 
-if y then 
-    print("Y is True");
-else
-    print("Y is False");
-end 
+    if y then 
+        print("Y is True");
+    else
+        print("Y is False");
+    end 
 
+    return 0;
+end
