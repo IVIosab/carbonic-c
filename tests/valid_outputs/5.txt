@@ -1,6 +1,0 @@
-I is not bigger than 9
-I is not bigger than 9
-I is bigger than or equal 9
-I is bigger than or equal 9
-I is bigger than or equal 9
-I is bigger than or equal 9

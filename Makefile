@@ -21,10 +21,8 @@ full_parser:
 	./output.out < ./test.crbc #remove later
 
 # Tests 
-test_lexer: 
-	bash test_lexer.sh
-test_parser:
-	bash test_parser.sh
+test:
+	bash test.sh
 
 # Cleaning
 clean:
