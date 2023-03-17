@@ -1,7 +1,1 @@
 type int is integer;
-routine main () : int is
-   var x : int is ( 7 + 8 );
-   x :=  ( 7 + 8 );
-   print(x);
-   return 0;
-end

@@ -46,6 +46,7 @@ RoutineDeclaration Parameter Statement Type PrimitiveType ArrayType RecordType
     #include <iostream>
     #include <string>
     #include <vector>
+    #include <memory>
     #include "lexer.h"
     #include "ast.hpp"
     namespace carbonic_c {
@@ -70,6 +71,7 @@ RoutineDeclaration Parameter Statement Type PrimitiveType ArrayType RecordType
 %%
 Program:
     %empty {
+        std::cout << "Program\n";
         $$ = program;
     }|
     SimpleDeclaration Program {
@@ -77,14 +79,17 @@ Program:
         $$ = $2;
     }| // TODO: Check which type of recursion is better (left or right)
     RoutineDeclaration Program {
+        std::cout<<"\tRoutineDecleration\n";
         $2->routineList.push_back($1);
         $$ = $2;
     };
 SimpleDeclaration:
     VariableDeclaration {
+        std::cout<<"\tVariableDecleration\n";
         $$ = $1;
     }|
     TypeDeclaration {
+        std::cout<<"\tTypeDecleration\n";
         $$ = $1;
     };
 RoutineDeclaration:
@@ -298,7 +303,7 @@ Primary: //...
     ModifiablePrimary {}|
     RoutineCall {}
     ;
-Sign: //...
+Sign:
     TK_PLUS {}|
     TK_MINUS {}
     ; 

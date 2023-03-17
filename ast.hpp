@@ -3,6 +3,8 @@
 #include <iostream>
 #include <vector>
 #include <unordered_map>
+#include <memory>
+#include <variant>
 #define first f
 #define second s
 
@@ -11,6 +13,7 @@ typedef std::vector <std::pair<VariableDeclerationNode, int>> VariableList;
 typedef std::unordered_map<std::string, TypeNode> TypeMap;
 typedef std::vector<StatementNode> StatementList;
 typedef std::vector<RoutineDeclerationNode> RoutineList;
+typedef std::variant<node_ptr<ExpressionNode>, node_ptr<IdentifierNode> > nestedAccess;
 template <typename Node> using node_ptr = std::shared_ptr<Node>;
 
 enum class typeEnum{
@@ -24,12 +27,12 @@ enum class relationalOperatorEnum{
 };
 
 class Node{
-    std::vector< std::shared_ptr<Node>>() children;
+    std::vector<std::shared_ptr<Node>> children();
 };
 /// This will hold the entire program tree and the lists of everything declared
 class Program : Node{
     VariableList variableList;
-    TypeMap typeMap;
+    TypeMap typeMap; // I may not be able to use that
     RoutineList routineList;
 };
 // you may need to override = operator for some classes
@@ -73,8 +76,8 @@ protected:
     node_ptr<ExpressionNode> size;
 public:
     ArrayNode(node_ptr<ExpressionNode> size, node_ptr<TypeNode> arrayType){
-        this->arrayType = arrayType;
         this->size = size;
+        this->arrayType = arrayType;
     }
     typeEnum getType(){
         return typeEnum::ARRAY;
@@ -113,13 +116,13 @@ protected:
     node_ptr<ExpressionNode> value;
 public:
     VariableDeclerationNode(node_ptr<IdentifierNode> identifier, node_ptr<TypeNode> variableType, node_ptr<ExpressionNode> expression){
-        this->variableType = variableType;
         this->idedntifier = identifier;
+        this->variableType = variableType;
         this->value = expression;
     }
     VariableDeclerationNode(node_ptr<IdentifierNode> identifier, node_ptr<TypeNode> variableType){
-        this->variableType = variableType;
         this->idedntifier = identifier;
+        this->variableType = variableType;
     }
     VariableDeclerationNode(node_ptr<IdentifierNode> identifier, node_ptr<ExpressionNode> expression){
        this->idedntifier = identifier;
@@ -147,7 +150,7 @@ public:
     }
     node_ptr<TypeNode> inferType(StatementList StatementList){
         // TODO: implement type inferring
-        std::shared_ptr<TypeNode> type = std::make_shared<IntNode>();
+        std::shared_ptr<TypeNode> type = std::make_shared<TypeNode>(IntNode());
         return type;
     }
 };
@@ -231,7 +234,7 @@ protected:
     node_ptr<ModifiablePrimaryNode> modifiablePrimary;
     StatementList loopBody;
 public:
-    ForEachNode(node_ptr<IdentifierNode> identifier, node_ptr<ModifablePrimaryNode> modifablePrimary, StatementList loopBody){
+    ForEachNode(node_ptr<IdentifierNode> identifier, node_ptr<ModifiablePrimaryNode> modifablePrimary, StatementList loopBody){
         this->identifier = identifier;
         this->modifiablePrimary = modifablePrimary;
         this->loopBody = loopBody;
@@ -310,6 +313,7 @@ public:
         this->accessValue = accessValue;
     }
 };
+// Look into
 class RoutineCallNode : ExpressionNode{
 protected:
     node_ptr<RoutineDeclerationNode> routine;
@@ -320,17 +324,14 @@ public:
         this->parameters = parameters;
     }
 };
-// TODO: THIS IS WRONG. 
-// for the accessValue we need a list of variant type
-// list value be an identifier(for record) or an expression for array
 class ModifiablePrimaryNode : ExpressionNode{
 protected:
     node_ptr<IdentifierNode> identifier;
-    node_ptr<ExpressionNode> accessValue;
+    std::vector<nestedAccess> accessValues;
 public:
-    ModifiablePrimaryNode(node_ptr<IdentifierNode> identifier, node_ptr<ExpressionNode> accessValue){
+    ModifiablePrimaryNode(node_ptr<IdentifierNode> identifier, std::vector<nestedAccess> accessValues){
         this->identifier = identifier;
-        this->accessValue = accessValue;
+        this->accessValues = accessValues;
     }
 };
 class ArithmeticOperatorNode : ExpressionNode{
@@ -341,7 +342,7 @@ public:
     ArithmeticOperatorNode(node_ptr<ExpressionNode> left, arithmeticOperatorEnum op, node_ptr<ExpressionNode> right){
         this->left = left;
         this->op = op;
-        this->right = op;
+        this->right = right;
     }
 };
 class RelationalOperatorNode : ExpressionNode{
