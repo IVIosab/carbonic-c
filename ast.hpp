@@ -20,10 +20,13 @@ enum class typeEnum{
     INT, DOUBLE, BOOL, CHAR, STRING, ARRAY, RECORD
 };
 enum class arithmeticOperatorEnum {
-    PLUS, MINUS, MUL, DIV, POW
+    PLUS, MINUS, MUL, DIV, MOD, POW
 };
 enum class relationalOperatorEnum{
-    EQ, NOTEQ, GEQ, GT, LEQ, LT
+    CEQ, CNEQ, CGE, CGT, CLE, CLT
+};
+enum class bitwiseOperatorEnum{
+    AND, OR, XOR
 };
 
 class Node{
@@ -134,16 +137,21 @@ public:
 };
 class RoutineDeclerationNode : Node{
 protected:
+    std::string identifier;
     StatementList statementList;
     node_ptr<TypeNode> routineType;
     std::vector<node_ptr<VariableDeclerationNode>> parameters;
 public:
-    RoutineDeclerationNode(std::vector<node_ptr<VariableDeclerationNode> > parameters, node_ptr<TypeNode> routineType, StatementList statementList){
+    RoutineDeclerationNode( std::string identifier, std::vector<node_ptr<VariableDeclerationNode> > parameters,
+     node_ptr<TypeNode> routineType, StatementList statementList){
+        this->identifier = identifier;
         this->parameters = parameters;
         this->routineType = routineType;
         this->statementList = statementList;
     }
-    RoutineDeclerationNode(std::vector<node_ptr<VariableDeclerationNode> > parameters, StatementList statementList){
+    RoutineDeclerationNode(std::string identifier,
+    std::vector<node_ptr<VariableDeclerationNode> > parameters, StatementList statementList){
+        this->identifier = identifier;
         this->parameters = parameters;
         this->routineType = inferType(statementList);
         this->statementList = statementList;
@@ -162,11 +170,11 @@ public:
 };
 class AssignmentNode : StatementNode {
 protected:
-    node_ptr<IdentifierNode> identifier;
+    node_ptr<ModifiablePrimaryNode> modifiablePrimary;
     node_ptr<ExpressionNode> expression;
 public:
-    AssignmentNode(node_ptr<IdentifierNode> identifier, node_ptr<ExpressionNode> expression){
-        this->identifier = identifier;
+    AssignmentNode(node_ptr<ModifiablePrimaryNode> modifiablePrimary, node_ptr<ExpressionNode> expression){
+        this->modifiablePrimary = modifiablePrimary;
         this->expression = expression;
     }
 };
@@ -316,11 +324,11 @@ public:
 // Look into
 class RoutineCallNode : ExpressionNode{
 protected:
-    node_ptr<RoutineDeclerationNode> routine;
+    node_ptr<IdentifierNode> routineName;
     std::vector<node_ptr<VariableDeclerationNode>> parameters;
 public:
-    RoutineCallNode(node_ptr<RoutineDeclerationNode> routine, std::vector<node_ptr<VariableDeclerationNode>> parameters){
-        this->routine = routine;
+    RoutineCallNode(node_ptr<IdentifierNode> routineName, std::vector<node_ptr<VariableDeclerationNode>> parameters){
+        this->routineName = routineName;
         this->parameters = parameters;
     }
 };
@@ -355,7 +363,17 @@ protected:
         this->right = right;
     }
 };
-
+class BitwiseOperatorNode : ExpressionNode{
+protected:
+    node_ptr<ExpressionNode> left, right;
+    bitwiseOperatorEnum op;
+public:
+    BitwiseOperatorNode(node_ptr<ExpressionNode> left, bitwiseOperatorEnum op, node_ptr<ExpressionNode> right){
+        this->left = left;
+        this->op = op;
+        this->right = right;
+    }
+};
 class NodeVisitor{
 
 };

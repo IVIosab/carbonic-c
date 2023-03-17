@@ -40,13 +40,21 @@
 
 %type ast::node_ptr<ast::Node>() Program SimpleDeclaration VariableDeclaration TypeDeclaration 
 RoutineDeclaration Parameter Statement Type PrimitiveType ArrayType RecordType
+Assignment Print IfStatement WhileLoop ForLoop ForEachLoop RoutineCall ReturnStatement
 %type std::vector<ast::node_ptr<ast::Node>> Parameters Body VariableDeclarations
-
+%type std::pair<ast::node_ptr<ast::ExpressionNode>, ast::node_ptr<ast::ExpressionNode>> Range
+%type <int> Sign
+%type std::variant<ast::node_ptr<ExpressionNode>, ast::node_ptr<IdentifierNode>,
+ast::node_ptr<ast::ArithmeticOperatorNode>, ast::node_ptr<ast::RelationalOperatorNode>, 
+ast::node_ptr<ast::BitwiseOperatorNode> >
+Primary Summand Factor Simple Complex Relation Expression
+%type std::vector<variant<ast::node_ptr<ast::IdentifierNode>, ast::node_ptr<ast::ExpressionNode>>> NestedAccess ModifiablePrimary
 %code requires {
     #include <iostream>
     #include <string>
     #include <vector>
     #include <memory>
+    #include <variant>
     #include "lexer.h"
     #include "ast.hpp"
     namespace carbonic_c {
@@ -94,10 +102,10 @@ SimpleDeclaration:
     };
 RoutineDeclaration:
     TK_ROUTINE TK_IDENTIFIER TK_LPAREN Parameters TK_RPAREN TK_COLON Type TK_IS Body TK_END {
-        $$ = make_shared<ast::RoutineDeclerationNode>($4, $7, $9);
+        $$ = make_shared<ast::RoutineDeclerationNode>($2, $4, $7, $9);
     }|
     TK_ROUTINE TK_IDENTIFIER TK_LPAREN Parameters TK_RPAREN TK_IS Body TK_END {
-        $$ = make_shared<ast::RoutineDeclerationNode>($4, $7);
+        $$ = make_shared<ast::RoutineDeclerationNode>($2, $4, $7);
     };    
 Parameters:
     %empty {
@@ -109,16 +117,15 @@ Parameters:
     Parameter TK_COMMA Parameters {
       $3.push_back($1);
       $$ = $3;
-    }
-    ;
+    };
 Parameter:
     TK_IDENTIFIER TK_IS Type {
         $$ = std::make_shared<ast::VariableDeclerationNode>(
-        std::make_shared<ast::TypeNode>($3), std::make_shared<ast::IdentifierNode>($1) );
+        std::make_shared<ast::IdentifierNode>($1), std::make_shared<ast::TypeNode>($3) );
         };
 Body:
     %empty {
-        // tI want this to be statementNode but it needs to be this to work with SimpleDecleratoin :/
+        // I want this to be statementNode but it needs to be this to work with SimpleDecleration :/
         $$ = std::vector<ast::node_ptr<ast::Node>>();
     }|
     SimpleDeclaration Body {
@@ -156,17 +163,22 @@ Statement:
     };
 VariableDeclaration:
     TK_VAR TK_IDENTIFIER TK_COLON Type TK_SCOLON {
-        $$ = std::make_shared<ast::node_ptr<ast::VariableDeclerationNode>>($2, $4);
+        $$ = std::make_shared<ast::VariableDeclerationNode>(
+        std::make_shared<ast::IdentifierNode>($2), std::make_shared<ast::TypeNode>($4) );
     }|
     TK_VAR TK_IDENTIFIER TK_COLON Type TK_IS Expression TK_SCOLON {
-        $$ = std::make_shared<ast::node_ptr<ast::VariableDeclerationNode>>($2, $4, $6);
+        $$ = std::make_shared<ast::VariableDeclerationNode>(
+        std::make_shared<ast::IdentifierNode>($2), std::make_shared<ast::TypeNode>($4),
+        std::make_shared<ast::ExpressionNode>($6) );
     }|
     TK_VAR TK_IDENTIFIER TK_IS Expression TK_SCOLON {
-        $$ = std::make_shared<ast::node_ptr<ast::VariableDeclerationNode>>($2, $4);
+        $$ = std::make_shared<ast::VariableDeclerationNode>(
+        std::make_shared<ast::IdentifierNode>($2),
+        std::make_shared<ast::ExpressionNode>($4) );
     };
 TypeDeclaration:
     TK_TYPE TK_IDENTIFIER TK_IS Type TK_SCOLON {
-        $$ = std::make_shared<ast::node_ptr<ast::TypeDeclerationNode>>($2, $4);
+        $$ = std::make_shared<ast::node_ptr<ast::TypeDeclerationNode>>($2, std::make_shared<ast::TypeNode>($4));
     };
 Type:
     PrimitiveType {
@@ -201,9 +213,9 @@ ArrayType:
     TK_ARRAY TK_LSQBRK Expression TK_RSQBRK Type {
         $$ = std::make_shared<ast::ArrayNode>($3, $5);
     };
-RecordType: //Good
+RecordType:
     TK_RECORD VariableDeclarations TK_END {
-        $$ = std::make_shared<ast::RecordNode($2);
+        $$ = std::make_shared<ast::RecordNode>($2);
     };
 VariableDeclarations:
     VariableDeclaration {
@@ -214,99 +226,216 @@ VariableDeclarations:
         $$ = $2;
     };
 Assignment:
-    ModifiablePrimary TK_ASSIGN Expression TK_SCOLON {}
-    ;
-Print: //Good
-    TK_PRINT TK_LPAREN TK_STRING_LITERAL TK_RPAREN TK_SCOLON {std::cout<<$3<<" ";}| 
-    TK_PRINT TK_LPAREN TK_CHARACTER_LITERAL TK_RPAREN TK_SCOLON {std::cout<<$3<<" ";}| 
-    TK_PRINT TK_LPAREN TK_NEWLINE TK_RPAREN TK_SCOLON {}|
-    TK_PRINT TK_LPAREN ModifiablePrimary TK_RPAREN TK_SCOLON {}
-    ;
-IfStatement: //Good
-    TK_IF Expression TK_THEN Body TK_END {}|
-    TK_IF Expression TK_THEN Body TK_ELSE Body TK_END {}
-    ;    
-WhileLoop: //Good
-    TK_WHILE Expression TK_LOOP Body TK_END {}
-   ;
-ForLoop: //Good
-    TK_FOR TK_IDENTIFIER Range TK_LOOP Body TK_END {}
-    ;
-Range: //Good 
-    TK_IN Expression TK_DDOT Expression {}|
-    TK_IN TK_REVERSE Expression TK_DDOT Expression {}
-    ;
-ForEachLoop: //Okay
-   TK_FOREACH TK_IDENTIFIER TK_FROM ModifiablePrimary TK_LOOP Body TK_END {}
-   ;
-RoutineCall: //Okay
-    TK_IDENTIFIER TK_LPAREN Parameters TK_RPAREN {} // Semi colon in statement no semi colon in expression
-    ;
+    ModifiablePrimary TK_ASSIGN Expression TK_SCOLON {
+        $$ = std::make_shared<ast::AssignmentNode>($1, $3);
+    };
+Print:
+    TK_PRINT TK_LPAREN TK_STRING_LITERAL TK_RPAREN TK_SCOLON {
+        std::cout<<$3<<" ";
+        $$ = std::make_shared<ast::PrintNode>($3);
+    }| 
+    TK_PRINT TK_LPAREN TK_CHARACTER_LITERAL TK_RPAREN TK_SCOLON {
+        std::cout<<$3<<" ";
+        $$ = std::make_shared<ast::PrintNode>($3);
+        }| 
+    TK_PRINT TK_LPAREN TK_NEWLINE TK_RPAREN TK_SCOLON {
+        $$ = std::make_shared<ast::PrintNode>(true);
+    }|
+    TK_PRINT TK_LPAREN ModifiablePrimary TK_RPAREN TK_SCOLON {
+        $$ = std::make_shared<ast::PrintNode>($3);
+    }|
+    TK_PRINT TK_LPAREN Expression TK_RPAREN TK_SCOLON{
+        $$ = std::make_shared<ast::PrintNode>($3);
+    };
+IfStatement:
+    TK_IF Expression TK_THEN Body TK_END {
+        $$ = std::make_shared<ast::IfStatementNode>($2, $4);
+    }|
+    TK_IF Expression TK_THEN Body TK_ELSE Body TK_END {
+        $$ = std::make_shared<ast::IfStatementNode>($2, $4, $6)
+    };    
+WhileLoop:
+    TK_WHILE Expression TK_LOOP Body TK_END {
+        $$ = std::make_shared<ast::WhileNode>($2, $4);
+    };
+ForLoop:
+    TK_FOR TK_IDENTIFIER Range TK_LOOP Body TK_END {
+        $$ = std::make_shared<ast::ForNode(
+            std::make_shared<ast::IdentifierNode>($2),
+            $3.first, $3.second, $5)
+    };
+Range:
+    TK_IN Expression TK_DDOT Expression {
+        $$ = std::make_pair<$2, $4>;
+    }|
+    TK_IN TK_REVERSE Expression TK_DDOT Expression {
+        $$ = std::make_pair<$4, $2>;
+    };
+ForEachLoop:
+   TK_FOREACH TK_IDENTIFIER TK_FROM ModifiablePrimary TK_LOOP Body TK_END {
+        $$ = std::make_shared<ast::ForEachNode>(
+            std::make_shared<ast::IdentifierNode>($2), $4, $6)
+   };
+RoutineCall:
+    TK_IDENTIFIER TK_LPAREN Parameters TK_RPAREN {
+        $$ = std::make_shared<ast::RoutineCallNode>(
+             std::make_shared<ast::IdentifierNode>($2), $4)
+    }; // Semi colon in statement no semi colon in expression
 ReturnStatement: //Okay
-    TK_RETURN Expression TK_SCOLON {}
-    ;
-NestedAccess: //...
-    %empty {}|
-    TK_DOT TK_IDENTIFIER NestedAccess {}|
-    TK_LSQBRK Expression TK_RSQBRK NestedAccess {}
-    ;
-ModifiablePrimary : //... 
+    TK_RETURN Expression TK_SCOLON {
+        $$ = std::make_shared<ast::ReturnStatementNode>($2);
+    };
+NestedAccess:
+    %empty {
+        $$ = std::vector<variant<ast::node_ptr<ast::IdentifierNode>, ast::node_ptr<ast::ExpressionNode>>>();
+    }|
+    TK_DOT TK_IDENTIFIER NestedAccess {
+        $3.push_back(std::make_shared<ast::IdentifierNode>($2));
+        $$ = $3;
+    }|
+    TK_LSQBRK Expression TK_RSQBRK NestedAccess {
+        $4.push_back(std::make_shared<ast::IdentifierNode>($2));
+        $$ = $4;
+    };
+ModifiablePrimary : 
     // TK_IDENTIFIER {}| useless, covered in nested access
-    TK_IDENTIFIER NestedAccess {}
-    ;
-Expression: //Good 
-    Relation {}|
-    Relation TK_AND Expression {}|
-    Relation TK_OR Expression {}|
-    Relation TK_XOR Expression {}
-    ;
-Relation: //Good
-    Complex {}|
-    Complex TK_CEQ Complex {}|
-    Complex TK_CNEQ Complex {}|
-    Complex TK_CGE Complex {}|
-    Complex TK_CGT Complex {}|
-    Complex TK_CLT Complex {}|
-    Complex TK_CLE Complex {}
-    ;
-Complex: //Okay
-    Simple {}|
-    Simple TK_POW Simple {}
-    ;
-Simple: //Good
-    Factor {}|
-    Factor TK_MUL Simple {}|
-    Factor TK_DIV Simple {}|
-    Factor TK_MOD Simple {}
-    ;
-Factor: //Good
-    Summand {}|
-    Summand TK_PLUS Factor {}|
-    Summand TK_MINUS Factor {}
-    ; 
+    TK_IDENTIFIER NestedAccess {
+        $2.push_back(std::make_shared<ast::IdentifierNode>($1));
+        $$ = $2;
+    };
+Expression: 
+    Relation {
+        $$ = $1;
+    }|
+    Relation TK_AND Expression {
+        $$ = std::make_shared<ast::BitwiseOperatorNode>($1,
+        ast::bitwiseOperatorEnum::AND, $3);
+    }|
+    Relation TK_OR Expression {
+        $$ = std::make_shared<ast::BitwiseOperatorNode>($1,
+        ast::bitwiseOperatorEnum::OR, $3);
+    }|
+    Relation TK_XOR Expression {
+        $$ = std::make_shared<ast::BitwiseOperatorNode>($1,
+        ast::bitwiseOperatorEnum::XOR, $3);
+    };
+Relation:
+    Complex {
+        $$ = $1;
+    }|
+    Complex TK_CEQ Complex {
+        $$ = std::make_shared<ast::RelationalOperatorNode>($1,
+        ast::relationalOperatorEnum::CEQ, $3);
+    }|
+    Complex TK_CNEQ Complex {
+        $$ = std::make_shared<ast::RelationalOperatorNode>($1,
+        ast::relationalOperatorEnum::CNEQ, $3);
+    }|
+    Complex TK_CGE Complex {
+        $$ = std::make_shared<ast::RelationalOperatorNode>($1,
+        ast::relationalOperatorEnum::CGE, $3);
+    }|
+    Complex TK_CGT Complex {
+        $$ = std::make_shared<ast::RelationalOperatorNode>($1,
+        ast::relationalOperatorEnum::CGT, $3);
+    }|
+    Complex TK_CLT Complex {
+        $$ = std::make_shared<ast::RelationalOperatorNode>($1,
+        ast::relationalOperatorEnum::CLT, $3);
+    }|
+    Complex TK_CLE Complex {
+        $$ = std::make_shared<ast::RelationalOperatorNode>($1,
+        ast::relationalOperatorEnum::CLE, $3);
+    };
+Complex:
+    Simple {
+        $$ = $1;
+    }|
+    Simple TK_POW Simple {
+        std::make_shared<ast::ArithmeticOperatorNode>($1, 
+        ast::arithmeticOperatorEnum::POW, $3);
+    };
+Simple:
+    Factor {
+        $$ = $1;
+    }|
+    Factor TK_MUL Simple {
+        $$ = std::make_shared<ast::ArithmeticOperatorNode>($1, 
+        ast::arithmeticOperatorEnum::MUL, $3);
+    }|
+    Factor TK_DIV Simple {
+        std::make_shared<ast::ArithmeticOperatorNode>($1, 
+        ast::arithmeticOperatorEnum::DIV, $3);
+    }|
+    Factor TK_MOD Simple {
+        std::make_shared<ast::ArithmeticOperatorNode>($1, 
+        ast::arithmeticOperatorEnum::MOD, $3);
+    };
+Factor:
+    Summand {
+        $$ = $1;
+    }|
+    Summand TK_PLUS Factor {
+        $$ = std::make_shared<ast::ArithmeticOperatorNode>($1, 
+        ast::arithmeticOperatorEnum::PLUS, $3);
+    }|
+    Summand TK_MINUS Factor {
+        $$ = std::make_shared<ast::ArithmeticOperatorNode>($1, 
+        ast::arithmeticOperatorEnum::MINUS, $3);
+    }; 
 // This doesn't care if we get unclosed paranthesis, is this a syntax error or a symantic error?
-Summand: //Good
-    Primary {}|
-    TK_LPAREN Primary {}|
-    Primary TK_RPAREN {}|
-    TK_LPAREN Primary TK_RPAREN {}
-;
-Primary: //...
-    TK_TRUE {}|
-    TK_FALSE {}|
-    TK_INTEGER_LITERAL {std::cout<<$1<<" ";}|
-    TK_NOT TK_INTEGER_LITERAL {std::cout<<$2<<" ";}|
-    Sign TK_INTEGER_LITERAL {std::cout<<$2<<" ";}| //Sign token is flawed, we should either remove it and only support positive numbers or do something about it in the lexer
-    Sign TK_DOUBLE_LITERAL {}|
-    TK_DOUBLE_LITERAL {}|
+Summand:
+    Primary {
+        $$ = $1;
+    }|
+    TK_LPAREN Primary {
+        $$ = ($2;
+    }|
+    Primary TK_RPAREN {
+        $$ = $1);
+    }|
+    TK_LPAREN Primary TK_RPAREN {
+        $$ = ($2);
+    };
+Primary:
+    TK_TRUE {
+        $$ = true;
+    }|
+    TK_FALSE {
+        $$ = false;
+    }|
+    TK_INTEGER_LITERAL {
+        std::cout<<$1<<" ";
+        $$ = $1;
+    }|
+    TK_NOT TK_INTEGER_LITERAL {
+        std::cout<<$2<<" ";
+        $$ = (! $2);
+    }|
+    Sign TK_INTEGER_LITERAL {
+        std::cout<<$2<<" ";
+        $$ = ($1 * $2);   
+    }|
+    Sign TK_DOUBLE_LITERAL {
+        $$ = ($1 * $2);
+    }|
+    TK_DOUBLE_LITERAL {
+        $$ = $1;
+    }|
     // TK_IDENTIFIER {} redundant, removed because ALready covered in modifable primary.4
-    ModifiablePrimary {}|
-    RoutineCall {}
-    ;
+    ModifiablePrimary {
+        $$ = $1;
+    }|
+    RoutineCall {
+        $$ = $1;
+    };
 Sign:
-    TK_PLUS {}|
-    TK_MINUS {}
-    ; 
+    TK_PLUS {
+        $$ = 1;
+    }|
+    TK_MINUS {
+        $$ = -1;
+    };
 %%
 
 void carbonic_c::Parser::error(const std::string& msg) {
