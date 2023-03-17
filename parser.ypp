@@ -34,21 +34,18 @@
 
 %type <long long> TK_INTEGER_LITERAL
 %type <char> TK_CHARACTER_LITERAL
-%type <std::string> TK_STRING_LITERAL
+%type <std::string> TK_STRING_LITERAL TK_IDENTIFIER
 %type <long double> TK_DOUBLE_LITERAL
 %type <bool> TK_TRUE TK_FALSE
 
-%type ast::node_ptr<ast::Node>() Program SimpleDeclaration VariableDeclaration TypeDeclaration 
-RoutineDeclaration Parameter Statement Type PrimitiveType ArrayType RecordType
-Assignment Print IfStatement WhileLoop ForLoop ForEachLoop RoutineCall ReturnStatement
-%type std::vector<ast::node_ptr<ast::Node>> Parameters Body VariableDeclarations
-%type std::pair<ast::node_ptr<ast::ExpressionNode>, ast::node_ptr<ast::ExpressionNode>> Range
+%type <node> Program SimpleDeclaration VariableDeclaration TypeDeclaration Parameter Statement Type PrimitiveType ArrayType RecordType Assignment Print IfStatement WhileLoop ForLoop ForEachLoop RoutineCall ReturnStatement
+%type <routineDeclerationNode> RoutineDeclaration
+%type <std::vector<node> > Body 
+%type <std::vector<variableDeclerationNode>> Parameters VariableDeclarations
+%type < std::pair<expressionType, expressionType> >Range
 %type <int> Sign
-%type std::variant<ast::node_ptr<ExpressionNode>, ast::node_ptr<IdentifierNode>,
-ast::node_ptr<ast::ArithmeticOperatorNode>, ast::node_ptr<ast::RelationalOperatorNode>, 
-ast::node_ptr<ast::BitwiseOperatorNode> >
-Primary Summand Factor Simple Complex Relation Expression
-%type std::vector<variant<ast::node_ptr<ast::IdentifierNode>, ast::node_ptr<ast::ExpressionNode>>> NestedAccess ModifiablePrimary
+%type <expressionType> Primary Summand Factor Simple Complex Relation Expression
+%type < std::vector<variant<identifierNode, expressionNode>> > NestedAccess ModifiablePrimary
 %code requires {
     #include <iostream>
     #include <string>
@@ -57,6 +54,14 @@ Primary Summand Factor Simple Complex Relation Expression
     #include <variant>
     #include "lexer.h"
     #include "ast.hpp"
+    typedef ast::node_ptr<ast::Node>() node;
+    typedef ast::node_ptr<ast::RoutineDeclerationNode>() routineDeclerationNode;
+    typedef ast::node_ptr<ast::VariableDeclarationNode>() variableDeclerationNode;
+    typedef ast::node_ptr<ast::ExpressionNode>()   expressionNode; 
+    typedef ast::node_ptr<ast::IdentifierNode>() identifierNode;
+    typedef std::variant<ast::node_ptr<ExpressionNode>, ast::node_ptr<IdentifierNode>,
+    ast::node_ptr<ast::ArithmeticOperatorNode>, ast::node_ptr<ast::RelationalOperatorNode>, 
+    ast::node_ptr<ast::BitwiseOperatorNode> expressionType;
     namespace carbonic_c {
     class Lexer;
     class Driver;
@@ -269,7 +274,7 @@ Range:
         $$ = std::make_pair<$2, $4>;
     }|
     TK_IN TK_REVERSE Expression TK_DDOT Expression {
-        $$ = std::make_pair<$4, $2>;
+        $$ = std::make_pair<$5, $3>;
     };
 ForEachLoop:
    TK_FOREACH TK_IDENTIFIER TK_FROM ModifiablePrimary TK_LOOP Body TK_END {
@@ -278,8 +283,7 @@ ForEachLoop:
    };
 RoutineCall:
     TK_IDENTIFIER TK_LPAREN Parameters TK_RPAREN {
-        $$ = std::make_shared<ast::RoutineCallNode>(
-             std::make_shared<ast::IdentifierNode>($2), $4)
+        $$ = std::make_shared<ast::RoutineCallNode>($1, $3);
     }; // Semi colon in statement no semi colon in expression
 ReturnStatement: //Okay
     TK_RETURN Expression TK_SCOLON {

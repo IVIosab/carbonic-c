@@ -324,10 +324,10 @@ public:
 // Look into
 class RoutineCallNode : ExpressionNode{
 protected:
-    node_ptr<IdentifierNode> routineName;
+    std::string routineName;
     std::vector<node_ptr<VariableDeclerationNode>> parameters;
 public:
-    RoutineCallNode(node_ptr<IdentifierNode> routineName, std::vector<node_ptr<VariableDeclerationNode>> parameters){
+    RoutineCallNode(std::string routineName, std::vector<node_ptr<VariableDeclerationNode>> parameters){
         this->routineName = routineName;
         this->parameters = parameters;
     }
