@@ -7,14 +7,41 @@
 #include <variant>
 #define first f
 #define second s
+class Node;
+class Program;
+class TypeDeclerationNode;
+class TypeNode;
+class IntNode;
+class DoubleNode;
+class BoolNode;
+class ArrayNode;
+class RecordNode;
+class VariableDeclerationNode;
+class RoutineDeclerationNode;
+class IdentifierNode;
+class ModifiablePrimaryNode;
+class ExpressionNode;
+class StatementNode;
+class BitwiseOperatorNode;
+class RelationalOperatorNode;
+class ArithmeticOperatorNode;
 
-/// variable list connected to scope. each scope has start and end, new scope is previous scope +1
-typedef std::vector <std::pair<VariableDeclerationNode, int>> VariableList;
+template <typename Node> using node_ptr = std::shared_ptr<Node>;
+/// potentially add scopes
+typedef std::vector<VariableDeclerationNode> VariableList;
 typedef std::unordered_map<std::string, TypeNode> TypeMap;
 typedef std::vector<StatementNode> StatementList;
 typedef std::vector<RoutineDeclerationNode> RoutineList;
-typedef std::variant<node_ptr<ExpressionNode>, node_ptr<IdentifierNode> > nestedAccess;
-template <typename Node> using node_ptr = std::shared_ptr<Node>;
+typedef std::variant<node_ptr<ExpressionNode>(), node_ptr<IdentifierNode>()> nestedAccess;
+
+typedef node_ptr<Node> node;
+typedef node_ptr<RoutineDeclerationNode> routineDeclerationNode;
+typedef node_ptr<VariableDeclerationNode> variableDeclerationNode;
+typedef node_ptr<ExpressionNode>   expressionNode; 
+typedef node_ptr<IdentifierNode> identifierNode;
+typedef std::variant<node_ptr<ExpressionNode>, node_ptr<IdentifierNode>,
+node_ptr<ArithmeticOperatorNode>, node_ptr<RelationalOperatorNode>, 
+node_ptr<BitwiseOperatorNode> > expressionType;
 
 enum class typeEnum{
     INT, DOUBLE, BOOL, CHAR, STRING, ARRAY, RECORD

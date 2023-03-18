@@ -45,7 +45,7 @@
 %type < std::pair<expressionType, expressionType> >Range
 %type <int> Sign
 %type <expressionType> Primary Summand Factor Simple Complex Relation Expression
-%type < std::vector<variant<identifierNode, expressionNode>> > NestedAccess ModifiablePrimary
+%type < std::vector<std::variant<identifierNode, expressionNode>> > NestedAccess ModifiablePrimary
 %code requires {
     #include <iostream>
     #include <string>
@@ -54,14 +54,6 @@
     #include <variant>
     #include "lexer.h"
     #include "ast.hpp"
-    typedef ast::node_ptr<ast::Node>() node;
-    typedef ast::node_ptr<ast::RoutineDeclerationNode>() routineDeclerationNode;
-    typedef ast::node_ptr<ast::VariableDeclarationNode>() variableDeclerationNode;
-    typedef ast::node_ptr<ast::ExpressionNode>()   expressionNode; 
-    typedef ast::node_ptr<ast::IdentifierNode>() identifierNode;
-    typedef std::variant<ast::node_ptr<ExpressionNode>, ast::node_ptr<IdentifierNode>,
-    ast::node_ptr<ast::ArithmeticOperatorNode>, ast::node_ptr<ast::RelationalOperatorNode>, 
-    ast::node_ptr<ast::BitwiseOperatorNode> expressionType;
     namespace carbonic_c {
     class Lexer;
     class Driver;
@@ -71,7 +63,9 @@
 %code top {
     #include "lexer.h"
     #include "driver.hpp"
-
+    #include "ast.hpp"
+    #include <variant>
+    #include <memory>
     static carbonic_c::Parser::symbol_type yylex( carbonic_c::Lexer &lexer , carbonic_c::Driver &driver) {
         return lexer.get_next_token();
     }
@@ -291,7 +285,7 @@ ReturnStatement: //Okay
     };
 NestedAccess:
     %empty {
-        $$ = std::vector<variant<ast::node_ptr<ast::IdentifierNode>, ast::node_ptr<ast::ExpressionNode>>>();
+        $$ = std::vector<std::variant<ast::node_ptr<ast::IdentifierNode>, ast::node_ptr<ast::ExpressionNode>>>();
     }|
     TK_DOT TK_IDENTIFIER NestedAccess {
         $3.push_back(std::make_shared<ast::IdentifierNode>($2));
