@@ -17,7 +17,7 @@ full_lexer:
 full_parser:
 	flex -o lexer.cpp -i lexer.l
 	bison -d parser.ypp -o parser.cpp
-	g++ -g main.cpp lexer.cpp parser.cpp driver.cpp -o output.out
+	g++ -g main.cpp lexer.cpp parser.cpp driver.cpp -o output.out 
 	./output.out < ./1.crbc #remove later
 
 # Tests 

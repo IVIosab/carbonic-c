@@ -1,0 +1,49 @@
+flex -o lexer.cpp -i lexer.l
+bison -d parser.ypp -o parser.cpp
+parser.ypp: warning: 8 nonterminals useless in grammar [-Wother]
+parser.ypp: warning: 28 rules useless in grammar [-Wother]
+parser.ypp:148.1-10: warning: nonterminal useless in grammar: EXPRESSION [-Wother]
+  148 | EXPRESSION: 
+      | ^~~~~~~~~~
+parser.ypp:162.1-6: warning: nonterminal useless in grammar: BINARY [-Wother]
+  162 | BINARY:
+      | ^~~~~~
+parser.ypp:170.1-7: warning: nonterminal useless in grammar: BITWISE [-Wother]
+  170 | BITWISE:
+      | ^~~~~~~
+parser.ypp:178.1-10: warning: nonterminal useless in grammar: COMPARISON [-Wother]
+  178 | COMPARISON:
+      | ^~~~~~~~~~
+parser.ypp:187.1-15: warning: nonterminal useless in grammar: BINARY_OPERATOR [-Wother]
+  187 | BINARY_OPERATOR: 
+      | ^~~~~~~~~~~~~~~
+parser.ypp:207.1-16: warning: nonterminal useless in grammar: BITWISE_OPERATOR [-Wother]
+  207 | BITWISE_OPERATOR: 
+      | ^~~~~~~~~~~~~~~~
+parser.ypp:218.1-19: warning: nonterminal useless in grammar: COMPARISON_OPERATOR [-Wother]
+  218 | COMPARISON_OPERATOR: 
+      | ^~~~~~~~~~~~~~~~~~~
+parser.ypp:238.1-5: warning: nonterminal useless in grammar: VALUE [-Wother]
+  238 | VALUE:
+      | ^~~~~
+g++ -g main.cpp lexer.cpp parser.cpp driver.cpp -o output.out
+./output.out < ./1.crbc
+TK_VAR TK_IDENTIFIER TK_COLON TK_INT TK_SCOLON <<VARIABLE_DECLARATION>>
+
+TK_VAR TK_IDENTIFIER TK_COLON TK_DOUBLE TK_SCOLON <<VARIABLE_DECLARATION>>
+
+TK_VAR TK_IDENTIFIER TK_COLON TK_BOOL TK_SCOLON <<VARIABLE_DECLARATION>>
+
+TK_TYPE TK_IDENTIFIER TK_IS TK_INT TK_SCOLON <<TYPE_DECLARATION>>
+
+TK_TYPE TK_IDENTIFIER TK_IS TK_DOUBLE TK_SCOLON <<TYPE_DECLARATION>>
+
+TK_TYPE TK_IDENTIFIER TK_IS TK_BOOL TK_SCOLON <<TYPE_DECLARATION>>
+
+TK_VAR TK_IDENTIFIER TK_COLON TK_IDENTIFIER TK_SCOLON <<VARIABLE_DECLARATION>>
+
+TK_VAR TK_IDENTIFIER TK_COLON TK_IDENTIFIER TK_SCOLON <<VARIABLE_DECLARATION>>
+
+TK_VAR TK_IDENTIFIER TK_COLON TK_IDENTIFIER TK_SCOLON <<VARIABLE_DECLARATION>>
+
+

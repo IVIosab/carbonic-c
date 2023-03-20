@@ -19,14 +19,11 @@ FlexLexer *lexer = new yyFlexLexer;
 "integer"               {cout << "TK_INT" << " "; return carbonic_c::Parser::make_TK_INT();} 
 "real"                  {cout << "TK_DOUBLE" << " "; return carbonic_c::Parser::make_TK_DOUBLE();}
 "boolean"               {cout << "TK_BOOL" << " "; return carbonic_c::Parser::make_TK_BOOL();}
-"char"                  {cout << "TK_CHAR" << " "; return carbonic_c::Parser::make_TK_CHAR();}
-"string"                {cout << "TK_STRING" << " "; return carbonic_c::Parser::make_TK_STRING();}
 "array"                 {cout << "TK_ARRAY" << " "; return carbonic_c::Parser::make_TK_ARRAY();}
 "record"                {cout << "TK_RECORD" << " "; return carbonic_c::Parser::make_TK_RECORD();}
 "routine"               {cout << "TK_ROUTINE" << " "; return carbonic_c::Parser::make_TK_ROUTINE();}
 "return"                {cout << "TK_RETURN" << " "; return carbonic_c::Parser::make_TK_RETURN();}
 "is"                    {cout << "TK_IS" << " "; return carbonic_c::Parser::make_TK_IS();}
-"not"                   {cout << "TK_NOT" << " "; return carbonic_c::Parser::make_TK_NOT();} 
 "while"                 {cout << "TK_WHILE" << " "; return carbonic_c::Parser::make_TK_WHILE();}
 "loop"		        	{cout << "TK_LOOP" << " "; return carbonic_c::Parser::make_TK_LOOP();}
 "end"                   {cout << "TK_END" << " "; return carbonic_c::Parser::make_TK_END();} 
@@ -40,8 +37,6 @@ FlexLexer *lexer = new yyFlexLexer;
 "reverse"               {cout << "TK_REVERSE" << " "; return carbonic_c::Parser::make_TK_REVERSE();}
 "print"                 {cout << "TK_PRINT" << " "; return carbonic_c::Parser::make_TK_PRINT();}
 "newline"               {cout << "TK_NEWLINE" << " "; return carbonic_c::Parser::make_TK_NEWLINE();} 
-true                    {cout << "TK_TRUE" << " "; return carbonic_c::Parser::make_TK_TRUE(true);}
-false                   {cout << "TK_FALSE" << " "; return carbonic_c::Parser::make_TK_FALSE(false);}
 ":="                    {cout << "TK_ASSIGN" << " "; return carbonic_c::Parser::make_TK_ASSIGN();}
 "="                     {cout << "TK_CEQ" << " "; return carbonic_c::Parser::make_TK_CEQ();} 
 "/="                    {cout << "TK_CNEQ" << " "; return carbonic_c::Parser::make_TK_CNEQ();}
@@ -69,13 +64,12 @@ false                   {cout << "TK_FALSE" << " "; return carbonic_c::Parser::m
 "and"                   {cout << "TK_AND" << " "; return carbonic_c::Parser::make_TK_AND();} 
 "or"                    {cout << "TK_OR" << " "; return carbonic_c::Parser::make_TK_OR();} 
 "xor"                   {cout << "TK_XOR" << " "; return carbonic_c::Parser::make_TK_XOR();}
-'.'                     {cout << "TK_CHARACTER_LITERAL" << " "; return carbonic_c::Parser::make_TK_CHARACTER_LITERAL(*yytext);}
-\"([^\\\"]|\\.)*\"      {cout << "TK_STRING_LITERAL" << " "; return carbonic_c::Parser::make_TK_STRING_LITERAL(yytext);} /*TODO: new_token*/
-\/\/(.*)                cout << "TK_COMMENT" << " "; /*TODO: will ignore and do nothing*/
-[a-zA-Z_][a-zA-Z0-9_]*  {cout << "TK_IDENTIFIER" << " "; return carbonic_c::Parser::make_TK_IDENTIFIER();}   /*TODO: new_token*/
 [0-9]+\.[0-9]+          {cout << "TK_DOUBLE_LITERAL" << " "; return carbonic_c::Parser::make_TK_DOUBLE_LITERAL(atof(yytext));} 
 [0-9]+                  {cout << "TK_INTEGER_LITERAL" << " "; return carbonic_c::Parser::make_TK_INTEGER_LITERAL(atoi(yytext));}  
-.                       cout << "LEXICAL ERROR: INVALID PARAMETER FOR THE LEXEME -> " << yytext << " ";
+\/\/(.*)                {cout << "TK_COMMENT" << " "; /*TODO: will ignore and do nothing*/}
+true                    {cout << "TK_BOOL_LITERAL" << " "; return carbonic_c::Parser::make_TK_BOOL_LITERAL(true);}
+false                   {cout << "TK_BOOL_LITERAL" << " "; return carbonic_c::Parser::make_TK_BOOL_LITERAL(false);}
+[a-zA-Z_][a-zA-Z0-9_]*  {cout << "TK_IDENTIFIER" << " "; return carbonic_c::Parser::make_TK_IDENTIFIER(yytext);}   /*TODO: new_token*/
 %%
 
 

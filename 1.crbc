@@ -1,1 +1,24 @@
+var i : integer;
+var d : real;
+var b : boolean;
+var x : integer is 1;
+var y : real is 1.1;
+var z : boolean is true;
+var a is 2;
+var b is 2.2;
+var c is false;
 type int is integer;
+type double is real;
+type bool is boolean;
+var ii : int;
+var dd : double;
+var bb : bool;
+var xx : int is 1;
+var yy : double is 1.1;
+var zz : bool is true;
+var arr : array [3] integer;
+var x : record 
+    var a : integer is 0;
+    var b : integer is 1;
+end;
+x is integer, y is real, z is boolean
