@@ -34,7 +34,11 @@ namespace ast
     struct Body;
     struct Statement;
     struct Print;
+    struct IfStatement;
+    struct WhileLoop;
+    struct ForLoop;
     struct Return;
+    struct ForeachLoop;
 } // namespace ast
 
 // Base class for code generator and anything that traverses AST.
@@ -50,7 +54,7 @@ public:
     virtual void visit(ast::IntLiteral *il) = 0;
     virtual void visit(ast::DoubleLiteral *il) = 0;
     virtual void visit(ast::BoolLiteral *il) = 0;
-    // virtual void visit(ast::ExpressionList *el) = 0;
+    // virtual void visit(ast::ExpressionList   *el) = 0;
     virtual void visit(ast::BinaryExpression *binexp) = 0;
     virtual void visit(ast::BinaryOperator *binop) = 0;
     virtual void visit(ast::BitwiseExpression *bitexp) = 0;
@@ -63,6 +67,10 @@ public:
     virtual void visit(ast::Return *stmt) = 0;
     virtual void visit(ast::Identifier *id) = 0;
     virtual void visit(ast::ModifiablePrimary *mp) = 0;
+    virtual void visit(ast::IfStatement *is) = 0;
+    virtual void visit(ast::WhileLoop *wl) =0;
+    virtual void visit(ast::ForLoop *fl) = 0;
+    virtual void visit(ast::ForeachLoop *fel) =0;
 };
 
 namespace ast
@@ -386,7 +394,53 @@ namespace ast
 
         void accept(Visitor *v) override { v->visit(this); }
     };
-
+    struct IfStatement : Statement{
+        node_ptr<Expression> condition;
+        node_ptr<Body> ifBody, elseBody;
+        IfStatement(node_ptr<Expression> condition, node_ptr<Body> ifBody){
+            this->condition = condition;
+            this->ifBody = ifBody;
+            this->elseBody = nullptr;
+        }
+        IfStatement(node_ptr<Expression> condition, node_ptr<Body> ifBody, node_ptr<Body> elseBody){
+            this->condition = condition;
+            this->ifBody = ifBody;
+            this->elseBody = elseBody;
+        }
+        void accept(Visitor *v) override {v->visit(this);}
+    };
+    struct WhileLoop : Statement{
+        node_ptr<Expression> condition;
+        node_ptr<Body> loopBody;
+        WhileLoop(node_ptr<Expression> condition, node_ptr<Body> loopBody){
+            this->condition = condition;
+            this->loopBody = loopBody;
+        }
+        void accept(Visitor *v) override {v->visit(this);}
+    };
+    struct ForLoop : Statement{
+        node_ptr<VariableDeclaration> identifier;
+        node_ptr<Expression> condition, action;
+        node_ptr<Body> loopBody;
+        ForLoop(node_ptr<VariableDeclaration> identifier, node_ptr<Expression> condition, node_ptr<Body> loopBody, node_ptr<Expression> action){
+            this->identifier = identifier;
+            this->condition = condition;
+            this->loopBody = loopBody;
+            this->action = action;
+        }
+        void accept(Visitor *v) override {v->visit(this);}
+    };
+    struct ForeachLoop : Statement{
+        node_ptr<Identifier> identifier;
+        node_ptr<ModifiablePrimary> modifiablePrimary;
+        node_ptr<Body> loopBody;
+        ForeachLoop(node_ptr<Identifier> identifier, node_ptr<ModifiablePrimary> modifablePrimary, node_ptr<Body> loopBody){
+            this->identifier = identifier;
+            this->modifiablePrimary = modifablePrimary;
+            this->loopBody = loopBody;
+        }
+        void accept(Visitor *v) override {v->visit(this);}
+    };
     struct Return : Statement
     {
         node_ptr<Expression> exp;

@@ -57,10 +57,13 @@
 %type <ast::node_ptr<ast::Return>> RETURN
 %type <ast::node_ptr<ast::Print>> PRINT
 %type <ast::node_ptr<ast::Body>> BODY
-
+%type <ast::node_ptr<ast::IfStatement> > IF_STATEMENT
 
 %type <std::vector<ast::nestedAccess>> NESTED_ACCESS
 %type <ast::node_ptr<ast::ModifiablePrimary>> MODIFIABLE_PRIMARY
+%type <ast::node_ptr<ast::WhileLoop>> WHILE_LOOP
+%type <ast::node_ptr<ast::ForLoop>> FOR_LOOP
+%type <ast::node_ptr<ast::ForeachLoop> > FOREACH_LOOP
 //%type <ast::node_ptr<ast::ExpressionList>> EXPRESSION_LIST
 
 %code requires {
@@ -101,11 +104,15 @@ PROGRAM:
     MODIFIABLE_PRIMARY PROGRAM{
     }|
     PARAMETERS PROGRAM{
-    };
+    }|
     ROUTINE_DECLARATION PROGRAM{
         $$ = $2;
-    }
-    ;
+    }|
+    IF_STATEMENT PROGRAM{
+    }|
+    FOR_LOOP PROGRAM{}|
+    WHILE_LOOP PROGRAM{}|
+    FOREACH_LOOP{};
 ROUTINE_DECLARATION:
     TK_ROUTINE TK_IDENTIFIER TK_LPAREN PARAMETERS TK_RPAREN TK_COLON TYPE TK_IS BODY TK_END {
         $$ = std::make_shared<ast::RoutineDeclaration>($2, $4, $7, $9);
@@ -155,7 +162,7 @@ STATEMENT:
     PRINT {
         $$ = $1;
     }|
-    /* IF_STATEMENT {
+    IF_STATEMENT {
         $$ = $1;
     }|
     WHILE_LOOP {
@@ -167,6 +174,7 @@ STATEMENT:
     FOREACH_LOOP {
         $$ = $1;
     }|
+    /*
     ROUTINE_CALL TK_SCOLON {
         $$ = $1;
     }|  */
@@ -180,6 +188,41 @@ PRINT:
     TK_PRINT TK_LPAREN EXPRESSION TK_RPAREN TK_SCOLON{
         $$ = std::make_shared<ast::Print>($3);
     }; 
+IF_STATEMENT:
+    TK_IF EXPRESSION TK_THEN BODY TK_END {
+        $$ = std::make_shared<ast::IfStatement>($2, $4);
+    }|
+    TK_IF EXPRESSION TK_THEN BODY TK_ELSE BODY TK_END {
+        $$ = std::make_shared<ast::IfStatement>($2, $4, $6);
+    };
+WHILE_LOOP:
+    TK_WHILE EXPRESSION TK_LOOP BODY TK_END {
+        $$ = std::make_shared<ast::WhileLoop>($2, $4);
+    };
+FOR_LOOP:
+    TK_FOR TK_IDENTIFIER TK_IN EXPRESSION TK_DDOT EXPRESSION TK_LOOP BODY TK_END{
+        auto loop_variable = std::make_shared<ast::VariableDeclaration>($2, $4);
+        ast::node_ptr<ast::Identifier> identifier = std::make_shared<ast::Identifier>($2);
+        auto cond = std::make_shared<ast::ComparisonExpression>(identifier,
+        ast::ComparisonOperatorEnum::CLE, $6);
+        auto action = std::make_shared<ast::BinaryExpression>(identifier,
+        ast::BinaryOperatorEnum::PLUS, std::make_shared<ast::IntLiteral>(1));
+        $$ = std::make_shared<ast::ForLoop>(loop_variable, cond, $8, action);
+    }|
+    TK_FOR TK_IDENTIFIER TK_IN TK_REVERSE EXPRESSION TK_DDOT EXPRESSION TK_LOOP BODY TK_END{
+        auto loop_variable = std::make_shared<ast::VariableDeclaration>($2, $7);
+        ast::node_ptr<ast::Identifier> identifier = std::make_shared<ast::Identifier>($2);
+        auto cond = std::make_shared<ast::ComparisonExpression>(identifier,
+        ast::ComparisonOperatorEnum::CGE, $5);
+        auto action = std::make_shared<ast::BinaryExpression>(identifier,
+        ast::BinaryOperatorEnum::MINUS, std::make_shared<ast::IntLiteral>(1));
+        $$ = std::make_shared<ast::ForLoop>(loop_variable, cond, $9, action);
+    };
+FOREACH_LOOP:
+   TK_FOREACH TK_IDENTIFIER TK_FROM MODIFIABLE_PRIMARY TK_LOOP BODY TK_END {
+        $$ = std::make_shared<ast::ForeachLoop>(
+            std::make_shared<ast::Identifier>($2), $4, $6);
+    };
 RETURN: 
     TK_RETURN EXPRESSION TK_SCOLON {
         $$ = std::make_shared<ast::Return>($2);
@@ -336,7 +379,6 @@ EXPRESSIONS:
     }; */
 NESTED_ACCESS:
     %empty {
-        std::cout << "Nested access for modifable primary -";
         $$ = std::vector<ast::nestedAccess>();
     }|
     TK_DOT TK_IDENTIFIER NESTED_ACCESS{
