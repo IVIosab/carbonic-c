@@ -5,7 +5,7 @@
 #include <memory>
 #include <map>
 #include <vector>
-
+#include <variant>
 // Forward declarations
 namespace ast
 {
@@ -29,6 +29,7 @@ namespace ast
     // struct ExpressionList;
     struct VariableDeclaration;
     struct TypeDeclaration;
+    struct ModifiablePrimary;
     struct RoutineDeclaration;
     struct Body;
     struct Statement;
@@ -61,6 +62,7 @@ public:
     virtual void visit(ast::Print *stmt) = 0;
     virtual void visit(ast::Return *stmt) = 0;
     virtual void visit(ast::Identifier *id) = 0;
+    virtual void visit(ast::ModifiablePrimary *mp) = 0;
 };
 
 namespace ast
@@ -69,6 +71,7 @@ namespace ast
     // Pointer to an AST node.
     template <typename Node>
     using node_ptr = std::shared_ptr<Node>;
+    typedef std::variant<node_ptr<ast::Expression>, node_ptr<ast::Identifier>> nestedAccess;
 
     // Enumerations
     enum class TypeEnum
@@ -348,6 +351,16 @@ namespace ast
             this->dtype = dtype;
         }
         void accept(Visitor *v) { v->visit(this); }
+    };
+    struct ModifiablePrimary : Expression{
+        node_ptr<Identifier> identifier;
+        std::vector<nestedAccess> accessValues;
+
+        ModifiablePrimary(node_ptr<Identifier> identifier, std::vector<nestedAccess> accessValues){
+            this->identifier = identifier;
+            this->accessValues = accessValues;
+        }
+        void accept(Visitor *v) override { v->visit(this); }
     };
     // Base class for Statements
     struct Statement : virtual Node

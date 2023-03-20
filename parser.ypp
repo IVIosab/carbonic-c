@@ -59,12 +59,15 @@
 %type <ast::node_ptr<ast::Body>> BODY
 
 
+%type <std::vector<ast::nestedAccess>> NESTED_ACCESS
+%type <ast::node_ptr<ast::ModifiablePrimary>> MODIFIABLE_PRIMARY
 //%type <ast::node_ptr<ast::ExpressionList>> EXPRESSION_LIST
 
 %code requires {
     #include <iostream>
     #include <string>
     #include <vector>
+    #include <variant>
     #include "ast.hpp"
     namespace carbonic_c {
     class Lexer;
@@ -73,9 +76,9 @@
 }
 
 %code top {
+    #include <variant>
     #include "lexer.h"
     #include "driver.hpp"
-    
     static carbonic_c::Parser::symbol_type yylex( carbonic_c::Lexer &lexer , carbonic_c::Driver &driver) {
         return lexer.get_next_token();
     }
@@ -95,6 +98,10 @@ PROGRAM:
     TYPE_DECLARATION PROGRAM {
         $$ = $2;
     }|
+    MODIFIABLE_PRIMARY PROGRAM{
+    }|
+    PARAMETERS PROGRAM{
+    };
     ROUTINE_DECLARATION PROGRAM{
         $$ = $2;
     }
@@ -305,8 +312,10 @@ VALUE:
     }|
     TK_DOUBLE_LITERAL {
         $$ = std::make_shared<ast::DoubleLiteral>($1);
+    }|
+    MODIFIABLE_PRIMARY {
+       $$ = $1; 
     }//|
-    //ModifiablePrimary {}|
     //RoutineCall {}|
     /* EXPRESSION_LIST {
         $$ = $1;
@@ -325,6 +334,24 @@ EXPRESSIONS:
         $3.push_back($1);
         $$ = $3;
     }; */
+NESTED_ACCESS:
+    %empty {
+        std::cout << "Nested access for modifable primary -";
+        $$ = std::vector<ast::nestedAccess>();
+    }|
+    TK_DOT TK_IDENTIFIER NESTED_ACCESS{
+        $3.push_back(std::make_shared<ast::Identifier>($2));
+        $$ = $3;
+    }|
+    TK_LSQBRK EXPRESSION TK_RSQBRK NESTED_ACCESS {
+        $4.push_back($2);
+        $$ = $4;
+    };
+MODIFIABLE_PRIMARY : 
+    TK_IDENTIFIER NESTED_ACCESS{
+        std::cout << " Modifiable primary\n";     
+        $$ = std::make_shared<ast::ModifiablePrimary>(std::make_shared<ast::Identifier>($1), $2);
+    };
 %%
 
 void carbonic_c::Parser::error(const std::string& msg) {

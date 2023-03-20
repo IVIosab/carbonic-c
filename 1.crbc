@@ -36,5 +36,7 @@ end
 
 routine x () is 
 end
+x[5].recordParameter
+x.recordParameter[5][6]
 
 [ 1 , 2 ]
