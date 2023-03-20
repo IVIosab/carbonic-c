@@ -64,7 +64,7 @@ public:
     virtual void visit(ast::RoutineDeclaration *routdecl) = 0;
     virtual void visit(ast::RoutineCall *routcall) = 0;
     virtual void visit(ast::Body *body) = 0;
-    virtual void visit(ast::Assignment* assign) = 0;
+    virtual void visit(ast::Assignment *assign) = 0;
     virtual void visit(ast::Print *stmt) = 0;
     virtual void visit(ast::Return *stmt) = 0;
     virtual void visit(ast::Identifier *id) = 0;
@@ -366,10 +366,12 @@ namespace ast
     {
         void accept(Visitor *v) override = 0;
     };
-    struct Assignment : Statement {
+    struct Assignment : Statement
+    {
         node_ptr<ModifiablePrimary> modifiablePrimary;
         node_ptr<Expression> expression;
-        Assignment(node_ptr<ModifiablePrimary> modifiablePrimary, node_ptr<Expression> expression){
+        Assignment(node_ptr<ModifiablePrimary> modifiablePrimary, node_ptr<Expression> expression)
+        {
             this->modifiablePrimary = modifiablePrimary;
             this->expression = expression;
         }
@@ -502,12 +504,13 @@ namespace ast
 
     struct RoutineCall : Statement, Expression
     {
-        node_ptr<RoutineDeclaration> routine;
+        // node_ptr<RoutineDeclaration> routine;
+        std::string name;
         std::vector<node_ptr<Expression>> args;
 
-        RoutineCall(node_ptr<RoutineDeclaration> routine, std::vector<node_ptr<Expression>> args)
+        RoutineCall(std::string name, std::vector<node_ptr<Expression>> args)
         {
-            this->routine = routine;
+            this->name = name;
             this->args = args;
         }
 

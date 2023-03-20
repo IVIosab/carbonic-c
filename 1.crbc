@@ -55,6 +55,7 @@ routine routineWithIfStatement () : integer is
     end
     return 0;
 end 
+
 routine routineWithWhileLoop() : integer is
     var i : int is 5;
     while i > 0 loop
@@ -62,6 +63,7 @@ routine routineWithWhileLoop() : integer is
         i := (i - 1);
     end
 end
+
 routine routineWithForLoop() : integer is 
     for i in 0 .. 3 loop
         print(i);
@@ -70,6 +72,7 @@ routine routineWithForLoop() : integer is
         print(i);
     end
 end
+
 routine routineWithForeachAndArray() : integer is 
     var x : array [3] integer;
     x[1] := 1;
@@ -79,6 +82,7 @@ routine routineWithForeachAndArray() : integer is
         print(i);
     end
 end
+
 routine routineWithRecord () : integer is 
    var x : record 
         var a : integer is 0;
@@ -87,9 +91,11 @@ routine routineWithRecord () : integer is
     print(x.a);
     print(x.b); 
 end 
+
 routine main () : integer is
-    //var returnedValue1 : routineWithParametersAndType(1) is integer;
-    //var returnedValue2 : routineWithParamter(2);
-    
+    var returnedValue1 : integer is routineWithParametersAndType(1);
+    var returnedValue2 is routineWithParamter(2);   
+    routineWithRecord(1); 
+    routineWithForeachAndArray();
     return 0;
 end
