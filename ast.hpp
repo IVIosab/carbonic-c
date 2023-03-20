@@ -26,11 +26,11 @@ namespace ast
     struct IntLiteral;
     struct DoubleLiteral;
     struct BoolLiteral;
-    // struct ExpressionList;
     struct VariableDeclaration;
     struct TypeDeclaration;
     struct ModifiablePrimary;
     struct RoutineDeclaration;
+    struct RoutineCall;
     struct Body;
     struct Statement;
     struct Print;
@@ -54,7 +54,6 @@ public:
     virtual void visit(ast::IntLiteral *il) = 0;
     virtual void visit(ast::DoubleLiteral *il) = 0;
     virtual void visit(ast::BoolLiteral *il) = 0;
-    // virtual void visit(ast::ExpressionList   *el) = 0;
     virtual void visit(ast::BinaryExpression *binexp) = 0;
     virtual void visit(ast::BinaryOperator *binop) = 0;
     virtual void visit(ast::BitwiseExpression *bitexp) = 0;
@@ -62,15 +61,16 @@ public:
     virtual void visit(ast::VariableDeclaration *vardecl) = 0;
     virtual void visit(ast::TypeDeclaration *typedecl) = 0;
     virtual void visit(ast::RoutineDeclaration *routdecl) = 0;
+    virtual void visit(ast::RoutineCall *routcall) = 0;
     virtual void visit(ast::Body *body) = 0;
     virtual void visit(ast::Print *stmt) = 0;
     virtual void visit(ast::Return *stmt) = 0;
     virtual void visit(ast::Identifier *id) = 0;
     virtual void visit(ast::ModifiablePrimary *mp) = 0;
     virtual void visit(ast::IfStatement *is) = 0;
-    virtual void visit(ast::WhileLoop *wl) =0;
+    virtual void visit(ast::WhileLoop *wl) = 0;
     virtual void visit(ast::ForLoop *fl) = 0;
-    virtual void visit(ast::ForeachLoop *fel) =0;
+    virtual void visit(ast::ForeachLoop *fel) = 0;
 };
 
 namespace ast
@@ -123,9 +123,9 @@ namespace ast
     // A special node containing program variables, type aliases, and routines.
     struct Program : Node
     {
-        // std::vector<node_ptr<VariableDeclaration>> variables;
-        // std::map<std::string, node_ptr<Type>> types;
-        // std::vector<node_ptr<RoutineDeclaration>> routines;
+        std::vector<node_ptr<VariableDeclaration>> variables;
+        std::map<std::string, node_ptr<Type>> types;
+        std::vector<node_ptr<RoutineDeclaration>> routines;
 
         void accept(Visitor *v) override { v->visit(this); }
     };
@@ -280,19 +280,6 @@ namespace ast
         void accept(Visitor *v) override { v->visit(this); }
     };
 
-    // struct ExpressionList : Expression
-    // {
-    //     std::vector<node_ptr<Expression>> elements;
-
-    //     ExpressionList(std::vector<node_ptr<Expression>> elements)
-    //     {
-    //         this->dtype = std::make_shared<ArrayType>();
-    //         this->elements = elements;
-    //     }
-
-    //     void accept(Visitor *v) override { v->visit(this); }
-    // };
-
     struct Identifier : Expression
     {
         std::string name;
@@ -360,11 +347,13 @@ namespace ast
         }
         void accept(Visitor *v) { v->visit(this); }
     };
-    struct ModifiablePrimary : Expression{
+    struct ModifiablePrimary : Expression
+    {
         node_ptr<Identifier> identifier;
         std::vector<nestedAccess> accessValues;
 
-        ModifiablePrimary(node_ptr<Identifier> identifier, std::vector<nestedAccess> accessValues){
+        ModifiablePrimary(node_ptr<Identifier> identifier, std::vector<nestedAccess> accessValues)
+        {
             this->identifier = identifier;
             this->accessValues = accessValues;
         }
@@ -394,52 +383,61 @@ namespace ast
 
         void accept(Visitor *v) override { v->visit(this); }
     };
-    struct IfStatement : Statement{
+    struct IfStatement : Statement
+    {
         node_ptr<Expression> condition;
         node_ptr<Body> ifBody, elseBody;
-        IfStatement(node_ptr<Expression> condition, node_ptr<Body> ifBody){
+        IfStatement(node_ptr<Expression> condition, node_ptr<Body> ifBody)
+        {
             this->condition = condition;
             this->ifBody = ifBody;
             this->elseBody = nullptr;
         }
-        IfStatement(node_ptr<Expression> condition, node_ptr<Body> ifBody, node_ptr<Body> elseBody){
+        IfStatement(node_ptr<Expression> condition, node_ptr<Body> ifBody, node_ptr<Body> elseBody)
+        {
             this->condition = condition;
             this->ifBody = ifBody;
             this->elseBody = elseBody;
         }
-        void accept(Visitor *v) override {v->visit(this);}
+        void accept(Visitor *v) override { v->visit(this); }
     };
-    struct WhileLoop : Statement{
+    struct WhileLoop : Statement
+    {
         node_ptr<Expression> condition;
         node_ptr<Body> loopBody;
-        WhileLoop(node_ptr<Expression> condition, node_ptr<Body> loopBody){
+        WhileLoop(node_ptr<Expression> condition, node_ptr<Body> loopBody)
+        {
             this->condition = condition;
             this->loopBody = loopBody;
         }
-        void accept(Visitor *v) override {v->visit(this);}
+        void accept(Visitor *v) override { v->visit(this); }
     };
-    struct ForLoop : Statement{
+    struct ForLoop : Statement
+    {
         node_ptr<VariableDeclaration> identifier;
         node_ptr<Expression> condition, action;
         node_ptr<Body> loopBody;
-        ForLoop(node_ptr<VariableDeclaration> identifier, node_ptr<Expression> condition, node_ptr<Body> loopBody, node_ptr<Expression> action){
+        ForLoop(node_ptr<VariableDeclaration> identifier, node_ptr<Expression> condition, node_ptr<Body> loopBody, node_ptr<Expression> action)
+        {
             this->identifier = identifier;
             this->condition = condition;
             this->loopBody = loopBody;
             this->action = action;
         }
-        void accept(Visitor *v) override {v->visit(this);}
+        void accept(Visitor *v) override { v->visit(this); }
     };
-    struct ForeachLoop : Statement{
+    struct ForeachLoop : Statement
+    {
         node_ptr<Identifier> identifier;
         node_ptr<ModifiablePrimary> modifiablePrimary;
         node_ptr<Body> loopBody;
-        ForeachLoop(node_ptr<Identifier> identifier, node_ptr<ModifiablePrimary> modifablePrimary, node_ptr<Body> loopBody){
+        ForeachLoop(node_ptr<Identifier> identifier, node_ptr<ModifiablePrimary> modifablePrimary, node_ptr<Body> loopBody)
+        {
             this->identifier = identifier;
             this->modifiablePrimary = modifablePrimary;
             this->loopBody = loopBody;
         }
-        void accept(Visitor *v) override {v->visit(this);}
+        void accept(Visitor *v) override { v->visit(this); }
     };
     struct Return : Statement
     {
@@ -487,6 +485,20 @@ namespace ast
             this->name = name;
             this->params = params;
             this->body = body;
+        }
+
+        void accept(Visitor *v) override { v->visit(this); }
+    };
+
+    struct RoutineCall : Statement, Expression
+    {
+        node_ptr<RoutineDeclaration> routine;
+        std::vector<node_ptr<Expression>> args;
+
+        RoutineCall(node_ptr<RoutineDeclaration> routine, std::vector<node_ptr<Expression>> args)
+        {
+            this->routine = routine;
+            this->args = args;
         }
 
         void accept(Visitor *v) override { v->visit(this); }

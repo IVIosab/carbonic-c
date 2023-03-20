@@ -1,41 +1,54 @@
-var i : integer;
-var d : real;
-var b : boolean;
-var x : integer is 1;
-var y : real is 1.1;
-var z : boolean is true;
-var a is 2;
-var b is 2.2;
-var c is false;
 type int is integer;
 type double is real;
 type bool is boolean;
-var ii : int;
-var dd : double;
-var bb : bool;
-var xx : int is 1;
-var yy : double is 1.1;
-var zz : bool is true;
-var arr : array [3] integer;
-var x : record 
-    var a : integer is 0;
-    var b : integer is 1;
-end;
 
-routine x (x is integer) : integer is 
-    var id : integer is 1;
-    print(5);
-    return 5;
+routine routineWithParametersAndType (parameter1 is integer) : integer is 
+    //variable declarations with initial value
+    var integerWithInitialValue : integer is 1;
+    var realWithInitialValue : real is 1.1;
+    var booleanWithInitialValue : boolean is true;
+    var intWithInitialValue : int is 2;
+    var doubleWithInitialValue : double is 2.2;
+    var boolWithInitialValue : bool is false;
+    
+    return 1;
 end
 
-routine x (x is integer) is
+routine routineWithParamter (parameter2 is integer) is
+    //variable declarations without initial value
+    var integerWithInitialValue : integer;
+    var realWithInitialValue : real;
+    var booleanWithInitialValue : boolean;
+    var intWithInitialValue : int;
+    var doubleWithInitialValue : double;
+    var boolWithInitialValue : bool;
+
+    var nestedRoutineCall : routineWithoutAnything();
+
+    return 2;
 end
 
-routine x () : integer is 
+routine routineWithoutAnything () is 
+    var inferredInteger is 3;
+    var inferredReal is 3.3;
+    var inferredBoolean is true;
+
+    var arrayVar : array [3] integer;
+    var recordVar : record 
+        var a : integer is 0;
+        var b : integer is 1;
+    end;
+
+    return 3;
 end
 
-routine x () is 
+routine main () : integer is
+    var returnedValue1 : routineWithParametersAndType(1) is integer;
+    var returnedValue2 : routineWithParamter(2);
+    
+    return 0;
 end
+
 
 x[5].recordParameter
 x.recordParameter[5][6]
@@ -61,3 +74,5 @@ end
 foreach i from x loop
         print(i);
     end
+
+var rc : integer is x(5); 
