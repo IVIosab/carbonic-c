@@ -64,6 +64,7 @@
 %type <ast::node_ptr<ast::ForLoop>> FOR_LOOP
 %type <ast::node_ptr<ast::ForeachLoop> > FOREACH_LOOP
 %type <std::vector<ast::nestedAccess>> NESTED_ACCESS
+%type <ast::node_ptr<ast::Assignment>> ASSIGNMENT
 
 %code requires {
     #include <iostream>
@@ -150,9 +151,9 @@ BODY:
         $$ = $2;
     };
 STATEMENT:
-    /* ASSIGNMENT {
+    ASSIGNMENT {
         $$ = $1;
-    }| */
+    }|
     PRINT {
         $$ = $1;
     }|
@@ -174,6 +175,10 @@ STATEMENT:
     RETURN {
         $$ = $1;
     }; 
+ASSIGNMENT:
+    MODIFIABLE_PRIMARY TK_ASSIGN EXPRESSION TK_SCOLON {
+        $$ = std::make_shared<ast::Assignment>($1, $3);
+    };
 PRINT:
     TK_PRINT TK_LPAREN TK_NEWLINE TK_RPAREN TK_SCOLON {
         $$ = std::make_shared<ast::Print>(true);

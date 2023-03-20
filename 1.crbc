@@ -23,7 +23,7 @@ routine routineWithParamter (parameter2 is integer) is
     var doubleWithInitialValue : double;
     var boolWithInitialValue : bool;
 
-    var nestedRoutineCall : routineWithoutAnything();
+    //var nestedRoutineCall : routineWithoutAnything();
 
     return 2;
 end
@@ -42,37 +42,54 @@ routine routineWithoutAnything () is
     return 3;
 end
 
+routine routineWithIfStatement () : integer is 
+    var x : integer is 7;
+    if (x > 5) then
+        print (x);
+    end
+    x := 5;
+    if (x < 6 and (6 <= 9) ) then
+        print(x);
+    else 
+        print(9);
+    end
+    return 0;
+end 
+routine routineWithWhileLoop() : integer is
+    var i : int is 5;
+    while i > 0 loop
+        print(i);
+        i := (i - 1);
+    end
+end
+routine routineWithForLoop() : integer is 
+    for i in 0 .. 3 loop
+        print(i);
+    end
+    for i in reverse 0 .. 3 loop
+        print(i);
+    end
+end
+routine routineWithForeachAndArray() : integer is 
+    var x : array [3] integer;
+    x[1] := 1;
+    x[2] := 2;
+    x[3] := 3;
+    foreach i from x loop
+        print(i);
+    end
+end
+routine routineWithRecord () : integer is 
+   var x : record 
+        var a : integer is 0;
+        var b : integer is 1;
+    end;
+    print(x.a);
+    print(x.b); 
+end 
 routine main () : integer is
-    var returnedValue1 : routineWithParametersAndType(1) is integer;
-    var returnedValue2 : routineWithParamter(2);
+    //var returnedValue1 : routineWithParametersAndType(1) is integer;
+    //var returnedValue2 : routineWithParamter(2);
     
     return 0;
 end
-
-
-x[5].recordParameter
-x.recordParameter[5][6]
-if (x > 5) then
-    print (x);
-end
-
-if (x < 6 and (6 > 9) ) then
-    print(x);
-else 
-   print(x);
-end 
-while i > 0 loop
-        print(i);
-end
-for i in 0 .. 3 loop
-        print(i);
-    end
-
-for i in reverse 0 .. 3 loop
-    print(i);
-end
-foreach i from x loop
-        print(i);
-    end
-
-var rc : integer is x(5); 

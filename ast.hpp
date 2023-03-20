@@ -33,6 +33,7 @@ namespace ast
     struct RoutineCall;
     struct Body;
     struct Statement;
+    struct Assignment;
     struct Print;
     struct IfStatement;
     struct WhileLoop;
@@ -63,6 +64,7 @@ public:
     virtual void visit(ast::RoutineDeclaration *routdecl) = 0;
     virtual void visit(ast::RoutineCall *routcall) = 0;
     virtual void visit(ast::Body *body) = 0;
+    virtual void visit(ast::Assignment* assign) = 0;
     virtual void visit(ast::Print *stmt) = 0;
     virtual void visit(ast::Return *stmt) = 0;
     virtual void visit(ast::Identifier *id) = 0;
@@ -364,7 +366,15 @@ namespace ast
     {
         void accept(Visitor *v) override = 0;
     };
-
+    struct Assignment : Statement {
+        node_ptr<ModifiablePrimary> modifiablePrimary;
+        node_ptr<Expression> expression;
+        Assignment(node_ptr<ModifiablePrimary> modifiablePrimary, node_ptr<Expression> expression){
+            this->modifiablePrimary = modifiablePrimary;
+            this->expression = expression;
+        }
+        void accept(Visitor *v) override { v->visit(this); }
+    };
     struct Print : Statement
     {
         node_ptr<Expression> exp;
