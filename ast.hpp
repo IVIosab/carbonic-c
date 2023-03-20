@@ -27,9 +27,13 @@ namespace ast
     struct DoubleLiteral;
     struct BoolLiteral;
     // struct ExpressionList;
-    struct SimpleDeclaration;
     struct VariableDeclaration;
     struct TypeDeclaration;
+    struct RoutineDeclaration;
+    struct Body;
+    struct Statement;
+    struct Print;
+    struct Return;
 } // namespace ast
 
 // Base class for code generator and anything that traverses AST.
@@ -52,6 +56,10 @@ public:
     virtual void visit(ast::ComparisonExpression *comexp) = 0;
     virtual void visit(ast::VariableDeclaration *vardecl) = 0;
     virtual void visit(ast::TypeDeclaration *typedecl) = 0;
+    virtual void visit(ast::RoutineDeclaration *routdecl) = 0;
+    virtual void visit(ast::Body *body) = 0;
+    virtual void visit(ast::Print *stmt) = 0;
+    virtual void visit(ast::Return *stmt) = 0;
     virtual void visit(ast::Identifier *id) = 0;
 };
 
@@ -300,11 +308,7 @@ namespace ast
 
     // <Simple Declaration>
 
-    struct SimpleDeclaration : Node
-    {
-        virtual void accept(Visitor *v) = 0;
-    };
-    struct VariableDeclaration : SimpleDeclaration
+    struct VariableDeclaration : Node
     {
         std::string name;
         node_ptr<Type> dtype;
@@ -333,7 +337,7 @@ namespace ast
 
         void accept(Visitor *v) { v->visit(this); }
     };
-    struct TypeDeclaration : SimpleDeclaration
+    struct TypeDeclaration : Node
     {
         std::string name;
         node_ptr<Type> dtype;
@@ -344,6 +348,81 @@ namespace ast
             this->dtype = dtype;
         }
         void accept(Visitor *v) { v->visit(this); }
+    };
+    // Base class for Statements
+    struct Statement : virtual Node
+    {
+        void accept(Visitor *v) override = 0;
+    };
+
+    struct Print : Statement
+    {
+        node_ptr<Expression> exp;
+        bool endl;
+
+        Print(node_ptr<Expression> exp)
+        {
+            this->exp = exp;
+            this->endl = false;
+        }
+        Print(bool endl)
+        {
+            this->exp = nullptr;
+            this->endl = endl;
+        }
+
+        void accept(Visitor *v) override { v->visit(this); }
+    };
+
+    struct Return : Statement
+    {
+        node_ptr<Expression> exp;
+
+        Return() {}
+
+        Return(node_ptr<Expression> exp)
+        {
+            this->exp = exp;
+        }
+
+        void accept(Visitor *v) override { v->visit(this); }
+    };
+    struct Body : Node
+    {
+        std::vector<node_ptr<VariableDeclaration>> variables;
+        std::vector<node_ptr<Statement>> statements;
+
+        Body(std::vector<node_ptr<VariableDeclaration>> variables, std::vector<node_ptr<Statement>> statements)
+        {
+            this->variables = variables;
+            this->statements = statements;
+        }
+
+        void accept(Visitor *v) override { v->visit(this); }
+    };
+    struct RoutineDeclaration : Node
+    {
+        std::string name;
+        std::vector<node_ptr<VariableDeclaration>> params;
+        node_ptr<Type> rtype;
+        node_ptr<Body> body;
+
+        RoutineDeclaration(std::string name, std::vector<node_ptr<VariableDeclaration>> params, node_ptr<Type> rtype, node_ptr<Body> body)
+        {
+            this->name = name;
+            this->params = params;
+            this->rtype = rtype;
+            this->body = body;
+        }
+
+        RoutineDeclaration(std::string name, std::vector<node_ptr<VariableDeclaration>> params, node_ptr<Body> body)
+        {
+            this->name = name;
+            this->params = params;
+            this->body = body;
+        }
+
+        void accept(Visitor *v) override { v->visit(this); }
     };
     // </Statements>
 } // namespace ast

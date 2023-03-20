@@ -21,4 +21,20 @@ var x : record
     var a : integer is 0;
     var b : integer is 1;
 end;
-x is integer, y is real, z is boolean
+
+routine x (x is integer) : integer is 
+    var id : integer is 1;
+    print(5);
+    return 5;
+end
+
+routine x (x is integer) is
+end
+
+routine x () : integer is 
+end
+
+routine x () is 
+end
+
+[ 1 , 2 ]

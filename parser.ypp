@@ -41,7 +41,6 @@
 %type <bool> TK_BOOL_LITERAL
 
 %type <ast::node_ptr<ast::Program>> PROGRAM
-%type <ast::node_ptr<ast::SimpleDeclaration>> SIMPLE_DECLARATION 
 %type <ast::node_ptr<ast::VariableDeclaration>> VARIABLE_DECLARATION PARAMETER 
 %type <std::vector<ast::node_ptr<ast::VariableDeclaration>>> VARIABLE_DECLARATIONS PARAMETERS
 %type <ast::node_ptr<ast::TypeDeclaration>> TYPE_DECLARATION 
@@ -53,6 +52,13 @@
 %type <ast::node_ptr<ast::BinaryExpression>> BINARY
 %type <ast::node_ptr<ast::BitwiseExpression>> BITWISE
 %type <ast::node_ptr<ast::ComparisonExpression>> COMPARISON
+%type <ast::node_ptr<ast::RoutineDeclaration>> ROUTINE_DECLARATION
+%type <ast::node_ptr<ast::Statement>> STATEMENT
+%type <ast::node_ptr<ast::Return>> RETURN
+%type <ast::node_ptr<ast::Print>> PRINT
+%type <ast::node_ptr<ast::Body>> BODY
+
+
 //%type <ast::node_ptr<ast::ExpressionList>> EXPRESSION_LIST
 
 %code requires {
@@ -82,13 +88,29 @@
 PROGRAM:
     %empty {
         std::cout<< '\n' << std::endl;
-        $$ = program;
     }|
-    SIMPLE_DECLARATION PROGRAM {
+    VARIABLE_DECLARATION PROGRAM {
         $$ = $2;
     }|
-    PARAMETERS {
-        std::cout<<"<<PARAMETERS>>"<<std::endl;
+    TYPE_DECLARATION PROGRAM {
+        $$ = $2;
+    }|
+    ROUTINE_DECLARATION PROGRAM{
+        $$ = $2;
+    }
+    ;
+ROUTINE_DECLARATION:
+    TK_ROUTINE TK_IDENTIFIER TK_LPAREN PARAMETERS TK_RPAREN TK_COLON TYPE TK_IS BODY TK_END {
+        $$ = std::make_shared<ast::RoutineDeclaration>($2, $4, $7, $9);
+    }|
+    TK_ROUTINE TK_IDENTIFIER TK_LPAREN PARAMETERS TK_RPAREN TK_IS BODY TK_END {
+        $$ = std::make_shared<ast::RoutineDeclaration>($2, $4, $7);
+    }|
+    TK_ROUTINE TK_IDENTIFIER TK_LPAREN TK_RPAREN TK_COLON TYPE TK_IS BODY TK_END {
+        $$ = std::make_shared<ast::RoutineDeclaration>($2, std::vector<ast::node_ptr<ast::VariableDeclaration>>(), $6, $8);
+    }|
+    TK_ROUTINE TK_IDENTIFIER TK_LPAREN TK_RPAREN TK_IS BODY TK_END {
+        $$ = std::make_shared<ast::RoutineDeclaration>($2, std::vector<ast::node_ptr<ast::VariableDeclaration>>(), $6);
     }
     ;
 PARAMETERS:
@@ -99,20 +121,62 @@ PARAMETERS:
         $3.push_back($1);
         $$ = $3;
     }
+    ;
 PARAMETER:
     TK_IDENTIFIER TK_IS TYPE{
         $$ = std::make_shared<ast::VariableDeclaration>($1, $3);
     }
     ;
-SIMPLE_DECLARATION:
-    VARIABLE_DECLARATION {
-        std::cout<<"<<VARIABLE_DECLARATION>>"<<std::endl;
+BODY:
+    %empty {
+        std::vector<ast::node_ptr<ast::VariableDeclaration>> tmp1;
+        std::vector<ast::node_ptr<ast::Statement>> tmp2;
+        $$ = std::make_shared<ast::Body>(tmp1, tmp2);
+    }|
+    VARIABLE_DECLARATION BODY {
+        $2->variables.push_back($1);
+        $$ = $2;
+    }| 
+    STATEMENT BODY {
+        $2->statements.push_back($1);
+        $$ = $2;
+    };
+STATEMENT:
+    /* ASSIGNMENT {
+        $$ = $1;
+    }| */
+    PRINT {
         $$ = $1;
     }|
-    TYPE_DECLARATION {
-        std::cout<<"<<TYPE_DECLARATION>>"<<std::endl;
+    /* IF_STATEMENT {
         $$ = $1;
-    };
+    }|
+    WHILE_LOOP {
+        $$ = $1;
+    }|
+    FOR_LOOP {
+        $$ = $1;
+    }|
+    FOREACH_LOOP {
+        $$ = $1;
+    }|
+    ROUTINE_CALL TK_SCOLON {
+        $$ = $1;
+    }|  */
+    RETURN {
+        $$ = $1;
+    }; 
+PRINT:
+    TK_PRINT TK_LPAREN TK_NEWLINE TK_RPAREN TK_SCOLON {
+        $$ = std::make_shared<ast::Print>(true);
+    }|
+    TK_PRINT TK_LPAREN EXPRESSION TK_RPAREN TK_SCOLON{
+        $$ = std::make_shared<ast::Print>($3);
+    }; 
+RETURN: 
+    TK_RETURN EXPRESSION TK_SCOLON {
+        $$ = std::make_shared<ast::Return>($2);
+    }; 
 VARIABLE_DECLARATION:
     TK_VAR TK_IDENTIFIER TK_COLON TYPE TK_SCOLON {
         $$ = std::make_shared<ast::VariableDeclaration>($2, $4);
@@ -122,8 +186,7 @@ VARIABLE_DECLARATION:
     }|
     TK_VAR TK_IDENTIFIER TK_IS EXPRESSION TK_SCOLON {
         $$ = std::make_shared<ast::VariableDeclaration>($2, $4);
-    }
-    ;
+    };
 TYPE_DECLARATION:
     TK_TYPE TK_IDENTIFIER TK_IS TYPE TK_SCOLON {
         $$ = std::make_shared<ast::TypeDeclaration>($2, $4);
@@ -136,8 +199,7 @@ TYPE:
     ARRAY_TYPE {
     }|
     RECORD_TYPE {
-    }
-    ;
+    };
 PRIMITIVE_TYPE:
     TK_INT {
         $$ = std::make_shared<ast::IntType>();
@@ -147,8 +209,7 @@ PRIMITIVE_TYPE:
     }|
     TK_BOOL {
         $$ = std::make_shared<ast::BoolType>();
-    }
-    ;
+    };
 ARRAY_TYPE:
     TK_ARRAY TK_LSQBRK EXPRESSION TK_RSQBRK TYPE {
         $$ = std::make_shared<ast::ArrayType>($3, $5);
@@ -186,8 +247,7 @@ EXPRESSION:
     }|
     TK_LPAREN COMPARISON TK_RPAREN {
         $$ = $2;
-    }
-    ;
+    };
 BINARY:
     VALUE TK_PLUS EXPRESSION {
         $$ = std::make_shared<ast::BinaryExpression>($1, ast::BinaryOperatorEnum::PLUS, $3);
@@ -206,8 +266,7 @@ BINARY:
     }|
     VALUE TK_MOD EXPRESSION {
         $$ = std::make_shared<ast::BinaryExpression>($1, ast::BinaryOperatorEnum::MOD, $3);
-    }
-    ;
+    };
 BITWISE:
     VALUE TK_AND EXPRESSION {
         $$ = std::make_shared<ast::BitwiseExpression>($1, ast::BitwiseOperatorEnum::AND, $3);
@@ -217,8 +276,7 @@ BITWISE:
     }|
     VALUE TK_XOR EXPRESSION {
         $$ = std::make_shared<ast::BitwiseExpression>($1, ast::BitwiseOperatorEnum::XOR, $3);
-    }
-    ;
+    };
 COMPARISON:
     VALUE TK_CEQ EXPRESSION {
         $$ = std::make_shared<ast::ComparisonExpression>($1, ast::ComparisonOperatorEnum::CEQ, $3);
@@ -237,8 +295,7 @@ COMPARISON:
     }|
     VALUE TK_CLE EXPRESSION {
         $$ = std::make_shared<ast::ComparisonExpression>($1, ast::ComparisonOperatorEnum::CLE, $3);
-    }
-    ;
+    };
 VALUE:
     TK_BOOL_LITERAL {
         $$ = std::make_shared<ast::BoolLiteral>($1);
