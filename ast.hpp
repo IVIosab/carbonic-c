@@ -2,6 +2,7 @@
 #define AST_H
 
 #include <iostream>
+#include <string>
 #include <memory>
 #include <map>
 #include <vector>
@@ -84,7 +85,7 @@ namespace ast
     typedef std::variant<node_ptr<ast::Expression>, node_ptr<ast::Identifier>> nestedAccess;
 
     // Enumerations
-    enum class TypeEnum
+    enum TypeEnum
     {
         INT,
         DOUBLE,
@@ -92,7 +93,7 @@ namespace ast
         ARRAY,
         RECORD
     };
-    enum class BinaryOperatorEnum
+    enum BinaryOperatorEnum
     {
         PLUS,
         MINUS,
@@ -101,13 +102,13 @@ namespace ast
         POW,
         MOD
     };
-    enum class BitwiseOperatorEnum
+    enum BitwiseOperatorEnum
     {
         AND,
         OR,
         XOR
     };
-    enum class ComparisonOperatorEnum
+    enum ComparisonOperatorEnum
     {
         CEQ,
         CNEQ,
@@ -135,10 +136,10 @@ namespace ast
     // Base class for Types
     struct Type : Node
     {
-        virtual TypeEnum getType() { return TypeEnum::INT; };
+        virtual TypeEnum getType() {return ast::TypeEnum::INT;}
         virtual void accept(Visitor *v) = 0;
+        //friend std::ostream& operator<<(std::ostream& os, const node_ptr<Type> value);
     };
-
     // <Types>
 
     struct IntType : Type
@@ -255,7 +256,6 @@ namespace ast
 
         void accept(Visitor *v) override { v->visit(this); }
     };
-
     struct DoubleLiteral : Expression
     {
         double value;
@@ -334,7 +334,6 @@ namespace ast
             this->dtype = dtype;
             this->initial_value = initial_value;
         }
-
         void accept(Visitor *v) { v->visit(this); }
     };
     struct TypeDeclaration : Node
