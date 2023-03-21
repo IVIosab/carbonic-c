@@ -15,7 +15,7 @@
 #include <fstream>
 
 // Define token types
-enum token_type
+enum class TokenType
 {
     TK_VAR,
     TK_TYPE,

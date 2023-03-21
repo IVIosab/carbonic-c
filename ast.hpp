@@ -15,7 +15,6 @@ namespace ast
     struct Type;
     struct Expression;
     struct BinaryExpression;
-    struct BinaryOperator;
     struct BitwiseExpression;
     struct ComparisonExpression;
     struct Identifier;
@@ -44,37 +43,40 @@ namespace ast
 } // namespace ast
 
 // Base class for code generator and anything that traverses AST.
-class Visitor
+
+namespace ast
 {
-public:
-    virtual void visit(ast::Program *program) = 0;
-    virtual void visit(ast::IntType *it) = 0;
-    virtual void visit(ast::DoubleType *dt) = 0;
-    virtual void visit(ast::BoolType *bt) = 0;
-    virtual void visit(ast::ArrayType *at) = 0;
-    virtual void visit(ast::RecordType *rt) = 0;
-    virtual void visit(ast::IntLiteral *il) = 0;
-    virtual void visit(ast::DoubleLiteral *il) = 0;
-    virtual void visit(ast::BoolLiteral *il) = 0;
-    virtual void visit(ast::BinaryExpression *binexp) = 0;
-    virtual void visit(ast::BinaryOperator *binop) = 0;
-    virtual void visit(ast::BitwiseExpression *bitexp) = 0;
-    virtual void visit(ast::ComparisonExpression *comexp) = 0;
-    virtual void visit(ast::VariableDeclaration *vardecl) = 0;
-    virtual void visit(ast::TypeDeclaration *typedecl) = 0;
-    virtual void visit(ast::RoutineDeclaration *routdecl) = 0;
-    virtual void visit(ast::RoutineCall *routcall) = 0;
-    virtual void visit(ast::Body *body) = 0;
-    virtual void visit(ast::Assignment *assign) = 0;
-    virtual void visit(ast::Print *stmt) = 0;
-    virtual void visit(ast::Return *stmt) = 0;
-    virtual void visit(ast::Identifier *id) = 0;
-    virtual void visit(ast::ModifiablePrimary *mp) = 0;
-    virtual void visit(ast::IfStatement *is) = 0;
-    virtual void visit(ast::WhileLoop *wl) = 0;
-    virtual void visit(ast::ForLoop *fl) = 0;
-    virtual void visit(ast::ForeachLoop *fel) = 0;
-};
+    class Visitor
+    {
+    public:
+        virtual void visit(ast::Program *program) = 0;
+        virtual void visit(ast::IntType *it) = 0;
+        virtual void visit(ast::DoubleType *dt) = 0;
+        virtual void visit(ast::BoolType *bt) = 0;
+        virtual void visit(ast::ArrayType *at) = 0;
+        virtual void visit(ast::RecordType *rt) = 0;
+        virtual void visit(ast::IntLiteral *il) = 0;
+        virtual void visit(ast::DoubleLiteral *il) = 0;
+        virtual void visit(ast::BoolLiteral *il) = 0;
+        virtual void visit(ast::BinaryExpression *binexp) = 0;
+        virtual void visit(ast::BitwiseExpression *bitexp) = 0;
+        virtual void visit(ast::ComparisonExpression *comexp) = 0;
+        virtual void visit(ast::VariableDeclaration *vardecl) = 0;
+        virtual void visit(ast::TypeDeclaration *typedecl) = 0;
+        virtual void visit(ast::RoutineDeclaration *routdecl) = 0;
+        virtual void visit(ast::RoutineCall *routcall) = 0;
+        virtual void visit(ast::Body *body) = 0;
+        virtual void visit(ast::Assignment *assign) = 0;
+        virtual void visit(ast::Print *stmt) = 0;
+        virtual void visit(ast::Return *stmt) = 0;
+        virtual void visit(ast::Identifier *id) = 0;
+        virtual void visit(ast::ModifiablePrimary *mp) = 0;
+        virtual void visit(ast::IfStatement *is) = 0;
+        virtual void visit(ast::WhileLoop *wl) = 0;
+        virtual void visit(ast::ForLoop *fl) = 0;
+        virtual void visit(ast::ForeachLoop *fel) = 0;
+    };
+}
 
 namespace ast
 {
@@ -136,9 +138,9 @@ namespace ast
     // Base class for Types
     struct Type : Node
     {
-        virtual TypeEnum getType() {return ast::TypeEnum::INT;}
+        virtual TypeEnum getType() { return ast::TypeEnum::INT; }
         virtual void accept(Visitor *v) = 0;
-        //friend std::ostream& operator<<(std::ostream& os, const node_ptr<Type> value);
+        // friend std::ostream& operator<<(std::ostream& os, const node_ptr<Type> value);
     };
     // <Types>
 
@@ -291,6 +293,7 @@ namespace ast
         Identifier(std::string name)
         {
             this->name = name;
+            this->idx = nullptr;
         }
 
         // array element access
@@ -454,7 +457,10 @@ namespace ast
     {
         node_ptr<Expression> exp;
 
-        Return() {}
+        Return()
+        {
+            this->exp = nullptr;
+        }
 
         Return(node_ptr<Expression> exp)
         {
