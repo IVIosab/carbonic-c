@@ -1,5 +1,6 @@
 #include "driver.hpp"
 
+extern ast::node_ptr<ast::Program> program;
 namespace carbonic_c
 {
 
