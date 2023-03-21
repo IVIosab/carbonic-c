@@ -1,29 +1,4 @@
-type int is integer;
-type double is real;
-type bool is boolean;
-var x : int is 5;
-var x : integer is 890;
-var y : double is 56.96;
-var z : bool is true;
-var a : integer is x;
-var b : integer is (x > 5);
-var c : integer is (x + 5);
-var d : integer is (7 or 5);
-var e : integer is 6 % 6 * 5 - 9 + 5;
-
-routine main () : integer is 
-    var x : array [3] integer;
-    //x[1] :- 0;
-    for i in 0 .. 2 loop
-        print(x[i]);
-    end
-     var x : record 
-        var a : integer is 0;
-        var b : integer is 1;
-    end;
-
-    print(x.a);
-    print(x.b);
-
+routine main () : integer is
+    var integerWithInitialValue : integer is 5 + 3;
     return 0;
 end
