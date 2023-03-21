@@ -96,6 +96,7 @@ PROGRAM:
         //std::cout<< '\n' << std::endl;
     }|
     VARIABLE_DECLARATION PROGRAM {
+        program->variables.push_back($1);
         $$ = $2;
     }|
     TYPE_DECLARATION PROGRAM {
@@ -236,17 +237,24 @@ VARIABLE_DECLARATION:
         $$ = std::make_shared<ast::VariableDeclaration>($2, $4);
     };
 TYPE_DECLARATION:
-    TK_TYPE TK_IDENTIFIER TK_IS TYPE TK_SCOLON {
+    // double check primitive type here.
+    TK_TYPE TK_IDENTIFIER TK_IS PRIMITIVE_TYPE TK_SCOLON {
+        program->types[$2] = $4;
         $$ = std::make_shared<ast::TypeDeclaration>($2, $4);
     };
 TYPE:
     PRIMITIVE_TYPE {
+        $$ = $1;
     }|
     TK_IDENTIFIER {
+        // be careful if it doesn't exist, we need type error
+        $$ = program->types[$1];
     }|
     ARRAY_TYPE {
+        $$ = $1;
     }|
     RECORD_TYPE {
+        $$ = $1;
     };
 PRIMITIVE_TYPE:
     TK_INT {
