@@ -1,2 +1,8 @@
-TK_ROUTINE TK_IDENTIFIER TK_LPAREN TK_RPAREN TK_COLON TK_INT TK_IS 
-TK_PRINT TK_LPAREN "TK_IDENTIFIER TK_IDENTIFIER 
+
+|- Program
+||- RoutineDeclaration (main)
+|||- IntType
+|||- Body
+||||- Print
+||||- Return
+|||||- IntLiteral (0)

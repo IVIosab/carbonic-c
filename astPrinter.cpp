@@ -82,11 +82,7 @@ namespace analyzer
         depth++;
         indent();
         cout << "ArrayType" << endl;
-
-        if (node->size != nullptr)
-        {
-            node->size->accept(this);
-        }
+        node->size->accept(this);
 
         node->dtype->accept(this);
 
@@ -188,12 +184,12 @@ namespace analyzer
             parameter->accept(this);
         }
 
-        node->body->accept(this);
-
         if (node->rtype != nullptr)
         {
             node->rtype->accept(this);
         }
+
+        node->body->accept(this);
 
         depth--;
     };
@@ -201,7 +197,7 @@ namespace analyzer
     {
         depth++;
         indent();
-        cout << "VariableDeclaration (" << node->name << ")" << endl;
+        cout << "RoutineCall (" << node->name << ")" << endl;
         for (size_t i = 0; i < node->args.size(); i++)
         {
             node->args[i]->accept(this);
@@ -270,8 +266,17 @@ namespace analyzer
     {
         depth++;
         indent();
-        cout << "ModifiablePrimary" << endl;
-        node->identifier->accept(this);
+        cout << "ModifiablePrimary (" << node->name << ")" << endl;
+        if (node->expression)
+        {
+            node->expression->accept(this);
+        }
+        if (node->argname != "")
+        {
+            cout << "|";
+            indent();
+            cout << node->argname << endl;
+        }
         depth--;
     };
     void AstPrinter::visit(ast::IfStatement *node)
@@ -279,7 +284,7 @@ namespace analyzer
         depth++;
         indent();
         cout << "IfStatement" << endl;
-        node->condition->accept(this); // TODO
+        node->condition->accept(this);
         node->ifBody->accept(this);
         if (node->elseBody)
         {
@@ -300,10 +305,9 @@ namespace analyzer
     {
         depth++;
         indent();
-        cout << "ForLoop" << endl;
-        node->identifier->accept(this);
-        node->condition->accept(this);
-        node->action->accept(this);
+        cout << "ForLoop (" << node->identifier << ")" << endl;
+        node->from->accept(this);
+        node->to->accept(this);
         node->loopBody->accept(this);
 
         depth--;
@@ -312,10 +316,9 @@ namespace analyzer
     {
         depth++;
         indent();
-        cout << "ForeachLoop" << endl;
-        node->identifier->accept(this);
-        node->loopBody->accept(this);
+        cout << "ForeachLoop (" << node->identifier << ")" << endl;
         node->modifiablePrimary->accept(this);
+        node->loopBody->accept(this);
         depth--;
     };
 

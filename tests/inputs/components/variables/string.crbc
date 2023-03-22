@@ -1,9 +1,0 @@
-routine main () : integer is 
-    var x : string is "Hello";
-    var y : string is "World!";
-
-    print(x);
-    print(y);
-
-    return 0;
-end

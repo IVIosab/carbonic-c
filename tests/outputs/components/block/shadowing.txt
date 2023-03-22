@@ -1,9 +1,16 @@
-TK_ROUTINE TK_IDENTIFIER TK_LPAREN TK_RPAREN TK_COLON TK_INT TK_IS 
-TK_VAR TK_IDENTIFIER TK_COLON TK_INT TK_IS TK_INTEGER_LITERAL TK_SCOLON 
 
-TK_IF TK_BOOL_LITERAL TK_THEN 
-TK_VAR TK_IDENTIFIER TK_COLON TK_INT TK_IS TK_INTEGER_LITERAL TK_SCOLON TK_COMMENT 
-TK_END 
-
-TK_RETURN TK_INTEGER_LITERAL TK_SCOLON 
-TK_END 
+|- Program
+||- RoutineDeclaration (main)
+|||- IntType
+|||- Body
+||||- VariableDeclaration (x)
+|||||- IntType
+|||||- IntLiteral (0)
+||||- IfStatement
+|||||- BoolLiteral (1)
+|||||- Body
+||||||- VariableDeclaration (x)
+|||||||- IntType
+|||||||- IntLiteral (1)
+||||- Return
+|||||- IntLiteral (0)

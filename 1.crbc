@@ -1,4 +1,0 @@
-routine main () : integer is
-    var integerWithInitialValue : integer is (5 + (1 + 2));
-    return 0;
-end

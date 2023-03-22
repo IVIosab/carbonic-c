@@ -1,11 +1,17 @@
-TK_ROUTINE TK_IDENTIFIER TK_LPAREN TK_RPAREN TK_COLON TK_INT TK_IS 
-TK_IF TK_BOOL_LITERAL TK_THEN 
-TK_PRINT TK_LPAREN "TK_IDENTIFIER !"TK_RPAREN TK_SCOLON 
-TK_END 
-
-TK_IF TK_BOOL_LITERAL TK_THEN 
-TK_PRINT TK_LPAREN "TK_IDENTIFIER !"TK_RPAREN TK_SCOLON 
-TK_END 
-
-TK_RETURN TK_INTEGER_LITERAL TK_SCOLON 
-TK_END 
+"!""!"
+|- Program
+||- RoutineDeclaration (main)
+|||- IntType
+|||- Body
+||||- IfStatement
+|||||- BoolLiteral (1)
+|||||- Body
+||||||- Print
+|||||||- ModifiablePrimary (Working)
+||||- IfStatement
+|||||- BoolLiteral (0)
+|||||- Body
+||||||- Print
+|||||||- ModifiablePrimary (ERROR)
+||||- Return
+|||||- IntLiteral (0)

@@ -1,11 +1,21 @@
-TK_ROUTINE TK_IDENTIFIER TK_LPAREN TK_RPAREN TK_COLON TK_INT TK_IS 
-TK_VAR TK_IDENTIFIER TK_COLON TK_RECORD 
-TK_VAR TK_IDENTIFIER TK_COLON TK_INT TK_IS TK_INTEGER_LITERAL TK_SCOLON 
-TK_VAR TK_IDENTIFIER TK_COLON TK_INT TK_IS TK_INTEGER_LITERAL TK_SCOLON 
-TK_END TK_SCOLON 
 
-TK_PRINT TK_LPAREN TK_IDENTIFIER TK_DOT TK_IDENTIFIER TK_RPAREN TK_SCOLON 
-TK_PRINT TK_LPAREN TK_IDENTIFIER TK_DOT TK_IDENTIFIER TK_RPAREN TK_SCOLON 
-
-TK_RETURN TK_INTEGER_LITERAL TK_SCOLON 
-TK_END 
+|- Program
+||- RoutineDeclaration (main)
+|||- IntType
+|||- Body
+||||- VariableDeclaration (x)
+|||||- RecordType
+||||||- VariableDeclaration (a)
+|||||||- IntType
+|||||||- IntLiteral (0)
+||||||- VariableDeclaration (b)
+|||||||- IntType
+|||||||- IntLiteral (1)
+||||- Print
+|||||- ModifiablePrimary (x)
+||||||- a
+||||- Print
+|||||- ModifiablePrimary (x)
+||||||- b
+||||- Return
+|||||- IntLiteral (0)

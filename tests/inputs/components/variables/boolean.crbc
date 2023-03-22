@@ -3,15 +3,15 @@ routine main () : integer is
     var y : boolean is false;
 
     if x then 
-        print("X is True");
+        print(1);
     else
-        print("X is False");
+        print(0);
     end 
 
     if y then 
-        print("Y is True");
+        print(1);
     else
-        print("Y is False");
+        print(0);
     end 
 
     return 0;

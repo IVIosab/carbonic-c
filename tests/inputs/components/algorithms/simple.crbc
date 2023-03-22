@@ -1,5 +1,6 @@
 routine main () : integer is 
-    var x : string is "Hello There!";
+    
+    var x : integer is 2 + 3;
 
     print(x);
 

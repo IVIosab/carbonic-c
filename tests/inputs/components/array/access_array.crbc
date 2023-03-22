@@ -1,8 +1,11 @@
 routine main () : integer is 
-    var x : array [3] integer is [1, 2, 3];
+    var ar : array [2] integer;
+    foreach x from ar loop
+        print(ar[i]);
+    end
 
-    for i in 0 .. 2 loop
-        print(x[i]);
+    for i in 1 .. 2 loop
+        ar[i] := i;
     end
 
     return 0;

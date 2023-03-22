@@ -1,4 +1,4 @@
 routine main () : integer is 
-    print("Hello World!");
+    print(newline);
     return 0;
 end

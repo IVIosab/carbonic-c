@@ -1,0 +1,22 @@
+routine main () : integer is
+    var a : array [6] integer is [6, 5, 4, 3, 2, 1];
+    for i in reverse 1 .. 6 loop
+        a[i] := i;
+    end
+
+    var temp : integer is 1;
+    for i in 1 .. 6 loop
+        for j : in (i + 1) .. 6 loop
+            if a[j] < a[i] then
+                temp := a[j];
+                a[j] := a[i];
+                a[i] := temp;
+            end
+        end 
+    end
+    for i : integer in 1 .. 6 loop
+        printeger(a[i]);
+        printeger(newline);
+    end
+    return 0;
+end

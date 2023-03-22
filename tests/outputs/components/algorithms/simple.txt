@@ -1,18 +1,13 @@
 
 |- Program
-||- RoutineDeclaration (SayHello)
-|||- IntType
-|||- Body
-||||- Print
-|||||- IntLiteral (1)
-||||- Return
-|||||- IntLiteral (1)
 ||- RoutineDeclaration (main)
 |||- IntType
 |||- Body
 ||||- VariableDeclaration (x)
 |||||- IntType
-|||||- RoutineCall (SayHello)
+|||||- BinaryExpression (+)
+||||||- IntLiteral (2)
+||||||- IntLiteral (3)
 ||||- Print
 |||||- ModifiablePrimary (x)
 ||||- Return

@@ -1,11 +1,22 @@
-TK_ROUTINE TK_IDENTIFIER TK_LPAREN TK_RPAREN TK_COLON TK_INT TK_IS 
-TK_VAR TK_IDENTIFIER TK_COLON TK_DOUBLE TK_IS TK_DOUBLE_LITERAL TK_SCOLON 
-TK_VAR TK_IDENTIFIER TK_COLON TK_DOUBLE TK_IS TK_DOUBLE_LITERAL TK_SCOLON 
-TK_VAR TK_IDENTIFIER TK_COLON TK_DOUBLE TK_IS TK_DOUBLE_LITERAL TK_SCOLON 
 
-TK_PRINT TK_LPAREN TK_IDENTIFIER TK_RPAREN TK_SCOLON 
-TK_PRINT TK_LPAREN TK_IDENTIFIER TK_RPAREN TK_SCOLON 
-TK_PRINT TK_LPAREN TK_IDENTIFIER TK_RPAREN TK_SCOLON 
-
-TK_RETURN TK_INTEGER_LITERAL TK_SCOLON 
-TK_END 
+|- Program
+||- RoutineDeclaration (main)
+|||- IntType
+|||- Body
+||||- VariableDeclaration (x)
+|||||- DoubleType
+|||||- DoubleLiteral (5.5)
+||||- VariableDeclaration (y)
+|||||- DoubleType
+|||||- DoubleLiteral (0.2)
+||||- VariableDeclaration (pi)
+|||||- DoubleType
+|||||- DoubleLiteral (3.14)
+||||- Print
+|||||- ModifiablePrimary (x)
+||||- Print
+|||||- ModifiablePrimary (y)
+||||- Print
+|||||- ModifiablePrimary (pi)
+||||- Return
+|||||- IntLiteral (0)

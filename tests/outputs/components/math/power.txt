@@ -1,4 +1,20 @@
-TK_ROUTINE TK_IDENTIFIER TK_LPAREN TK_RPAREN TK_COLON TK_INT TK_IS 
-TK_VAR TK_IDENTIFIER TK_COLON TK_INT TK_IS TK_INTEGER_LITERAL TK_SCOLON 
-TK_VAR TK_IDENTIFIER TK_COLON TK_INT TK_IS TK_INTEGER_LITERAL TK_SCOLON 
-TK_VAR TK_IDENTIFIER TK_COLON TK_INT TK_IS TK_IDENTIFIER ^TK_IDENTIFIER 
+
+|- Program
+||- RoutineDeclaration (main)
+|||- IntType
+|||- Body
+||||- VariableDeclaration (x)
+|||||- IntType
+|||||- IntLiteral (2)
+||||- VariableDeclaration (y)
+|||||- IntType
+|||||- IntLiteral (3)
+||||- VariableDeclaration (z)
+|||||- IntType
+|||||- BinaryExpression (**)
+||||||- ModifiablePrimary (x)
+||||||- ModifiablePrimary (y)
+||||- Print
+|||||- ModifiablePrimary (z)
+||||- Return
+|||||- IntLiteral (0)

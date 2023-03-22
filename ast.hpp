@@ -327,7 +327,7 @@ namespace ast
         VariableDeclaration(std::string name, node_ptr<Expression> initial_value)
         {
             this->name = name;
-            this->dtype = initial_value->dtype;
+            this->dtype = nullptr;
             this->initial_value = initial_value;
         }
 
@@ -353,14 +353,34 @@ namespace ast
     };
     struct ModifiablePrimary : Expression
     {
-        node_ptr<Identifier> identifier;
-        std::vector<nestedAccess> accessValues;
+        std::string name;
+        std::string argname;
+        node_ptr<Expression> expression;
+        // std::vector<nestedAccess> accessValues;
 
-        ModifiablePrimary(node_ptr<Identifier> identifier, std::vector<nestedAccess> accessValues)
+        // ModifiablePrimary(node_ptr<Identifier> identifier, std::vector<nestedAccess> accessValues)
+        // {
+        //     this->identifier = identifier;
+        //     this->accessValues = accessValues;
+        // }
+
+        ModifiablePrimary(std::string name)
         {
-            this->identifier = identifier;
-            this->accessValues = accessValues;
+            this->name = name;
+            this->argname = "";
         }
+        ModifiablePrimary(std::string name, node_ptr<Expression> expression)
+        {
+            this->name = name;
+            this->expression = expression;
+            this->argname = "";
+        }
+        ModifiablePrimary(std::string name, std::string argname)
+        {
+            this->name = name;
+            this->argname = argname;
+        }
+
         void accept(Visitor *v) override { v->visit(this); }
     };
     // Base class for Statements
@@ -428,24 +448,24 @@ namespace ast
     };
     struct ForLoop : Statement
     {
-        node_ptr<VariableDeclaration> identifier;
-        node_ptr<Expression> condition, action;
+        std::string identifier;
+        node_ptr<Expression> from, to;
         node_ptr<Body> loopBody;
-        ForLoop(node_ptr<VariableDeclaration> identifier, node_ptr<Expression> condition, node_ptr<Body> loopBody, node_ptr<Expression> action)
+        ForLoop(std::string identifier, node_ptr<Expression> from, node_ptr<Expression> to, node_ptr<Body> loopBody)
         {
             this->identifier = identifier;
-            this->condition = condition;
+            this->from = from;
+            this->to = to;
             this->loopBody = loopBody;
-            this->action = action;
         }
         void accept(Visitor *v) override { v->visit(this); }
     };
     struct ForeachLoop : Statement
     {
-        node_ptr<Identifier> identifier;
+        std::string identifier;
         node_ptr<ModifiablePrimary> modifiablePrimary;
         node_ptr<Body> loopBody;
-        ForeachLoop(node_ptr<Identifier> identifier, node_ptr<ModifiablePrimary> modifablePrimary, node_ptr<Body> loopBody)
+        ForeachLoop(std::string identifier, node_ptr<ModifiablePrimary> modifablePrimary, node_ptr<Body> loopBody)
         {
             this->identifier = identifier;
             this->modifiablePrimary = modifablePrimary;
