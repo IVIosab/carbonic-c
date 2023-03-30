@@ -128,8 +128,7 @@ namespace ast
     // A special node containing program variables, type aliases, and routines.
     struct Program : Node
     {
-        std::vector<node_ptr<VariableDeclaration>> variables;
-        std::map<std::string, node_ptr<Type>> types;
+        std::vector<node_ptr<TypeDeclaration>> types;
         std::vector<node_ptr<RoutineDeclaration>> routines;
 
         void accept(Visitor *v) override { v->visit(this); }

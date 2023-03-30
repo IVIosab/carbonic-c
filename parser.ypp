@@ -95,9 +95,6 @@ PROGRAM:
     %empty {
         //std::cout<< '\n' << std::endl;
     }|
-    VARIABLE_DECLARATION PROGRAM {
-        $$ = $2;
-    }|
     TYPE_DECLARATION PROGRAM {
         $$ = $2;
     }|
