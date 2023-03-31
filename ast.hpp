@@ -6,6 +6,7 @@
 #include <memory>
 #include <map>
 #include <vector>
+#include <algorithm>
 #include <variant>
 // Forward declarations
 namespace ast
@@ -69,7 +70,7 @@ namespace ast
         virtual void visit(ast::Assignment *assign) = 0;
         virtual void visit(ast::Print *stmt) = 0;
         virtual void visit(ast::Return *stmt) = 0;
-        virtual void visit(ast::Identifier *id) = 0;
+//        virtual void visit(ast::Identifier *id) = 0;
         virtual void visit(ast::ModifiablePrimary *mp) = 0;
         virtual void visit(ast::IfStatement *is) = 0;
         virtual void visit(ast::WhileLoop *wl) = 0;
@@ -84,7 +85,7 @@ namespace ast
     // Pointer to an AST node.
     template <typename Node>
     using node_ptr = std::shared_ptr<Node>;
-    typedef std::variant<node_ptr<ast::Expression>, node_ptr<ast::Identifier>> nestedAccess;
+    typedef std::variant<node_ptr<ast::Expression>, std::string> nestedAccess;
 
     // Enumerations
     enum TypeEnum
@@ -283,27 +284,27 @@ namespace ast
         void accept(Visitor *v) override { v->visit(this); }
     };
 
-    struct Identifier : Expression
-    {
-        std::string name;
-        node_ptr<Expression> idx;
+    // struct Identifier : Expression
+    // {
+    //     std::string name;
+    //     node_ptr<Expression> idx;
 
-        // variable or record field access
-        Identifier(std::string name)
-        {
-            this->name = name;
-            this->idx = nullptr;
-        }
+    //     // variable or record field access
+    //     Identifier(std::string name)
+    //     {
+    //         this->name = name;
+    //         this->idx = nullptr;
+    //     }
 
-        // array element access
-        Identifier(std::string name, node_ptr<Expression> idx)
-        {
-            this->name = name;
-            this->idx = idx;
-        }
+    //     // array element access
+    //     Identifier(std::string name, node_ptr<Expression> idx)
+    //     {
+    //         this->name = name;
+    //         this->idx = idx;
+    //     }
 
-        void accept(Visitor *v) override { v->visit(this); }
-    };
+    //     void accept(Visitor *v) override { v->visit(this); }
+    // };
 
     // </Expressions>
     // <Nodes>
@@ -353,32 +354,32 @@ namespace ast
     struct ModifiablePrimary : Expression
     {
         std::string name;
-        std::string argname;
-        node_ptr<Expression> expression;
-        // std::vector<nestedAccess> accessValues;
+        std::vector<nestedAccess> accessValues;
 
-        // ModifiablePrimary(node_ptr<Identifier> identifier, std::vector<nestedAccess> accessValues)
+        ModifiablePrimary(std::string name, std::vector<nestedAccess> accessValues)
+        {
+             this->name = name;
+             std::reverse(accessValues.begin(), accessValues.end());
+             this->accessValues = accessValues;
+        }
+
+        // ModifiablePrimary(std::string identifier)
         // {
-        //     this->identifier = identifier;
-        //     this->accessValues = accessValues;
+        //      this->identifier = identifier;
+        //      this->accessValues = {};
+        // }
+        // ModifiablePrimary(std::string name, node_ptr<Expression> expression)
+        // {
+        //     this->name = name;
+        //     this->expression = expression;
+        //     this->argname = "";
         // }
 
-        ModifiablePrimary(std::string name)
-        {
-            this->name = name;
-            this->argname = "";
-        }
-        ModifiablePrimary(std::string name, node_ptr<Expression> expression)
-        {
-            this->name = name;
-            this->expression = expression;
-            this->argname = "";
-        }
-        ModifiablePrimary(std::string name, std::string argname)
-        {
-            this->name = name;
-            this->argname = argname;
-        }
+        // ModifiablePrimary(std::string name, std::string argname)
+        // {
+        //     this->name = name;
+        //     this->argname = argname;
+        // }
 
         void accept(Visitor *v) override { v->visit(this); }
     };

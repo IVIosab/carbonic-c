@@ -65,12 +65,13 @@
 %type <ast::node_ptr<ast::ForeachLoop> > FOREACH_LOOP
 //%type <std::vector<ast::nestedAccess>> NESTED_ACCESS
 %type <ast::node_ptr<ast::Assignment>> ASSIGNMENT
-
+%type <std::vector<ast::nestedAccess> > NESTED_ACCESS
 %code requires {
     #include <iostream>
     #include <string>
     #include <vector>
     #include <variant>
+    #include <algorithm>
     #include "ast.hpp"
     namespace carbonic_c {
     class Lexer;
@@ -364,20 +365,20 @@ EXPRESSIONS:
         $1.push_back($3);
         $$ = $1;
     }; 
-/* NESTED_ACCESS:
+NESTED_ACCESS:
     %empty {
         $$ = std::vector<ast::nestedAccess>();
     }|
     TK_DOT TK_IDENTIFIER NESTED_ACCESS{
-        $3.push_back(std::make_shared<ast::Identifier>($2));
+        $3.push_back($2);
         $$ = $3;
     }|
     TK_LSQBRK EXPRESSION TK_RSQBRK NESTED_ACCESS {
         $4.push_back($2);
         $$ = $4;
-    }; */
+    };
 MODIFIABLE_PRIMARY : 
-    TK_IDENTIFIER{
+    /*TK_IDENTIFIER{
         $$ = std::make_shared<ast::ModifiablePrimary>($1);
     }|
     TK_IDENTIFIER TK_DOT TK_IDENTIFIER{
@@ -385,11 +386,10 @@ MODIFIABLE_PRIMARY :
     }|
     TK_IDENTIFIER TK_LSQBRK EXPRESSION TK_RSQBRK{
         $$ = std::make_shared<ast::ModifiablePrimary>($1, $3);
-    };
-    /* TK_IDENTIFIER NESTED_ACCESS{
-        //std::cout << " Modifiable primary\n";     
-        $$ = std::make_shared<ast::ModifiablePrimary>(std::make_shared<ast::Identifier>($1), $2);
     }; */
+    TK_IDENTIFIER NESTED_ACCESS{
+        $$ = std::make_shared<ast::ModifiablePrimary>($1, $2);
+    };
 %%
 
 void carbonic_c::Parser::error(const std::string& msg) {

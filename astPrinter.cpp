@@ -42,12 +42,7 @@ namespace analyzer
         cout << "Program" << endl;
         for (auto type : node->types)
         {
-            type.second->accept(this);
-        }
-
-        for (auto variableDecl : node->variables)
-        {
-            variableDecl->accept(this);
+            type->accept(this);
         }
 
         for (auto routine : node->routines)
@@ -251,32 +246,43 @@ namespace analyzer
         }
         depth--;
     };
-    void AstPrinter::visit(ast::Identifier *node)
-    {
-        depth++;
-        // name
-        node->idx->accept(this);
-        if (node->idx)
-        {
-            node->idx->accept(this);
-        }
-        depth--;
-    };
+    // void AstPrinter::visit(ast::Identifier *node)
+    // {
+    //     depth++;
+    //     // name
+    //     node->idx->accept(this);
+    //     if (node->idx)
+    //     {
+    //         node->idx->accept(this);
+    //     }
+    //     depth--;
+    // };
     void AstPrinter::visit(ast::ModifiablePrimary *node)
     {
         depth++;
         indent();
         cout << "ModifiablePrimary (" << node->name << ")" << endl;
-        if (node->expression)
-        {
-            node->expression->accept(this);
+        for (int i = 0; i < node->accessValues.size(); i++){
+            auto AV = node->accessValues[i];
+            if(std::holds_alternative<ast::node_ptr<Expression>>(AV)){
+                std::get<ast::node_ptr<Expression>>(AV)->accept(this);
+            }
+            else{
+                cout << "|";
+                indent();
+                cout << std::get<std::string>(node->accessValues[i]) << endl;
+            }
         }
-        if (node->argname != "")
-        {
-            cout << "|";
-            indent();
-            cout << node->argname << endl;
-        }
+        // if (node->expression)
+        // {
+        //     node->expression->accept(this);
+        // }
+        // if (node->argname != "")
+        // {
+        //     cout << "|";
+        //     indent();
+        //     cout << node->argname << endl;
+        // }
         depth--;
     };
     void AstPrinter::visit(ast::IfStatement *node)

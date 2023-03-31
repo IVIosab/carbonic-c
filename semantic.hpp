@@ -32,7 +32,7 @@ namespace analyzer
         void visit(ast::Assignment *node) override;
         void visit(ast::Print *node) override;
         void visit(ast::Return *node) override;
-        void visit(ast::Identifier *node) override;
+//        void visit(ast::Identifier *node) override;
         void visit(ast::ModifiablePrimary *node) override;
         void visit(ast::IfStatement *node) override;
         void visit(ast::WhileLoop *node) override;
@@ -45,7 +45,7 @@ namespace analyzer
         std::unordered_map<std::string, ast::Type *> typeDeclSymbolTable;
         std::unordered_map<std::string, ast::Type *> varDeclSymbolTable;
         std::unordered_map<std::string, ast::Type *> routineDeclSymbolTable;
-
+        std::vector< std::pair<std::string, ast::Type*> > varStack;
         ast::Type *actual_type = nullptr;
 
         void err_undefined_obj(std::string obj)

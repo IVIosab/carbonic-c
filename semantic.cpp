@@ -235,23 +235,20 @@ namespace analyzer
             node->exp->accept(this);
         }
     };
-    void Semantic::visit(ast::Identifier *node)
-    {
-        if (node->idx)
-        {
-            node->idx->accept(this);
-        }
-    };
+    // void Semantic::visit(ast::Identifier *node)
+    // {
+    //     if (node->idx)
+    //     {
+    //         node->idx->accept(this);
+    //     }
+    // };
     void Semantic::visit(ast::ModifiablePrimary *node)
     {
         if (varDeclSymbolTable.find(node->name) == varDeclSymbolTable.end())
         {
             err_undefined_obj(node->name);
         }
-        if (node->expression)
-        {
-            node->expression->accept(this);
-        }
+        // TODO: implement
     };
     void Semantic::visit(ast::IfStatement *node)
     {

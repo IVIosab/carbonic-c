@@ -14,8 +14,8 @@ int main(int argc, char **argv)
     int x = driver.parse_program();
 
     std::cout << std::endl;
-    // analyzer::AstPrinter printer;
-    // program->accept(&printer);
+    //analyzer::AstPrinter printer;
+    //program->accept(&printer);
     analyzer::Semantic analyzer;
     program->accept(&analyzer);
     return 0;
