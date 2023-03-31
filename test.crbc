@@ -13,3 +13,14 @@ routine main () : integer is
 
     return 0;
 end
+
+routine secondary() : integer is
+	var ar : array [2] record 
+        var a : integer is 0;
+        var b : integer is 1;
+    end;
+    print( ar[0].a );
+    print( ar[3].b );
+    print( ar.b);
+    return 0;
+ end

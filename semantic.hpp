@@ -64,31 +64,31 @@ namespace analyzer
         {
             std::cout << "Warning: Shadowing object: " << obj << std::endl;
         }
-
+        std::string type_to_string(ast::Type* type){
+            if (auto typeInt = dynamic_cast<ast::IntType *>(type))
+                return "Int";
+            if (auto typeDouble = dynamic_cast<ast::DoubleType *>(type))
+                return "Double";
+            if (auto typeBool = dynamic_cast<ast::BoolType *>(type))
+                return "Bool";
+            if (auto typeArray = dynamic_cast<ast::ArrayType*>(type)){
+                return "Array of " + type_to_string(&(*typeArray->dtype));
+            }
+            if (auto typeRecord = dynamic_cast<ast::RecordType*>(type)){
+                std::string typeString = "Record {";
+                for (auto field : typeRecord->fields){
+                    typeString += '\n';
+                    typeString += type_to_string(&(*field->dtype));
+                }
+                typeString += "}";
+                return typeString;
+            }
+            return "undefined";
+        }
         void typecheck_types(ast::Type *type1, ast::Type *type2)
         {
-            std::string first = "", second = "";
-
-            auto ti1 = dynamic_cast<ast::IntType *>(type1);
-            if (ti1)
-                first = "Int";
-            auto td1 = dynamic_cast<ast::DoubleType *>(type1);
-            if (td1)
-                first = "Double";
-            auto tb1 = dynamic_cast<ast::BoolType *>(type1);
-            if (tb1)
-                first = "Bool";
-
-            auto ti2 = dynamic_cast<ast::IntType *>(type2);
-            if (ti2)
-                second = "Int";
-            auto td2 = dynamic_cast<ast::DoubleType *>(type2);
-            if (td2)
-                second = "Double";
-            auto tb2 = dynamic_cast<ast::BoolType *>(type2);
-            if (tb2)
-                second = "Bool";
-
+            std::string first = type_to_string(type1),
+            second = type_to_string(type2);
             if (first != second)
                 err_expected_got(first, second);
         }

@@ -24,6 +24,7 @@ namespace analyzer
     };
     void Semantic::visit(ast::TypeDeclaration *node)
     {
+        // I don't think this is shadowing, this is an error, type declarations are all global.
         if (typeDeclSymbolTable.find(node->name) != typeDeclSymbolTable.end())
         {
             warn_shadow(node->name);
@@ -39,6 +40,7 @@ namespace analyzer
     void Semantic::visit(ast::RoutineDeclaration *node)
     {
         varDeclSymbolTable.clear();
+        // I don't think this is shadowing, this is an error, routines are all global.
         if (routineDeclSymbolTable.find(node->name) != routineDeclSymbolTable.end())
         {
             warn_shadow(node->name);
@@ -47,6 +49,7 @@ namespace analyzer
         {
             if (parameter)
             {
+                // add parameter to identifier table
                 parameter->accept(this);
             }
         }
@@ -248,7 +251,45 @@ namespace analyzer
         {
             err_undefined_obj(node->name);
         }
-        // TODO: implement
+        auto currentType = varDeclSymbolTable[node->name];
+        for(auto AV : node->accessValues){
+            if(std::holds_alternative<ast::node_ptr<ast::Expression>>(AV)){
+                // check that we're trying to access an array
+                std::string got_type = type_to_string(currentType);
+                if(got_type.substr(0,5) != "Array" ){
+                    err_expected_got(got_type, "Array");
+                    break;
+                }
+                else{
+                    auto castedType = static_cast<ast::ArrayType*>(currentType);
+                    currentType = &(*castedType->dtype);
+                }
+            }
+            else{
+                // check that we're trying to access a record and that this field exists
+                std::string fieldName = std::get<std::string>(AV);
+                std::string got_type = type_to_string(currentType);
+                if(got_type.substr(0,6) != "Record" ){
+                    err_expected_got(got_type, "Record");
+                    break;
+                }
+                else{
+                    auto castedType = static_cast<ast::RecordType*>(currentType);
+                    bool found_field = false;
+                    for (auto field : castedType->fields){
+                        if(field->name == fieldName){
+                            found_field = true;
+                            currentType = &(*field->dtype);
+                        }
+                    }
+                    if (!found_field){
+                        err_undefined_obj(fieldName);
+                        break;
+                    }
+                }
+            }
+        }
+        actual_type = currentType;
     };
     void Semantic::visit(ast::IfStatement *node)
     {
