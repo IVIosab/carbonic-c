@@ -378,15 +378,6 @@ NESTED_ACCESS:
         $$ = $4;
     };
 MODIFIABLE_PRIMARY : 
-    /*TK_IDENTIFIER{
-        $$ = std::make_shared<ast::ModifiablePrimary>($1);
-    }|
-    TK_IDENTIFIER TK_DOT TK_IDENTIFIER{
-        $$ = std::make_shared<ast::ModifiablePrimary>($1, $3);
-    }|
-    TK_IDENTIFIER TK_LSQBRK EXPRESSION TK_RSQBRK{
-        $$ = std::make_shared<ast::ModifiablePrimary>($1, $3);
-    }; */
     TK_IDENTIFIER NESTED_ACCESS{
         $$ = std::make_shared<ast::ModifiablePrimary>($1, $2);
     };

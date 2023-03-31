@@ -246,17 +246,6 @@ namespace analyzer
         }
         depth--;
     };
-    // void AstPrinter::visit(ast::Identifier *node)
-    // {
-    //     depth++;
-    //     // name
-    //     node->idx->accept(this);
-    //     if (node->idx)
-    //     {
-    //         node->idx->accept(this);
-    //     }
-    //     depth--;
-    // };
     void AstPrinter::visit(ast::ModifiablePrimary *node)
     {
         depth++;
@@ -273,16 +262,6 @@ namespace analyzer
                 cout << std::get<std::string>(node->accessValues[i]) << endl;
             }
         }
-        // if (node->expression)
-        // {
-        //     node->expression->accept(this);
-        // }
-        // if (node->argname != "")
-        // {
-        //     cout << "|";
-        //     indent();
-        //     cout << node->argname << endl;
-        // }
         depth--;
     };
     void AstPrinter::visit(ast::IfStatement *node)

@@ -238,58 +238,63 @@ namespace analyzer
             node->exp->accept(this);
         }
     };
-    // void Semantic::visit(ast::Identifier *node)
-    // {
-    //     if (node->idx)
-    //     {
-    //         node->idx->accept(this);
-    //     }
-    // };
     void Semantic::visit(ast::ModifiablePrimary *node)
     {
         if (varDeclSymbolTable.find(node->name) == varDeclSymbolTable.end())
         {
             err_undefined_obj(node->name);
         }
-        auto currentType = varDeclSymbolTable[node->name];
-        for(auto AV : node->accessValues){
-            if(std::holds_alternative<ast::node_ptr<ast::Expression>>(AV)){
+        auto current_type = varDeclSymbolTable[node->name];
+        for (auto AV : node->accessValues)
+        {
+            if (std::holds_alternative<ast::node_ptr<ast::Expression>>(AV))
+            {
                 // check that we're trying to access an array
-                std::string got_type = type_to_string(currentType);
-                if(got_type.substr(0,5) != "Array" ){
+                std::string got_type = type_to_string(current_type);
+                if (got_type.substr(0, 5) != "Array")
+                {
                     err_expected_got(got_type, "Array");
                     break;
                 }
-                else{
-                    auto castedType = static_cast<ast::ArrayType*>(currentType);
-                    currentType = &(*castedType->dtype);
+                else
+                {
+                    auto access_value = std::get<ast::node_ptr<ast::Expression>>(AV);
+                    typecheck_types(&(*access_value->dtype), new ast::IntType());
+                    auto casted_type = static_cast<ast::ArrayType *>(current_type);
+                    current_type = &(*casted_type->dtype);
                 }
             }
-            else{
+            else
+            {
                 // check that we're trying to access a record and that this field exists
-                std::string fieldName = std::get<std::string>(AV);
-                std::string got_type = type_to_string(currentType);
-                if(got_type.substr(0,6) != "Record" ){
+                std::string field_name = std::get<std::string>(AV);
+                std::string got_type = type_to_string(current_type);
+                if (got_type.substr(0, 6) != "Record")
+                {
                     err_expected_got(got_type, "Record");
                     break;
                 }
-                else{
-                    auto castedType = static_cast<ast::RecordType*>(currentType);
+                else
+                {
+                    auto casted_type = static_cast<ast::RecordType *>(current_type);
                     bool found_field = false;
-                    for (auto field : castedType->fields){
-                        if(field->name == fieldName){
+                    for (auto field : casted_type->fields)
+                    {
+                        if (field->name == field_name)
+                        {
                             found_field = true;
-                            currentType = &(*field->dtype);
+                            current_type = &(*field->dtype);
                         }
                     }
-                    if (!found_field){
-                        err_undefined_obj(fieldName);
+                    if (!found_field)
+                    {
+                        err_undefined_obj(field_name);
                         break;
                     }
                 }
             }
         }
-        actual_type = currentType;
+        actual_type = current_type;
     };
     void Semantic::visit(ast::IfStatement *node)
     {

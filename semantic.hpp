@@ -32,7 +32,7 @@ namespace analyzer
         void visit(ast::Assignment *node) override;
         void visit(ast::Print *node) override;
         void visit(ast::Return *node) override;
-//        void visit(ast::Identifier *node) override;
+        //        void visit(ast::Identifier *node) override;
         void visit(ast::ModifiablePrimary *node) override;
         void visit(ast::IfStatement *node) override;
         void visit(ast::WhileLoop *node) override;
@@ -45,7 +45,7 @@ namespace analyzer
         std::unordered_map<std::string, ast::Type *> typeDeclSymbolTable;
         std::unordered_map<std::string, ast::Type *> varDeclSymbolTable;
         std::unordered_map<std::string, ast::Type *> routineDeclSymbolTable;
-        std::vector< std::pair<std::string, ast::Type*> > varStack;
+        std::vector<std::pair<std::string, ast::Type *>> varStack;
         ast::Type *actual_type = nullptr;
 
         void err_undefined_obj(std::string obj)
@@ -64,31 +64,35 @@ namespace analyzer
         {
             std::cout << "Warning: Shadowing object: " << obj << std::endl;
         }
-        std::string type_to_string(ast::Type* type){
-            if (auto typeInt = dynamic_cast<ast::IntType *>(type))
+        std::string type_to_string(ast::Type *type)
+        {
+            if (auto type_int = dynamic_cast<ast::IntType *>(type))
                 return "Int";
-            if (auto typeDouble = dynamic_cast<ast::DoubleType *>(type))
+            if (auto type_double = dynamic_cast<ast::DoubleType *>(type))
                 return "Double";
-            if (auto typeBool = dynamic_cast<ast::BoolType *>(type))
+            if (auto type_bool = dynamic_cast<ast::BoolType *>(type))
                 return "Bool";
-            if (auto typeArray = dynamic_cast<ast::ArrayType*>(type)){
-                return "Array of " + type_to_string(&(*typeArray->dtype));
+            if (auto type_array = dynamic_cast<ast::ArrayType *>(type))
+            {
+                return "Array of " + type_to_string(&(*type_array->dtype));
             }
-            if (auto typeRecord = dynamic_cast<ast::RecordType*>(type)){
-                std::string typeString = "Record {";
-                for (auto field : typeRecord->fields){
-                    typeString += '\n';
-                    typeString += type_to_string(&(*field->dtype));
+            if (auto type_record = dynamic_cast<ast::RecordType *>(type))
+            {
+                std::string type_string = "Record {";
+                for (auto field : type_record->fields)
+                {
+                    type_string += '\n';
+                    type_string += type_to_string(&(*field->dtype));
                 }
-                typeString += "}";
-                return typeString;
+                type_string += "}";
+                return type_string;
             }
             return "undefined";
         }
         void typecheck_types(ast::Type *type1, ast::Type *type2)
         {
             std::string first = type_to_string(type1),
-            second = type_to_string(type2);
+                        second = type_to_string(type2);
             if (first != second)
                 err_expected_got(first, second);
         }
