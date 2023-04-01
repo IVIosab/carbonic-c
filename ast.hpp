@@ -130,6 +130,7 @@ namespace ast
     struct Program : Node
     {
         std::vector<node_ptr<TypeDeclaration>> types;
+        std::vector<node_ptr<VariableDeclaration>> variables;
         std::vector<node_ptr<RoutineDeclaration>> routines;
 
         void accept(Visitor *v) override { v->visit(this); }

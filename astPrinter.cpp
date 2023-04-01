@@ -44,7 +44,10 @@ namespace analyzer
         {
             type->accept(this);
         }
-
+        for (auto variable : node->variables)
+        {
+            variable->accept(this);
+        }
         for (auto routine : node->routines)
         {
             routine->accept(this);

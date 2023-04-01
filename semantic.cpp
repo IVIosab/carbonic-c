@@ -13,7 +13,13 @@ namespace analyzer
                 type->accept(this);
             }
         }
-
+        for (auto variable : node->variables)
+        {
+            if(variable)
+            {
+                variable->accept(this);
+            }
+        }
         for (auto routine : node->routines)
         {
             if (routine)
@@ -24,10 +30,10 @@ namespace analyzer
     };
     void Semantic::visit(ast::TypeDeclaration *node)
     {
-        // I don't think this is shadowing, this is an error, type declarations are all global.
-        if (typeDeclSymbolTable.find(node->name) != typeDeclSymbolTable.end())
+        if (typeDeclSymbolTable.find(node->name) != typeDeclSymbolTable.end() ||
+        varDeclSymbolTable.count(node->name) || routineDeclSymbolTable.count(node->name))
         {
-            warn_shadow(node->name);
+            err_second_declaration(node->name);
         }
         ast::Type *type;
         if (node->dtype)
@@ -39,17 +45,16 @@ namespace analyzer
     };
     void Semantic::visit(ast::RoutineDeclaration *node)
     {
-        varDeclSymbolTable.clear();
-        // I don't think this is shadowing, this is an error, routines are all global.
-        if (routineDeclSymbolTable.find(node->name) != routineDeclSymbolTable.end())
+        routine_vars_n = 0;
+        if (routineDeclSymbolTable.find(node->name) != routineDeclSymbolTable.end() ||
+        varDeclSymbolTable.count(node->name) || typeDeclSymbolTable.count(node->name))
         {
-            warn_shadow(node->name);
+            err_second_declaration(node->name);
         }
         for (auto parameter : node->params)
         {
             if (parameter)
             {
-                // add parameter to identifier table
                 parameter->accept(this);
             }
         }
@@ -64,9 +69,30 @@ namespace analyzer
             node->body->accept(this);
         }
         routineDeclSymbolTable[node->name] = ret_type;
+        while(routine_vars_n -- ){
+            if(varStack.size()){
+                std::string delVar = varStack[varStack.size()-1].first;
+                varDeclSymbolTable.erase(delVar);
+                varStack.pop_back();
+                ast::Type* shadowed_i = nullptr;
+                for (auto i : varStack){
+                    if (i.first == delVar){
+                        shadowed_i = i.second;
+                        break;
+                    }
+                }
+                if(shadowed_i)
+                    varDeclSymbolTable[delVar] = shadowed_i;
+            }
+        }
     };
     void Semantic::visit(ast::VariableDeclaration *node)
     {
+        if (typeDeclSymbolTable.find(node->name) != typeDeclSymbolTable.end() 
+                    || routineDeclSymbolTable.count(node->name))
+        {
+            err_second_declaration(node->name);
+        }
         if (varDeclSymbolTable.find(node->name) != varDeclSymbolTable.end())
         {
             warn_shadow(node->name);
@@ -90,6 +116,8 @@ namespace analyzer
             var_type = expr_type;
         }
         varDeclSymbolTable[node->name] = var_type;
+        varStack.push_back({node->name, var_type});
+        routine_vars_n ++;
     };
     void Semantic::visit(ast::Body *node)
     {
@@ -207,7 +235,7 @@ namespace analyzer
         typecheck_types(lhs_type, rhs_type);
         actual_type = new ast::BoolType();
     };
-    void Semantic::visit(ast::Assignment *node) // TODO
+    void Semantic::visit(ast::Assignment *node)
     {
         ast::Type *lhs_type;
         if (node->modifiablePrimary)
@@ -223,7 +251,7 @@ namespace analyzer
         rhs_type = actual_type;
         typecheck_types(lhs_type, rhs_type);
     };
-    void Semantic::visit(ast::Print *node) // DONE
+    void Semantic::visit(ast::Print *node)
     {
         if (node->exp)
         {
@@ -376,6 +404,7 @@ namespace analyzer
             if (arg)
             {
                 arg->accept(this);
+                
             }
         }
     };

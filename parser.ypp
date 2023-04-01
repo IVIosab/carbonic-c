@@ -99,6 +99,10 @@ PROGRAM:
     TYPE_DECLARATION PROGRAM {
         $$ = $2;
     }|
+    VARIABLE_DECLARATION PROGRAM{
+        program->variables.push_back($1);
+        $$ = $2;
+    }|
     ROUTINE_DECLARATION PROGRAM{
         $$ = $2;
     };

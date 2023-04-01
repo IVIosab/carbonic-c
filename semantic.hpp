@@ -46,8 +46,12 @@ namespace analyzer
         std::unordered_map<std::string, ast::Type *> varDeclSymbolTable;
         std::unordered_map<std::string, ast::Type *> routineDeclSymbolTable;
         std::vector<std::pair<std::string, ast::Type *>> varStack;
+        int routine_vars_n = 0;
         ast::Type *actual_type = nullptr;
-
+        void err_second_declaration(std::string name){
+            std::cout << "Error: second declaration of " << name << " is invalid.";
+            exit(0);
+        }
         void err_undefined_obj(std::string obj)
         {
             std::cout << "Error: Undefined object: " << obj << std::endl;
