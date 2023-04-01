@@ -1,18 +1,18 @@
 routine main () : integer is 
     if true xor true then 
-        print("ERROR!");
+        print(0);
     end
 
     if true xor false then 
-        print("Working!");
+        print(1);
     end
 
     if false xor true then 
-        print("Working!");
+        print(1);
     end
 
     if false xor false then 
-        print("ERROR!");
+        print(0);
     end
 
     return 0;

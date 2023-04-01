@@ -40,7 +40,7 @@ namespace ast
     struct WhileLoop;
     struct ForLoop;
     struct Return;
-    struct ForeachLoop;
+    // struct ForeachLoop;
 } // namespace ast
 
 // Base class for code generator and anything that traverses AST.
@@ -70,12 +70,12 @@ namespace ast
         virtual void visit(ast::Assignment *assign) = 0;
         virtual void visit(ast::Print *stmt) = 0;
         virtual void visit(ast::Return *stmt) = 0;
-//        virtual void visit(ast::Identifier *id) = 0;
+        //        virtual void visit(ast::Identifier *id) = 0;
         virtual void visit(ast::ModifiablePrimary *mp) = 0;
         virtual void visit(ast::IfStatement *is) = 0;
         virtual void visit(ast::WhileLoop *wl) = 0;
         virtual void visit(ast::ForLoop *fl) = 0;
-        virtual void visit(ast::ForeachLoop *fel) = 0;
+        // virtual void visit(ast::ForeachLoop *fel) = 0;
     };
 }
 
@@ -358,9 +358,9 @@ namespace ast
 
         ModifiablePrimary(std::string name, std::vector<nestedAccess> accessValues)
         {
-             this->name = name;
-             std::reverse(accessValues.begin(), accessValues.end());
-             this->accessValues = accessValues;
+            this->name = name;
+            std::reverse(accessValues.begin(), accessValues.end());
+            this->accessValues = accessValues;
         }
 
         // ModifiablePrimary(std::string identifier)
@@ -460,19 +460,19 @@ namespace ast
         }
         void accept(Visitor *v) override { v->visit(this); }
     };
-    struct ForeachLoop : Statement
-    {
-        std::string identifier;
-        node_ptr<ModifiablePrimary> modifiablePrimary;
-        node_ptr<Body> loopBody;
-        ForeachLoop(std::string identifier, node_ptr<ModifiablePrimary> modifablePrimary, node_ptr<Body> loopBody)
-        {
-            this->identifier = identifier;
-            this->modifiablePrimary = modifablePrimary;
-            this->loopBody = loopBody;
-        }
-        void accept(Visitor *v) override { v->visit(this); }
-    };
+    // struct ForeachLoop : Statement
+    // {
+    //     std::string identifier;
+    //     node_ptr<ModifiablePrimary> modifiablePrimary;
+    //     node_ptr<Body> loopBody;
+    //     ForeachLoop(std::string identifier, node_ptr<ModifiablePrimary> modifablePrimary, node_ptr<Body> loopBody)
+    //     {
+    //         this->identifier = identifier;
+    //         this->modifiablePrimary = modifablePrimary;
+    //         this->loopBody = loopBody;
+    //     }
+    //     void accept(Visitor *v) override { v->visit(this); }
+    // };
     struct Return : Statement
     {
         node_ptr<Expression> exp;

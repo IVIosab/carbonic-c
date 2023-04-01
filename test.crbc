@@ -1,26 +1,9 @@
 routine main () : integer is 
-    if true then 
-        print(1);
-    else
-        print(0);
-    end
+    var ar : array [2] integer;
 
-    if 1 then 
-        print(0);
-    else
-        print(1);
+    for i in 1 .. 2 loop
+        ar[i] := i;
     end
 
     return 0;
 end
-
-routine secondary() : integer is
-	var ar : array [2] record 
-        var a : integer is 0;
-        var b : integer is 1;
-    end;
-    print( ar[0].a );
-    print( ar[3].b );
-    print( ar.b);
-    return 0;
- end

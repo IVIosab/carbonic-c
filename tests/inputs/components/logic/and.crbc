@@ -1,18 +1,18 @@
 routine main () : integer is 
     if true and true then 
-        print("Working!");
+        print(1);
     end
 
     if true and false then 
-        print("ERROR!");
+        print(0);
     end
 
     if false and true then 
-        print("ERROR!");
+        print(0);
     end
 
     if false and false then 
-        print("ERROR!");
+        print(0);
     end
 
     return 0;

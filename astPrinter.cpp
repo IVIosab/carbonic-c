@@ -251,12 +251,15 @@ namespace analyzer
         depth++;
         indent();
         cout << "ModifiablePrimary (" << node->name << ")" << endl;
-        for (int i = 0; i < node->accessValues.size(); i++){
+        for (int i = 0; i < node->accessValues.size(); i++)
+        {
             auto AV = node->accessValues[i];
-            if(std::holds_alternative<ast::node_ptr<Expression>>(AV)){
+            if (std::holds_alternative<ast::node_ptr<Expression>>(AV))
+            {
                 std::get<ast::node_ptr<Expression>>(AV)->accept(this);
             }
-            else{
+            else
+            {
                 cout << "|";
                 indent();
                 cout << std::get<std::string>(node->accessValues[i]) << endl;
@@ -297,14 +300,14 @@ namespace analyzer
 
         depth--;
     };
-    void AstPrinter::visit(ast::ForeachLoop *node)
-    {
-        depth++;
-        indent();
-        cout << "ForeachLoop (" << node->identifier << ")" << endl;
-        node->modifiablePrimary->accept(this);
-        node->loopBody->accept(this);
-        depth--;
-    };
+    // void AstPrinter::visit(ast::ForeachLoop *node)
+    // {
+    //     depth++;
+    //     indent();
+    //     cout << "ForeachLoop (" << node->identifier << ")" << endl;
+    //     node->modifiablePrimary->accept(this);
+    //     node->loopBody->accept(this);
+    //     depth--;
+    // };
 
 }

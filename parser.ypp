@@ -62,7 +62,7 @@
 %type <ast::node_ptr<ast::ModifiablePrimary>> MODIFIABLE_PRIMARY
 %type <ast::node_ptr<ast::WhileLoop>> WHILE_LOOP
 %type <ast::node_ptr<ast::ForLoop>> FOR_LOOP
-%type <ast::node_ptr<ast::ForeachLoop> > FOREACH_LOOP
+/* %type <ast::node_ptr<ast::ForeachLoop> > FOREACH_LOOP */
 //%type <std::vector<ast::nestedAccess>> NESTED_ACCESS
 %type <ast::node_ptr<ast::Assignment>> ASSIGNMENT
 %type <std::vector<ast::nestedAccess> > NESTED_ACCESS
@@ -164,9 +164,9 @@ STATEMENT:
     FOR_LOOP {
         $$ = $1;
     }|
-    FOREACH_LOOP {
+    /* FOREACH_LOOP {
         $$ = $1;
-    }|
+    }| */
     ROUTINE_CALL TK_SCOLON {
         $$ = $1;
     }| 
@@ -202,10 +202,10 @@ FOR_LOOP:
     TK_FOR TK_IDENTIFIER TK_IN TK_REVERSE EXPRESSION TK_DDOT EXPRESSION TK_LOOP BODY TK_END{
         $$ = std::make_shared<ast::ForLoop>($2, $7, $5, $9);
     };
-FOREACH_LOOP:
+/* FOREACH_LOOP:
    TK_FOREACH TK_IDENTIFIER TK_FROM MODIFIABLE_PRIMARY TK_LOOP BODY TK_END {
         $$ = std::make_shared<ast::ForeachLoop>($2, $4, $6);
-    };
+    }; */
 RETURN: 
     TK_RETURN EXPRESSION TK_SCOLON {
         $$ = std::make_shared<ast::Return>($2);

@@ -1,8 +1,5 @@
 routine main () : integer is 
     var ar : array [2] integer;
-    foreach x from ar loop
-        print(ar[i]);
-    end
 
     for i in 1 .. 2 loop
         ar[i] := i;

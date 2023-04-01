@@ -35,7 +35,7 @@ namespace analyzer
         void visit(ast::IfStatement *node) override;
         void visit(ast::WhileLoop *node) override;
         void visit(ast::ForLoop *node) override;
-        void visit(ast::ForeachLoop *node) override;
+        // void visit(ast::ForeachLoop *node) override;
 
     private:
         size_t depth;

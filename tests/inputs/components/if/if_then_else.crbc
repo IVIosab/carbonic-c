@@ -1,14 +1,14 @@
 routine main () : integer is 
     if true then 
-        print("Working!");
+        print(1);
     else
-        print("ERROR!");
+        print(0);
     end
 
     if false then 
-        print("ERROR!");
+        print(0);
     else
-        print("Working!");
+        print(1);
     end
 
     return 0;

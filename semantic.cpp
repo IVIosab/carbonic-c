@@ -259,7 +259,8 @@ namespace analyzer
                 else
                 {
                     auto access_value = std::get<ast::node_ptr<ast::Expression>>(AV);
-                    typecheck_types(&(*access_value->dtype), new ast::IntType());
+                    access_value->accept(this);
+                    typecheck_types(actual_type, new ast::IntType());
                     auto casted_type = static_cast<ast::ArrayType *>(current_type);
                     current_type = &(*casted_type->dtype);
                 }
@@ -330,6 +331,7 @@ namespace analyzer
     };
     void Semantic::visit(ast::ForLoop *node)
     {
+        varDeclSymbolTable[node->identifier] = new ast::IntType();
         ast::Type *fromType;
         if (node->from)
         {
@@ -349,18 +351,18 @@ namespace analyzer
             node->loopBody->accept(this);
         }
     };
-    void Semantic::visit(ast::ForeachLoop *node) // TODO
-    {
-        // TODO remove foreach loop from all places
-        if (node->modifiablePrimary)
-        {
-            node->modifiablePrimary->accept(this);
-        }
-        if (node->loopBody)
-        {
-            node->loopBody->accept(this);
-        }
-    };
+    // void Semantic::visit(ast::ForeachLoop *node) // TODO
+    // {
+    //     // TODO remove foreach loop from all places
+    //     if (node->modifiablePrimary)
+    //     {
+    //         node->modifiablePrimary->accept(this);
+    //     }
+    //     if (node->loopBody)
+    //     {
+    //         node->loopBody->accept(this);
+    //     }
+    // };
     void Semantic::visit(ast::RoutineCall *node) // TODO
     {
         // TODO Check for wrong number of arguments

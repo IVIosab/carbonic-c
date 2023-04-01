@@ -2,15 +2,15 @@ routine main () : integer is
     var x : integer is 1;
 
     if x >= 0 then 
-        print("Working!");
+        print(1);
     end
 
     if x >= 1 then 
-        print("Working!");
+        print(1);
     end
 
     if x >= 2 then
-        print("ERROR!");
+        print(0);
     end
 
     return 0;
