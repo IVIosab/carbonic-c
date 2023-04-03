@@ -48,6 +48,7 @@ namespace analyzer
         std::vector<std::pair<std::string, ast::Type *>> varStack;
         int routine_vars_n = 0;
         ast::Type *actual_type = nullptr;
+        ast::node_ptr<ast::Type> routine_return_type = nullptr;
         void err_second_declaration(std::string name){
             std::cout << "Error: second declaration of " << name << " is invalid.\n";
             exit(0);

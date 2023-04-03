@@ -5,10 +5,10 @@ routine main (x : integer) : integer is
         ar[i] := i;
     end
 
-    return 0;
+    return false;
 end
-routine callMain () : integer is 
-    main(false);
-    main(2, 3);
-    return 0;
-end
+// routine callMain () : integer is 
+//     main(false);
+//     main(2, 3);
+//     return 0;
+// end

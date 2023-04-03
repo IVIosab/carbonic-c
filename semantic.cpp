@@ -46,6 +46,8 @@ namespace analyzer
     void Semantic::visit(ast::RoutineDeclaration *node)
     {
         routine_vars_n = 0;
+        routine_return_type = nullptr;
+        ast::Type *ret_type = nullptr;
         if (routineDeclTable.find(node->name) != routineDeclTable.end() ||
         varDeclSymbolTable.count(node->name) || typeDeclSymbolTable.count(node->name))
         {
@@ -58,7 +60,6 @@ namespace analyzer
                 parameter->accept(this);
             }
         }
-        ast::Type *ret_type;
         if (node->rtype)
         {
             node->rtype->accept(this);
@@ -70,6 +71,8 @@ namespace analyzer
         }
         node->rtype = TypePointerToShared(ret_type); 
         routineDeclTable[node->name] = node;
+        if(routine_return_type && ret_type)
+            typecheck_types(&(*routine_return_type), ret_type);
         while(routine_vars_n -- ){
             if(varStack.size()){
                 std::string delVar = varStack[varStack.size()-1].first;
@@ -264,6 +267,9 @@ namespace analyzer
         // TODO type check exp with return type of current routine if exists
         if (node->exp)
         {
+            if(node->exp->dtype){
+                routine_return_type = node->exp->dtype;
+            }
             node->exp->accept(this);
         }
     };
