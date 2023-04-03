@@ -1,5 +1,14 @@
-routine main () : integer is 
-    var ar : integer is 5;
+routine main (x : integer) : integer is 
+    var ar : array [2] integer;
 
+    for i in 1 .. 2 loop
+        ar[i] := i;
+    end
+
+    return 0;
+end
+routine callMain () : integer is 
+    main(false);
+    main(2, 3);
     return 0;
 end

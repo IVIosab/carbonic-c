@@ -44,29 +44,32 @@ namespace analyzer
 
         std::unordered_map<std::string, ast::Type *> typeDeclSymbolTable;
         std::unordered_map<std::string, ast::Type *> varDeclSymbolTable;
-        std::unordered_map<std::string, ast::Type *> routineDeclSymbolTable;
+        std::unordered_map<std::string, ast::RoutineDeclaration *> routineDeclTable;
         std::vector<std::pair<std::string, ast::Type *>> varStack;
         int routine_vars_n = 0;
         ast::Type *actual_type = nullptr;
         void err_second_declaration(std::string name){
-            std::cout << "Error: second declaration of " << name << " is invalid.";
+            std::cout << "Error: second declaration of " << name << " is invalid.\n";
             exit(0);
         }
         void err_undefined_obj(std::string obj)
         {
-            std::cout << "Error: Undefined object: " << obj << std::endl;
+            std::cout << "Error: Undefined object: " << obj << '\n';
             exit(0);
         }
 
         void err_expected_got(std::string got, std::string expected)
         {
-            std::cout << "Error: Expected: " << expected << ", got: " << got << std::endl;
+            std::cout << "Error: Expected: " << expected << ", got: " << got << '\n';
             exit(0);
         }
-
+        void err_wrong_params_number(int got, int expected){
+            std::cout << "Error: Expected number of params: " << expected << " got: " << got << '\n';
+            exit(0);
+        }
         void warn_shadow(std::string obj)
         {
-            std::cout << "Warning: Shadowing object: " << obj << std::endl;
+            std::cout << "Warning: Shadowing object: " << obj << '\n';
         }
         std::string type_to_string(ast::Type *type)
         {
@@ -100,7 +103,19 @@ namespace analyzer
             if (first != second)
                 err_expected_got(first, second);
         }
-
+        ast::node_ptr<ast::Type> TypePointerToShared(ast::Type* type){
+            if (auto type_int = dynamic_cast<ast::IntType *>(type))
+                return std::make_shared<ast::IntType>(*type_int);
+            if (auto type_double = dynamic_cast<ast::DoubleType *>(type))
+                return std::make_shared<ast::DoubleType>(*type_double);
+            if (auto type_bool = dynamic_cast<ast::BoolType *>(type))
+                return std::make_shared<ast::BoolType>(*type_bool);
+            if (auto type_array = dynamic_cast<ast::ArrayType *>(type))
+                return std::make_shared<ast::ArrayType>(*type_array);
+            if (auto type_record = dynamic_cast<ast::RecordType *>(type))
+               return std::make_shared<ast::RecordType>(*type_record);
+            return nullptr;
+        }
         void testing()
         {
             ast::Type *test = new ast::IntType();

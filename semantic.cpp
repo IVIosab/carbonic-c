@@ -31,7 +31,7 @@ namespace analyzer
     void Semantic::visit(ast::TypeDeclaration *node)
     {
         if (typeDeclSymbolTable.find(node->name) != typeDeclSymbolTable.end() ||
-        varDeclSymbolTable.count(node->name) || routineDeclSymbolTable.count(node->name))
+        varDeclSymbolTable.count(node->name) || routineDeclTable.count(node->name))
         {
             err_second_declaration(node->name);
         }
@@ -46,7 +46,7 @@ namespace analyzer
     void Semantic::visit(ast::RoutineDeclaration *node)
     {
         routine_vars_n = 0;
-        if (routineDeclSymbolTable.find(node->name) != routineDeclSymbolTable.end() ||
+        if (routineDeclTable.find(node->name) != routineDeclTable.end() ||
         varDeclSymbolTable.count(node->name) || typeDeclSymbolTable.count(node->name))
         {
             err_second_declaration(node->name);
@@ -68,7 +68,8 @@ namespace analyzer
         {
             node->body->accept(this);
         }
-        routineDeclSymbolTable[node->name] = ret_type;
+        node->rtype = TypePointerToShared(ret_type); 
+        routineDeclTable[node->name] = node;
         while(routine_vars_n -- ){
             if(varStack.size()){
                 std::string delVar = varStack[varStack.size()-1].first;
@@ -89,7 +90,7 @@ namespace analyzer
     void Semantic::visit(ast::VariableDeclaration *node)
     {
         if (typeDeclSymbolTable.find(node->name) != typeDeclSymbolTable.end() 
-                    || routineDeclSymbolTable.count(node->name))
+                    || routineDeclTable.count(node->name))
         {
             err_second_declaration(node->name);
         }
@@ -391,11 +392,9 @@ namespace analyzer
     //         node->loopBody->accept(this);
     //     }
     // };
-    void Semantic::visit(ast::RoutineCall *node) // TODO
+    void Semantic::visit(ast::RoutineCall *node)
     {
-        // TODO Check for wrong number of arguments
-        // TODO Check for wrong type of arguments
-        if (routineDeclSymbolTable.find(node->name) == routineDeclSymbolTable.end())
+        if (routineDeclTable.find(node->name) == routineDeclTable.end())
         {
             err_undefined_obj(node->name);
         }
@@ -405,6 +404,15 @@ namespace analyzer
             {
                 arg->accept(this);
                 
+            }
+        }
+        auto routine = routineDeclTable[node->name];
+        if(routine->params.size() != node->args.size()){
+            err_wrong_params_number(node->args.size(), routine->params.size());
+        }
+        for (int i = 0; i < node->args.size(); i++){
+            if(routine->params[i]->dtype && node->args[i]->dtype){
+                typecheck_types( &(*node->args[i]->dtype),&(*routine->params[i]->dtype));
             }
         }
     };

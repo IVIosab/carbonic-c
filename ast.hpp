@@ -497,6 +497,8 @@ namespace ast
 
         Body(std::vector<node_ptr<VariableDeclaration>> variables, std::vector<node_ptr<Statement>> statements)
         {
+            std::reverse(variables.begin(), variables.end());
+            std::reverse(variables.begin(), variables.end());
             this->variables = variables;
             this->statements = statements;
         }
