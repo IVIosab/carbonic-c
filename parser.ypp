@@ -13,59 +13,91 @@
 %parse-param { carbonic_c::Lexer &lexer }
 %parse-param { carbonic_c::Driver &driver }
 
-%token TK_VAR TK_TYPE
-%token TK_INT TK_DOUBLE TK_BOOL TK_STRING TK_CHAR TK_ARRAY TK_RECORD TK_ROUTINE TK_IS TK_NOT
-%token TK_WHILE TK_LOOP TK_END TK_FOR TK_FOREACH TK_FROM TK_RETURN
-%token TK_IF TK_THEN TK_ELSE TK_IN TK_REVERSE 
-%token TK_IDENTIFIER TK_ASSIGN
-%token TK_STRING_LITERAL TK_DOUBLE_LITERAL TK_INTEGER_LITERAL TK_CHARACTER_LITERAL TK_BOOL_LITERAL
+/*Varaibles*/
+%token TK_VAR TK_IS
+/*Types*/
+%token TK_TYPE TK_INTEGER TK_REAL TK_BOOLEAN TK_ARRAY TK_RECORD
+/*Routines*/
+%token TK_ROUTINE
+/*Loops*/
+%token TK_WHILE TK_LOOP TK_FOR TK_END TK_FROM TK_IN TK_REVERSE TK_DDOT
+/*If*/
+%token TK_IF TK_THEN TK_ELSE
+/*Return*/
+%token TK_RETURN
+/*Assignment*/
+%token TK_ASSIGN
+/*Print*/
 %token TK_PRINT
-%token TK_CEQ TK_CNEQ TK_CLT TK_CLE TK_CGT TK_CGE
-%token TK_LPAREN TK_RPAREN TK_LBRACK TK_RBRACK TK_LSQBRK TK_RSQBRK 
-%token TK_SQUOT TK_DOT TK_COMMA TK_COLON TK_SCOLON TK_DDOT
-%token TK_PLUS TK_MINUS TK_MUL TK_DIV
-%token TK_NEWLINE
-%token TK_MOD TK_POW TK_AND TK_OR TK_XOR
+/*Comparison*/
+%token TK_EQ TK_NEQ TK_LT TK_LEQ TK_GT TK_GEQ
+/*Operators*/
+%token TK_PLUS TK_MINUS TK_MUL TK_DIV TK_MOD TK_AND TK_OR TK_XOR
+/*Variables*/
+%token TK_IDENTIFIER TK_DOT
+/*Literals*/
+%token TK_REAL_LITERAL TK_BOOLEAN_LITERAL TK_INTEGER_LITERAL
+/*Utils*/
+%token TK_LPAREN TK_RPAREN TK_LSQUARE TK_RSQUARE TK_COMMA TK_COLON TK_SEMICOLON
 
+/**/
 %left TK_OR
 %left TK_AND
-%left TK_CEQ TK_CNEQ TK_XOR
-%left TK_CLT TK_CLE TK_CGT TK_CGE
+%left TK_EQ TK_NEQ TK_XOR
+%left TK_LT TK_LEQ TK_GT TK_GEQ
 %left TK_PLUS TK_MINUS
 %left TK_MUL TK_DIV TK_MOD
-%right TK_POW
 
-%type <long long> TK_INTEGER_LITERAL
-%type <std::string> TK_IDENTIFIER
-%type <double> TK_DOUBLE_LITERAL
-%type <bool> TK_BOOL_LITERAL
+%type <ast::Integer> TK_INTEGER_LITERAL
+%type <ast::Real> TK_REAL_LITERAL
+%type <ast::Boolean> TK_BOOLEAN_LITERAL
+%type <ast::Ident> TK_IDENTIFIER
 
-%type <ast::node_ptr<ast::Program>> PROGRAM
-%type <ast::node_ptr<ast::VariableDeclaration>> VARIABLE_DECLARATION PARAMETER 
-%type <std::vector<ast::node_ptr<ast::VariableDeclaration>>> VARIABLE_DECLARATIONS PARAMETERS
-%type <ast::node_ptr<ast::TypeDeclaration>> TYPE_DECLARATION 
-%type <ast::node_ptr<ast::Type>> TYPE PRIMITIVE_TYPE 
-%type <ast::node_ptr<ast::ArrayType>> ARRAY_TYPE
-%type <ast::node_ptr<ast::RecordType>> RECORD_TYPE
-%type <ast::node_ptr<ast::Expression>> EXPRESSION VALUE
-%type <std::vector<ast::node_ptr<ast::Expression>>> EXPRESSIONS
-%type <ast::node_ptr<ast::BinaryExpression>> BINARY
-%type <ast::node_ptr<ast::BitwiseExpression>> BITWISE
-%type <ast::node_ptr<ast::ComparisonExpression>> COMPARISON
-%type <ast::node_ptr<ast::RoutineDeclaration>> ROUTINE_DECLARATION
-%type <ast::node_ptr<ast::RoutineCall>> ROUTINE_CALL
-%type <ast::node_ptr<ast::Statement>> STATEMENT
-%type <ast::node_ptr<ast::Return>> RETURN
-%type <ast::node_ptr<ast::Print>> PRINT
-%type <ast::node_ptr<ast::Body>> BODY
-%type <ast::node_ptr<ast::IfStatement> > IF_STATEMENT
-%type <ast::node_ptr<ast::ModifiablePrimary>> MODIFIABLE_PRIMARY
-%type <ast::node_ptr<ast::WhileLoop>> WHILE_LOOP
-%type <ast::node_ptr<ast::ForLoop>> FOR_LOOP
-/* %type <ast::node_ptr<ast::ForeachLoop> > FOREACH_LOOP */
-//%type <std::vector<ast::nestedAccess>> NESTED_ACCESS
-%type <ast::node_ptr<ast::Assignment>> ASSIGNMENT
-%type <std::vector<ast::nestedAccess> > NESTED_ACCESS
+%type <ast::Program*> PROGRAM;
+%type <ast::Decl*> DECLARATION;
+%type <ast::RoutineDecl*> ROUTINE_DECL;
+%type <ast::GlobalVarDecl*> GLOBAL_VAR_DECL;
+%type <ast::Expr*> EXPR;
+%type <ast::ExprList*> EXPR_LIST;
+%type <ast::BinaryExpr*> BINARY;
+%type <ast::LogicExpr*> LOGIC;
+%type <ast::ComparisonExpr*> COMPARISON;
+%type <ast::Value*> VALUE;
+%type <ast::IntegerValue*> INTEGER_VALUE;
+%type <ast::RealValue*> REAL_VALUE;
+%type <ast::BooleanValue*> BOOLEAN_VALUE;
+%type <ast::Var*> VAR;
+%type <ast::RoutineCallValue*> ROUTINE_CALL_VALUE;
+%type <ast::TypeDecl*> TYPE_DECL;
+%type <ast::Type*> TYPE;
+%type <ast::PrimitiveType*> PRIMITIVE_TYPE;
+%type <ast::UserType*> USER_TYPE;
+%type <ast::TypeIdentifier*> TYPE_IDENTIFIER;
+%type <ast::IntegerType*> INTEGER_TYPE;
+%type <ast::RealType*> REAL_TYPE;
+%type <ast::BooleanType*> BOOLEAN_TYPE;
+%type <ast::ArrayType*> ARRAY_TYPE;
+%type <ast::RecordType*> RECORD_TYPE;
+%type <ast::ParameterDecl*> PARAMETER_DECL;
+%type <ast::ParameterList*> PARAMETER_LIST;
+%type <ast::Body*> BODY;
+%type <ast::BodyEntity*> BODY_ENTITY;
+%type <ast::LocalVarDecl*> LOCAL_VAR_DECL;
+%type <ast::Statement*> STATEMENT;
+%type <ast::Assignment*> ASSIGNMENT;
+%type <ast::RoutineCall*> ROUTINE_CALL;
+%type <ast::Return*> RETURN;
+%type <ast::Print*> PRINT;
+%type <ast::WhileLoop*> WHILE_LOOP;
+%type <ast::ForLoop*> FOR_LOOP;
+%type <ast::Range*> RANGE;
+%type <ast::If*> IF;
+%type <ast::NestedAccess*> NESTED_ACCESS;
+%type <ast::NestedAccessList*> NESTED_ACCESS_LIST;
+%type <ast::ArrayAccess*> ARRAY_ACCESS;
+%type <ast::RecordAccess*> RECORD_ACCESS;
+%type <ast::LocalVarList*> LOCAL_VAR_LIST;
+
 %code requires {
     #include <iostream>
     #include <string>
@@ -73,6 +105,7 @@
     #include <variant>
     #include <algorithm>
     #include "ast.hpp"
+    #include "Enums.h"
     namespace carbonic_c {
     class Lexer;
     class Driver;
@@ -86,306 +119,175 @@
     static carbonic_c::Parser::symbol_type yylex( carbonic_c::Lexer &lexer , carbonic_c::Driver &driver) {
         return lexer.get_next_token();
     }
-    ast::node_ptr<ast::Program> program = std::make_shared<ast::Program>();  // Points to the whole program node.
+    ast::Program *program = new ast::Program(std::vector<ast::Decl*>());  // Points to the whole program node.
 }
-
 
 %start PROGRAM
 %%
 PROGRAM:
-    %empty {
-        //std::cout<< '\n' << std::endl;
-    }|
-    TYPE_DECLARATION PROGRAM {
-        $$ = $2;
-    }|
-    VARIABLE_DECLARATION PROGRAM{
-        program->variables.push_back($1);
-        $$ = $2;
-    }|
-    ROUTINE_DECLARATION PROGRAM{
-        $$ = $2;
-    };
-ROUTINE_DECLARATION:
-    TK_ROUTINE TK_IDENTIFIER TK_LPAREN PARAMETERS TK_RPAREN TK_COLON TYPE TK_IS BODY TK_END {
-        $$ = std::make_shared<ast::RoutineDeclaration>($2, $4, $7, $9);
-        program->routines.push_back($$);
-    }|
-    TK_ROUTINE TK_IDENTIFIER TK_LPAREN PARAMETERS TK_RPAREN TK_IS BODY TK_END {
-        $$ = std::make_shared<ast::RoutineDeclaration>($2, $4, $7);
-        program->routines.push_back($$);
-    }|
-    TK_ROUTINE TK_IDENTIFIER TK_LPAREN TK_RPAREN TK_COLON TYPE TK_IS BODY TK_END {
-        $$ = std::make_shared<ast::RoutineDeclaration>($2, std::vector<ast::node_ptr<ast::VariableDeclaration>>(), $6, $8);
-        program->routines.push_back($$);
-    }|
-    TK_ROUTINE TK_IDENTIFIER TK_LPAREN TK_RPAREN TK_IS BODY TK_END {
-        $$ = std::make_shared<ast::RoutineDeclaration>($2, std::vector<ast::node_ptr<ast::VariableDeclaration>>(), $6);
-        program->routines.push_back($$);
-    }
+    %empty {}
+    | DECLARATION PROGRAM {  program->decls.push_back($1); }
     ;
-PARAMETERS:
-    PARAMETER {
-        $$ = std::vector<ast::node_ptr<ast::VariableDeclaration>>(1, $1);
-    }|
-    PARAMETERS TK_COMMA PARAMETER{
-        $1.push_back($3);
-        $$ = $1;
-    }
+DECLARATION:
+    TYPE_DECL { $$ = $1; }
+    | GLOBAL_VAR_DECL { $$ = $1; }
+    | ROUTINE_DECL { $$ = $1; }
     ;
-PARAMETER:
-    TK_IDENTIFIER TK_COLON TYPE{
-        $$ = std::make_shared<ast::VariableDeclaration>($1, $3);
-    }
+ROUTINE_DECL:
+    TK_ROUTINE TK_IDENTIFIER TK_LPAREN PARAMETER_LIST TK_RPAREN TK_COLON TYPE TK_IS BODY TK_END { $$ = new ast::RoutineDecl($2, $4, $7, $9); }
+    | TK_ROUTINE TK_IDENTIFIER TK_LPAREN PARAMETER_LIST TK_RPAREN TK_IS BODY TK_END { $$ = new ast::RoutineDecl($2, $4, nullptr, $7); }
+    | TK_ROUTINE TK_IDENTIFIER TK_LPAREN TK_RPAREN TK_COLON TYPE TK_IS BODY TK_END { $$ = new ast::RoutineDecl($2, nullptr, $6, $8); }
+    | TK_ROUTINE TK_IDENTIFIER TK_LPAREN TK_RPAREN TK_IS BODY TK_END { $$ = new ast::RoutineDecl($2, nullptr, nullptr, $6); }
+    ;
+PARAMETER_LIST:
+    PARAMETER_DECL { $$ = new ast::ParameterList(std::vector<ast::ParameterDecl *>()); $$->decls.push_back($1); }
+    | PARAMETER_LIST TK_COMMA PARAMETER_DECL{ $1->decls.push_back($3); $$ = $1; }
+    ;
+PARAMETER_DECL:
+    TK_IDENTIFIER TK_COLON TYPE{ $$ = new ast::ParameterDecl($1, $3); }
     ;
 BODY:
-    %empty {
-        std::vector<ast::node_ptr<ast::VariableDeclaration>> tmp1;
-        std::vector<ast::node_ptr<ast::Statement>> tmp2;
-        $$ = std::make_shared<ast::Body>(tmp1, tmp2);
-    }|
-    BODY VARIABLE_DECLARATION {
-        $1->variables.push_back($2);
-        $$ = $1;
-    }| 
-    BODY STATEMENT {
-        $1->statements.push_back($2);
-        $$ = $1;
-    };
-STATEMENT:
-    ASSIGNMENT {
-        $$ = $1;
-    }|
-    PRINT {
-        $$ = $1;
-    }|
-    IF_STATEMENT {
-        $$ = $1;
-    }|
-    WHILE_LOOP {
-        $$ = $1;
-    }|
-    FOR_LOOP {
-        $$ = $1;
-    }|
-    /* FOREACH_LOOP {
-        $$ = $1;
-    }| */
-    ROUTINE_CALL TK_SCOLON {
-        $$ = $1;
-    }| 
-    RETURN {
-        $$ = $1;
-    }; 
-ASSIGNMENT:
-    MODIFIABLE_PRIMARY TK_ASSIGN EXPRESSION TK_SCOLON {
-        $$ = std::make_shared<ast::Assignment>($1, $3);
-    };
-PRINT:
-    TK_PRINT TK_LPAREN TK_NEWLINE TK_RPAREN TK_SCOLON {
-        $$ = std::make_shared<ast::Print>(true);
-    }|
-    TK_PRINT TK_LPAREN EXPRESSION TK_RPAREN TK_SCOLON{
-        $$ = std::make_shared<ast::Print>($3);
-    }; 
-IF_STATEMENT:
-    TK_IF EXPRESSION TK_THEN BODY TK_END {
-        $$ = std::make_shared<ast::IfStatement>($2, $4);
-    }|
-    TK_IF EXPRESSION TK_THEN BODY TK_ELSE BODY TK_END {
-        $$ = std::make_shared<ast::IfStatement>($2, $4, $6);
-    };
-WHILE_LOOP:
-    TK_WHILE EXPRESSION TK_LOOP BODY TK_END {
-        $$ = std::make_shared<ast::WhileLoop>($2, $4);
-    };
-FOR_LOOP:
-    TK_FOR TK_IDENTIFIER TK_IN EXPRESSION TK_DDOT EXPRESSION TK_LOOP BODY TK_END{
-        $$ = std::make_shared<ast::ForLoop>($2, $4, $6, $8);
-    }|
-    TK_FOR TK_IDENTIFIER TK_IN TK_REVERSE EXPRESSION TK_DDOT EXPRESSION TK_LOOP BODY TK_END{
-        $$ = std::make_shared<ast::ForLoop>($2, $7, $5, $9);
-    };
-/* FOREACH_LOOP:
-   TK_FOREACH TK_IDENTIFIER TK_FROM MODIFIABLE_PRIMARY TK_LOOP BODY TK_END {
-        $$ = std::make_shared<ast::ForeachLoop>($2, $4, $6);
-    }; */
-RETURN: 
-    TK_RETURN EXPRESSION TK_SCOLON {
-        $$ = std::make_shared<ast::Return>($2);
-    }; 
-VARIABLE_DECLARATION:
-    TK_VAR TK_IDENTIFIER TK_COLON TYPE TK_IS EXPRESSION TK_SCOLON {
-        $$ = std::make_shared<ast::VariableDeclaration>($2, $4, $6);
-    }|
-    TK_VAR TK_IDENTIFIER TK_IS EXPRESSION TK_SCOLON {
-        $$ = std::make_shared<ast::VariableDeclaration>($2, $4);
-    }|
-    TK_VAR TK_IDENTIFIER TK_COLON TYPE TK_SCOLON {
-        $$ = std::make_shared<ast::VariableDeclaration>($2, $4);
-    };
-TYPE_DECLARATION:
-    TK_TYPE TK_IDENTIFIER TK_IS TYPE TK_SCOLON {
-        $$ = std::make_shared<ast::TypeDeclaration>($2, $4);
-    };
-TYPE:
-    PRIMITIVE_TYPE {
-        $$ = $1;
-    }|
-    TK_IDENTIFIER {
-        // $$ = $1;
-    }|
-    ARRAY_TYPE {
-        $$ = $1;
-    }|
-    RECORD_TYPE {
-        $$ = $1;
-    };
-PRIMITIVE_TYPE:
-    TK_INT {
-        $$ = std::make_shared<ast::IntType>();
-    }|
-    TK_DOUBLE {
-        $$ = std::make_shared<ast::DoubleType>();
-    }|
-    TK_BOOL {
-        $$ = std::make_shared<ast::BoolType>();
-    };
-ARRAY_TYPE:
-    TK_ARRAY TK_LSQBRK EXPRESSION TK_RSQBRK TYPE {
-        $$ = std::make_shared<ast::ArrayType>($3, $5);
-    };
-RECORD_TYPE:
-    TK_RECORD VARIABLE_DECLARATIONS TK_END {
-        $$ = std::make_shared<ast::RecordType>($2);
-    };
-VARIABLE_DECLARATIONS:
-    VARIABLE_DECLARATION {
-        $$ = std::vector<ast::node_ptr<ast::VariableDeclaration>>(1, $1);
-    }|
-    VARIABLE_DECLARATIONS VARIABLE_DECLARATION {
-        $1.push_back($2);
-        $$ = $1;
-    };
-EXPRESSION: 
-    VALUE {
-        $$ = $1;
-    }|
-    BINARY {
-        $$ = $1;
-    }|
-    TK_LPAREN BINARY TK_RPAREN {
-        $$ = $2;
-    }|
-    BITWISE {
-        $$ = $1;
-    }|
-    TK_LPAREN BITWISE TK_RPAREN {
-        $$ = $2;
-    }|
-    COMPARISON {
-        $$ = $1;
-    }|
-    TK_LPAREN COMPARISON TK_RPAREN {
-        $$ = $2;
-    };
-BINARY:
-    VALUE TK_PLUS EXPRESSION {
-        $$ = std::make_shared<ast::BinaryExpression>($1, ast::BinaryOperatorEnum::PLUS, $3);
-    }|
-    VALUE TK_MINUS EXPRESSION {
-        $$ = std::make_shared<ast::BinaryExpression>($1, ast::BinaryOperatorEnum::MINUS, $3);
-    }|
-    VALUE TK_MUL EXPRESSION {
-        $$ = std::make_shared<ast::BinaryExpression>($1, ast::BinaryOperatorEnum::MUL, $3);
-    }|
-    VALUE TK_DIV EXPRESSION {
-        $$ = std::make_shared<ast::BinaryExpression>($1, ast::BinaryOperatorEnum::DIV, $3);
-    }|
-    VALUE TK_POW EXPRESSION {
-        $$ = std::make_shared<ast::BinaryExpression>($1, ast::BinaryOperatorEnum::POW, $3);
-    }|
-    VALUE TK_MOD EXPRESSION {
-        $$ = std::make_shared<ast::BinaryExpression>($1, ast::BinaryOperatorEnum::MOD, $3);
-    };
-BITWISE:
-    VALUE TK_AND EXPRESSION {
-        $$ = std::make_shared<ast::BitwiseExpression>($1, ast::BitwiseOperatorEnum::AND, $3);
-    }|
-    VALUE TK_OR EXPRESSION {
-        $$ = std::make_shared<ast::BitwiseExpression>($1, ast::BitwiseOperatorEnum::OR, $3);
-    }|
-    VALUE TK_XOR EXPRESSION {
-        $$ = std::make_shared<ast::BitwiseExpression>($1, ast::BitwiseOperatorEnum::XOR, $3);
-    };
-COMPARISON:
-    VALUE TK_CEQ EXPRESSION {
-        $$ = std::make_shared<ast::ComparisonExpression>($1, ast::ComparisonOperatorEnum::CEQ, $3);
-    }|
-    VALUE TK_CNEQ EXPRESSION {
-        $$ = std::make_shared<ast::ComparisonExpression>($1, ast::ComparisonOperatorEnum::CNEQ, $3);
-    }|
-    VALUE TK_CGE EXPRESSION {
-        $$ = std::make_shared<ast::ComparisonExpression>($1, ast::ComparisonOperatorEnum::CGE, $3);
-    }|
-    VALUE TK_CGT EXPRESSION {
-        $$ = std::make_shared<ast::ComparisonExpression>($1, ast::ComparisonOperatorEnum::CGT, $3);
-    }|
-    VALUE TK_CLT EXPRESSION {
-        $$ = std::make_shared<ast::ComparisonExpression>($1, ast::ComparisonOperatorEnum::CLT, $3);
-    }|
-    VALUE TK_CLE EXPRESSION {
-        $$ = std::make_shared<ast::ComparisonExpression>($1, ast::ComparisonOperatorEnum::CLE, $3);
-    };
-VALUE:
-    TK_BOOL_LITERAL {
-        $$ = std::make_shared<ast::BoolLiteral>($1);
-    }|
-    TK_INTEGER_LITERAL {
-        $$ = std::make_shared<ast::IntLiteral>($1);
-    }|
-    TK_DOUBLE_LITERAL {
-        $$ = std::make_shared<ast::DoubleLiteral>($1);
-    }|
-    MODIFIABLE_PRIMARY {
-        $$ = $1; 
-    }|
-    ROUTINE_CALL {
-        $$ = $1;
-    }
+    %empty { $$ = new ast::Body(std::vector<ast::BodyEntity *>()); }
+    | BODY BODY_ENTITY { $1->entities.push_back($2); $$ = $1; }
     ;
+BODY_ENTITY:
+    LOCAL_VAR_DECL { $$ = $1; }
+    | STATEMENT { $$ = $1; }
+    ;
+LOCAL_VAR_DECL:
+    TK_VAR TK_IDENTIFIER TK_COLON TYPE TK_IS EXPR TK_SEMICOLON { $$ = new ast::LocalVarDecl($2, $4, $6); }
+    | TK_VAR TK_IDENTIFIER TK_IS EXPR TK_SEMICOLON { $$ = new ast::LocalVarDecl($2, nullptr, $4); }
+    | TK_VAR TK_IDENTIFIER TK_COLON TYPE TK_SEMICOLON { $$ = new ast::LocalVarDecl($2, $4, nullptr); }
+    ;
+GLOBAL_VAR_DECL:
+    TK_VAR TK_IDENTIFIER TK_COLON TYPE TK_IS EXPR TK_SEMICOLON { $$ = new ast::GlobalVarDecl($2, $4, $6); }
+    | TK_VAR TK_IDENTIFIER TK_IS EXPR TK_SEMICOLON { $$ = new ast::GlobalVarDecl($2, nullptr, $4); }
+    | TK_VAR TK_IDENTIFIER TK_COLON TYPE TK_SEMICOLON { $$ = new ast::GlobalVarDecl($2, $4, nullptr); }
+    ;
+STATEMENT:
+    ASSIGNMENT { $$ = $1; }
+    | PRINT { $$ = $1; }
+    | IF { $$ = $1; }
+    | WHILE_LOOP { $$ = $1; }
+    | FOR_LOOP { $$ = $1; }
+    | ROUTINE_CALL { $$ = $1;}
+    | RETURN { $$ = $1; }
+    ; 
+ASSIGNMENT:
+    VAR TK_ASSIGN EXPR TK_SEMICOLON { $$ = new ast::Assignment($1, $3); };
 ROUTINE_CALL:
-    TK_IDENTIFIER TK_LPAREN EXPRESSIONS TK_RPAREN {
-        $$ = std::make_shared<ast::RoutineCall>($1, $3);
-    }|
-    TK_IDENTIFIER TK_LPAREN TK_RPAREN {
-        $$ = std::make_shared<ast::RoutineCall>($1, std::vector<ast::node_ptr<ast::Expression>>());
-    };
-EXPRESSIONS:
-    EXPRESSION {
-        $$ = std::vector<ast::node_ptr<ast::Expression>>(1, $1);
-    }|
-    EXPRESSIONS TK_COMMA EXPRESSION {
-        $1.push_back($3);
-        $$ = $1;
-    }; 
-NESTED_ACCESS:
-    %empty {
-        $$ = std::vector<ast::nestedAccess>();
-    }|
-    TK_DOT TK_IDENTIFIER NESTED_ACCESS{
-        $3.push_back($2);
-        $$ = $3;
-    }|
-    TK_LSQBRK EXPRESSION TK_RSQBRK NESTED_ACCESS {
-        $4.push_back($2);
-        $$ = $4;
-    };
-MODIFIABLE_PRIMARY : 
-    TK_IDENTIFIER NESTED_ACCESS{
-        $$ = std::make_shared<ast::ModifiablePrimary>($1, $2);
-    };
+    TK_IDENTIFIER TK_LPAREN EXPR_LIST TK_RPAREN TK_SEMICOLON { $$ = new ast::RoutineCall($1, $3); }
+    | TK_IDENTIFIER TK_LPAREN TK_RPAREN TK_SEMICOLON { $$ = new ast::RoutineCall($1, nullptr); };
+PRINT:
+    TK_PRINT TK_LPAREN EXPR TK_RPAREN TK_SEMICOLON{ $$ = new ast::Print($3); }
+    ; 
+IF:
+    TK_IF EXPR TK_THEN BODY TK_END { $$ = new ast::If($2, $4, nullptr); }
+    | TK_IF EXPR TK_THEN BODY TK_ELSE BODY TK_END {$$ = new ast::If($2, $4, $6); }
+    ;
+WHILE_LOOP:
+    TK_WHILE EXPR TK_LOOP BODY TK_END {$$ = new ast::WhileLoop($2, $4); }
+    ;
+FOR_LOOP:
+    TK_FOR TK_IDENTIFIER TK_IN RANGE TK_LOOP BODY TK_END{ $$ = new ast::ForLoop($2, $4, $6); }
+    ;
+RANGE:
+    EXPR TK_DDOT EXPR { $$ = new ast::Range($1, $3); }
+    | TK_REVERSE EXPR TK_DDOT EXPR { $$ = new ast::Range($4, $2); }
+    ;
+RETURN: 
+    TK_RETURN EXPR TK_SEMICOLON { $$ = new ast::Return($2); }
+    ; 
+TYPE_DECL:
+    TK_TYPE TYPE_IDENTIFIER TK_IS TYPE TK_SEMICOLON { $$ = new ast::TypeDecl($2, $4); }
+    ;
+TYPE:
+    PRIMITIVE_TYPE { $$ = $1; }
+    | USER_TYPE { $$ = $1; }
+    | TYPE_IDENTIFIER { $$ = $1;} 
+    ;
+PRIMITIVE_TYPE:
+    TK_INTEGER { $$ = new ast::IntegerType(); }
+    | TK_REAL { $$ = new ast::RealType(); }
+    | TK_BOOLEAN { $$ = new ast::BooleanType(); }
+    ;
+USER_TYPE:
+    ARRAY_TYPE { $$ = $1; }
+    | RECORD_TYPE { $$ = $1; }
+    ;
+TYPE_IDENTIFIER:
+    TK_IDENTIFIER { $$ = new ast::TypeIdentifier($1); }
+    ;
+ARRAY_TYPE:
+    TK_ARRAY TK_LSQUARE EXPR TK_RSQUARE TYPE  { $$ = new ast::ArrayType($5, $3); }
+    ;
+RECORD_TYPE:
+    TK_RECORD LOCAL_VAR_LIST TK_END { $$ = new ast::RecordType($2); }
+    ;
+LOCAL_VAR_LIST: 
+    LOCAL_VAR_DECL{ $$ = new ast::LocalVarList(std::vector<ast::LocalVarDecl *>()); $$->vars.push_back($1); }
+    | LOCAL_VAR_LIST LOCAL_VAR_DECL { $1->vars.push_back($2); $$ = $1; } 
+    ;
+EXPR: 
+    VALUE { $$ = $1; }
+    | BINARY { $$ = $1; }
+    | TK_LPAREN BINARY TK_RPAREN { $$ = $2; }
+    | LOGIC { $$ = $1; }
+    | TK_LPAREN LOGIC TK_RPAREN { $$ = $2; }
+    | COMPARISON { $$ = $1; }
+    | TK_LPAREN COMPARISON TK_RPAREN { $$ = $2; }
+    ;
+BINARY:
+    EXPR TK_PLUS EXPR { $$ = new ast::BinaryExpr(BinaryOperator::Plus, $1, $3); }
+    | EXPR TK_MINUS EXPR { $$ = new ast::BinaryExpr(BinaryOperator::Minus, $1, $3); }
+    | EXPR TK_MUL EXPR { $$ = new ast::BinaryExpr(BinaryOperator::Mul, $1, $3); }
+    | EXPR TK_DIV EXPR { $$ = new ast::BinaryExpr(BinaryOperator::Div, $1, $3); }
+    | EXPR TK_MOD EXPR { $$ = new ast::BinaryExpr(BinaryOperator::Mod, $1, $3); }
+    ;
+LOGIC:
+    EXPR TK_AND EXPR { $$ = new ast::LogicExpr(LogicOperator::And, $1, $3); }
+    | EXPR TK_OR EXPR { $$ = new ast::LogicExpr(LogicOperator::Or, $1, $3); }
+    | EXPR TK_XOR EXPR { $$ = new ast::LogicExpr(LogicOperator::Xor, $1, $3); }
+    ;
+COMPARISON:
+    EXPR TK_EQ EXPR { $$ = new ast::ComparisonExpr(ComparisonOperator::Equal, $1, $3); }
+    | EXPR TK_NEQ EXPR { $$ = new ast::ComparisonExpr(ComparisonOperator::NotEqual, $1, $3); }
+    | EXPR TK_GEQ EXPR { $$ = new ast::ComparisonExpr(ComparisonOperator::GreaterEqual, $1, $3); }
+    | EXPR TK_GT EXPR { $$ = new ast::ComparisonExpr(ComparisonOperator::Greater, $1, $3); }
+    | EXPR TK_LT EXPR { $$ = new ast::ComparisonExpr(ComparisonOperator::Less, $1, $3); }
+    | EXPR TK_LEQ EXPR { $$ = new ast::ComparisonExpr(ComparisonOperator::LessEqual, $1, $3); }
+    ;
+VALUE:
+    TK_BOOLEAN_LITERAL { $$ = new ast::BooleanValue($1);  }
+    | TK_INTEGER_LITERAL { $$ = new ast::IntegerValue($1); }
+    | TK_REAL_LITERAL { $$ = new ast::RealValue($1); }
+    | VAR { $$ = $1; }
+    | ROUTINE_CALL_VALUE { $$ = $1;} 
+    ;
+ROUTINE_CALL_VALUE:
+    TK_IDENTIFIER TK_LPAREN EXPR_LIST TK_RPAREN { $$ = new ast::RoutineCallValue($1, $3); }
+    | TK_IDENTIFIER TK_LPAREN TK_RPAREN { $$ = new ast::RoutineCallValue($1, nullptr); }
+    ;
+EXPR_LIST: 
+    EXPR { $$ =  new ast::ExprList(std::vector<ast::Expr *>()); $$->exprs.push_back($1);}
+    | EXPR_LIST TK_COMMA EXPR { $1->exprs.push_back($3); $$ = $1; }
+    ; 
+VAR: 
+    TK_IDENTIFIER NESTED_ACCESS_LIST{ $$ = new ast::Var($1, $2); }
+    ;
+NESTED_ACCESS_LIST: 
+    %empty { $$ = new ast::NestedAccessList(std::vector<ast::NestedAccess*> ()); }
+    | NESTED_ACCESS_LIST RECORD_ACCESS { $1->accesses.push_back($2); $$ = $1; }
+    | NESTED_ACCESS_LIST ARRAY_ACCESS { $1->accesses.push_back($2); $$ = $1; }
+    ;
+RECORD_ACCESS:
+    TK_DOT TK_IDENTIFIER { $$ = new ast::RecordAccess($2); }
+    ;
+ARRAY_ACCESS:
+    TK_LSQUARE EXPR TK_RSQUARE { $$ = new ast::ArrayAccess($2); }
+    ;
 %%
+
 
 void carbonic_c::Parser::error(const std::string& msg) {
     std::cerr << msg << '\n';

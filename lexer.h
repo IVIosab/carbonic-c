@@ -17,67 +17,83 @@
 // Define token types
 enum class TokenType
 {
+    /*=========== Declarations Tokens ==============*/
+    /*Variables*/
     TK_VAR,
+    TK_IS,
+
+    /*Type*/
     TK_TYPE,
-    TK_INT,
-    TK_DOUBLE,
-    TK_BOOL,
-    TK_CHAR,
-    TK_STRING,
+    TK_INTEGER,
+    TK_REAL,
+    TK_BOOLEAN,
     TK_ARRAY,
     TK_RECORD,
+
+    /*Routine*/
     TK_ROUTINE,
-    TK_RETURN,
-    TK_IS,
-    TK_NOT,
+
+    /*============= Statement Tokens ===============*/
+    /*Loops*/
     TK_WHILE,
     TK_LOOP,
     TK_END,
     TK_FOR,
-    TK_FOREACH,
     TK_FROM,
+    TK_IN,
+    TK_REVERSE,
+    TK_DDOT,
+
+    /*If*/
     TK_IF,
     TK_THEN,
     TK_ELSE,
-    TK_IN,
-    TK_REVERSE,
-    TK_STRING_LITERAL,
-    TK_IDENTIFIER,
-    TK_DOUBLE_LITERAL,
-    TK_INTEGER_LITERAL,
-    TK_CHARACTER_LITERAL,
-    TK_TRUE,
-    TK_FALSE,
-    TK_PRINT,
+
+    /*Return*/
+    TK_RETURN,
+
+    /*Assignment*/
     TK_ASSIGN,
-    TK_CEQ,
-    TK_CNEQ,
-    TK_CLT,
-    TK_CLE,
-    TK_CGT,
-    TK_CGE,
-    TK_LPAREN,
-    TK_RPAREN,
-    TK_LBRACK,
-    TK_RBRACK,
-    TK_LSQBRK,
-    TK_RSQBRK,
-    TK_SQUOT,
-    TK_DOT,
-    TK_COMMA,
-    TK_COLON,
-    TK_SCOLON,
-    TK_DDOT,
+
+    /*Print*/
+    TK_PRINT,
+
+    /*============ Expressions Tokens ==============*/
+    /*Literals*/
+    TK_REAL_LITERAL,
+    TK_INTEGER_LITERAL,
+    TK_BOOLEAN_LITERAL,
+
+    /*Comparisons*/
+    TK_EQ,
+    TK_NEQ,
+    TK_LT,
+    TK_LEQ,
+    TK_GT,
+    TK_GEQ,
+
+    /*Operators*/
     TK_PLUS,
     TK_MINUS,
     TK_MUL,
     TK_DIV,
-    TK_NEWLINE,
     TK_MOD,
-    TK_POW,
     TK_AND,
     TK_OR,
-    TK_XOR
+    TK_XOR,
+
+    /*Variables*/
+    TK_IDENTIFIER,
+    TK_DOT,
+
+    /*=============== Utility Tokens ===============*/
+    TK_LPAREN,
+    TK_RPAREN,
+    TK_LSQUARE,
+    TK_RSQUARE,
+    TK_COMMA,
+    TK_COLON,
+    TK_SEMICOLON
 };
 
 namespace carbonic_c

@@ -2,549 +2,479 @@
 #define AST_H
 
 #include <iostream>
-#include <string>
-#include <memory>
 #include <map>
 #include <vector>
-#include <algorithm>
-#include <variant>
+#include "Enums.h"
+
 // Forward declarations
 namespace ast
 {
-    struct Node;
-    struct Program;
-    struct Type;
-    struct Expression;
-    struct BinaryExpression;
-    struct BitwiseExpression;
-    struct ComparisonExpression;
-    struct Identifier;
-    struct IntType;
-    struct DoubleType;
-    struct BoolType;
-    struct ArrayType;
-    struct RecordType;
-    struct IntLiteral;
-    struct DoubleLiteral;
-    struct BoolLiteral;
-    struct VariableDeclaration;
-    struct TypeDeclaration;
-    struct ModifiablePrimary;
-    struct RoutineDeclaration;
-    struct RoutineCall;
-    struct Body;
-    struct Statement;
-    struct Assignment;
-    struct Print;
-    struct IfStatement;
-    struct WhileLoop;
-    struct ForLoop;
-    struct Return;
-    // struct ForeachLoop;
-} // namespace ast
+    typedef long long Integer;
+    typedef long double Real;
+    typedef bool Boolean;
+    typedef std::string Ident;
 
-// Base class for code generator and anything that traverses AST.
+    class Program;
+    class Decl; /*Abstract*/
+    class RoutineDecl;
+    class GlobalVarDecl;
+    class Expr; /*Abstract*/
+    class ExprList;
+    class BinaryExpr;
+    class LogicExpr;
+    class ComparisonExpr;
+    class Value; /*Abstract*/
+    class IntegerValue;
+    class RealValue;
+    class BooleanValue;
+    class RoutineCallValue;
+    class Var;
+    class TypeDecl;
+    class Type;          /*Abstract*/
+    class PrimitiveType; /*Abstract*/
+    class UserType;      /*Abstract*/
+    class TypeIdentifier;
+    class IntegerType;
+    class RealType;
+    class BooleanType;
+    class ArrayType;
+    class RecordType;
+    class ParameterDecl;
+    class ParameterList;
+    class Body;
+    class BodyEntity; /*Abstract*/
+    class LocalVarDecl;
+    class LocalVarList;
+    class Statement; /*Abstract*/
+    class Assignment;
+    class RoutineCall;
+    class Return;
+    class Print;
+    class WhileLoop;
+    class ForLoop;
+    class Range;
+    class If;
+    class NestedAccess;
+    class NestedAccessList;
+    class ArrayAccess;
+    class RecordAccess;
 
-namespace ast
-{
     class Visitor
     {
     public:
-        virtual void visit(ast::Program *program) = 0;
-        virtual void visit(ast::IntType *it) = 0;
-        virtual void visit(ast::DoubleType *dt) = 0;
-        virtual void visit(ast::BoolType *bt) = 0;
-        virtual void visit(ast::ArrayType *at) = 0;
-        virtual void visit(ast::RecordType *rt) = 0;
-        virtual void visit(ast::IntLiteral *il) = 0;
-        virtual void visit(ast::DoubleLiteral *il) = 0;
-        virtual void visit(ast::BoolLiteral *il) = 0;
-        virtual void visit(ast::BinaryExpression *binexp) = 0;
-        virtual void visit(ast::BitwiseExpression *bitexp) = 0;
-        virtual void visit(ast::ComparisonExpression *comexp) = 0;
-        virtual void visit(ast::VariableDeclaration *vardecl) = 0;
-        virtual void visit(ast::TypeDeclaration *typedecl) = 0;
-        virtual void visit(ast::RoutineDeclaration *routdecl) = 0;
-        virtual void visit(ast::RoutineCall *routcall) = 0;
-        virtual void visit(ast::Body *body) = 0;
-        virtual void visit(ast::Assignment *assign) = 0;
-        virtual void visit(ast::Print *stmt) = 0;
-        virtual void visit(ast::Return *stmt) = 0;
-        //        virtual void visit(ast::Identifier *id) = 0;
-        virtual void visit(ast::ModifiablePrimary *mp) = 0;
-        virtual void visit(ast::IfStatement *is) = 0;
-        virtual void visit(ast::WhileLoop *wl) = 0;
-        virtual void visit(ast::ForLoop *fl) = 0;
-        // virtual void visit(ast::ForeachLoop *fel) = 0;
-    };
-}
+        virtual ~Visitor() {}
+        virtual void visitProgram(Program *p);
+        virtual void visitDecl(Decl *p);
+        virtual void visitRoutineDecl(RoutineDecl *p);
+        virtual void visitGlobalVarDecl(GlobalVarDecl *p);
+        virtual void visitExpr(Expr *p);
+        virtual void visitExprList(ExprList *p);
+        virtual void visitBinaryExpr(BinaryExpr *p);
+        virtual void visitLogicExpr(LogicExpr *p);
+        virtual void visitComparisonExpr(ComparisonExpr *p);
+        virtual void visitValue(Value *p);
+        virtual void visitIntegerValue(IntegerValue *p);
+        virtual void visitRealValue(RealValue *p);
+        virtual void visitBooleanValue(BooleanValue *p);
+        virtual void visitRoutineCallValue(RoutineCallValue *p);
+        virtual void visitVar(Var *p);
+        virtual void visitTypeDecl(TypeDecl *p);
+        virtual void visitType(Type *p);
+        virtual void visitPrimitiveType(PrimitiveType *p);
+        virtual void visitUserType(UserType *p);
+        virtual void visitTypeIdentifier(TypeIdentifier *p);
+        virtual void visitIntegerType(IntegerType *p);
+        virtual void visitRealType(RealType *p);
+        virtual void visitBooleanType(BooleanType *p);
+        virtual void visitArrayType(ArrayType *p);
+        virtual void visitRecordType(RecordType *p);
+        virtual void visitParameterDecl(ParameterDecl *p);
+        virtual void visitParameterList(ParameterList *p);
+        virtual void visitBody(Body *p);
+        virtual void visitBodyEntity(BodyEntity *p);
+        virtual void visitLocalVarDecl(LocalVarDecl *p);
+        virtual void visitLocalVarList(LocalVarList *p);
+        virtual void visitStatement(Statement *p);
+        virtual void visitAssignment(Assignment *p);
+        virtual void visitRoutineCall(RoutineCall *p);
+        virtual void visitReturn(Return *p);
+        virtual void visitPrint(Print *p);
+        virtual void visitWhileLoop(WhileLoop *p);
+        virtual void visitForLoop(ForLoop *p);
+        virtual void visitRange(Range *p);
+        virtual void visitIf(If *p);
+        virtual void visitNestedAccess(NestedAccess *p);
+        virtual void visitNestedAccessList(NestedAccessList *p);
+        virtual void visitArrayAccess(ArrayAccess *p);
+        virtual void visitRecordAccess(RecordAccess *p);
 
-namespace ast
-{
+        virtual void visitInteger(Integer x);
+        virtual void visitReal(Real x);
+        virtual void visitBoolean(Boolean x);
+        virtual void visitIdent(Ident x);
+    };
 
-    // Pointer to an AST node.
-    template <typename Node>
-    using node_ptr = std::shared_ptr<Node>;
-    typedef std::variant<node_ptr<ast::Expression>, std::string> nestedAccess;
-
-    // Enumerations
-    enum TypeEnum
+    class Visitable
     {
-        INT,
-        DOUBLE,
-        BOOL,
-        ARRAY,
-        RECORD
-    };
-    enum BinaryOperatorEnum
-    {
-        PLUS,
-        MINUS,
-        MUL,
-        DIV,
-        POW,
-        MOD
-    };
-    enum BitwiseOperatorEnum
-    {
-        AND,
-        OR,
-        XOR
-    };
-    enum ComparisonOperatorEnum
-    {
-        CEQ,
-        CNEQ,
-        CGE,
-        CGT,
-        CLT,
-        CLE
-    };
-    // Base class for AST nodes
-    struct Node
-    {
+    public:
         virtual void accept(Visitor *v) = 0;
     };
 
-    // A special node containing program variables, type aliases, and routines.
-    struct Program : Node
+    class Program : public Visitable
     {
-        std::vector<node_ptr<TypeDeclaration>> types;
-        std::vector<node_ptr<VariableDeclaration>> variables;
-        std::vector<node_ptr<RoutineDeclaration>> routines;
-
-        void accept(Visitor *v) override { v->visit(this); }
+    public:
+        std::vector<Decl *> decls = {};
+        Program(std::vector<Decl *> decls) : decls(decls) {}
+        void accept(Visitor *v) override { v->visitProgram(this); }
     };
 
-    // Base class for Types
-    struct Type : Node
+    class Decl : public Visitable
     {
-        virtual TypeEnum getType() { return ast::TypeEnum::INT; }
+    public:
         virtual void accept(Visitor *v) = 0;
-        // friend std::ostream& operator<<(std::ostream& os, const node_ptr<Type> value);
     };
-    // <Types>
 
-    struct IntType : Type
+    class RoutineDecl : public Decl
     {
-        IntType() {}
-        TypeEnum getType() { return TypeEnum::INT; }
-
-        void accept(Visitor *v) override { v->visit(this); }
+    public:
+        Ident name;
+        ParameterList *params = nullptr;
+        Type *returnType = nullptr;
+        Body *body = nullptr;
+        RoutineDecl(Ident name, ParameterList *params, Type *returnType, Body *body) : name(name), params(params), returnType(returnType), body(body) {}
+        void accept(Visitor *v) override { v->visitRoutineDecl(this); }
     };
-    struct BoolType : Type
+
+    class GlobalVarDecl : public Decl
     {
-        BoolType() {}
-        TypeEnum getType() { return TypeEnum::BOOL; }
-
-        void accept(Visitor *v) override { v->visit(this); }
+    public:
+        Ident name;
+        Type *type = nullptr;
+        Expr *init = nullptr;
+        GlobalVarDecl(Ident name, Type *type, Expr *init) : name(name), type(type), init(init) {}
+        void accept(Visitor *v) override { v->visitGlobalVarDecl(this); }
     };
-    struct DoubleType : Type
+
+    class TypeDecl : public Decl
     {
-        DoubleType() {}
-        TypeEnum getType() { return TypeEnum::DOUBLE; }
-
-        void accept(Visitor *v) override { v->visit(this); }
+    public:
+        TypeIdentifier *name = nullptr;
+        Type *type = nullptr;
+        TypeDecl(TypeIdentifier *name, Type *type) : name(name), type(type) {}
+        void accept(Visitor *v) override { v->visitTypeDecl(this); }
     };
-    struct ArrayType : Type
+
+    class Expr : public Visitable
     {
-        node_ptr<Expression> size;
-        node_ptr<Type> dtype;
-
-        ArrayType(node_ptr<Expression> size, node_ptr<Type> dtype)
-        {
-            this->size = size;
-            this->dtype = dtype;
-        }
-
-        TypeEnum getType() { return TypeEnum::ARRAY; }
-
-        void accept(Visitor *v) override { v->visit(this); }
+    public:
+        virtual void accept(Visitor *v) = 0;
     };
-    struct RecordType : Type
+
+    class ExprList : public Visitable
     {
-        std::string name;
-        std::vector<node_ptr<VariableDeclaration>> fields;
-
-        RecordType(std::vector<node_ptr<VariableDeclaration>> fields)
-        {
-            this->fields = fields;
-        }
-
-        TypeEnum getType() { return TypeEnum::RECORD; }
-
-        void accept(Visitor *v) override { v->visit(this); }
+    public:
+        std::vector<Expr *> exprs = {};
+        ExprList(std::vector<Expr *> exprs) : exprs(exprs) {}
+        void accept(Visitor *v) override { v->visitExprList(this); }
     };
-    // </Types>
-    // <Expressions>
-    // Base class for Expressions
-    struct Expression : Node
+
+    class BinaryExpr : public Expr
     {
-        node_ptr<Type> dtype;
+    public:
+        BinaryOperator op;
+        Expr *left = nullptr;
+        Expr *right = nullptr;
+        BinaryExpr(BinaryOperator op, Expr *left, Expr *right) : op(op), left(left), right(right) {}
+        void accept(Visitor *v) override { v->visitBinaryExpr(this); }
     };
-    struct BinaryExpression : Expression
+
+    class LogicExpr : public Expr
     {
-        node_ptr<Expression> lhs, rhs;
-        BinaryOperatorEnum op;
-
-        BinaryExpression(node_ptr<Expression> lhs, BinaryOperatorEnum op, node_ptr<Expression> rhs)
-        {
-            this->lhs = lhs;
-            this->rhs = rhs;
-            this->op = op;
-        }
-
-        void accept(Visitor *v) override { v->visit(this); }
+    public:
+        LogicOperator op;
+        Expr *left = nullptr;
+        Expr *right = nullptr;
+        LogicExpr(LogicOperator op, Expr *left, Expr *right) : op(op), left(left), right(right) {}
+        void accept(Visitor *v) override { v->visitLogicExpr(this); }
     };
 
-    struct BitwiseExpression : Expression
+    class ComparisonExpr : public Expr
     {
-        node_ptr<Expression> lhs, rhs;
-        BitwiseOperatorEnum op;
-
-        BitwiseExpression(node_ptr<Expression> lhs, BitwiseOperatorEnum op, node_ptr<Expression> rhs)
-        {
-            this->lhs = lhs;
-            this->rhs = rhs;
-            this->op = op;
-        }
-
-        void accept(Visitor *v) override { v->visit(this); }
+    public:
+        ComparisonOperator op;
+        Expr *left = nullptr;
+        Expr *right = nullptr;
+        ComparisonExpr(ComparisonOperator op, Expr *left, Expr *right) : op(op), left(left), right(right) {}
+        void accept(Visitor *v) override { v->visitComparisonExpr(this); }
     };
 
-    struct ComparisonExpression : Expression
+    class Value : public Expr
     {
-        node_ptr<Expression> lhs, rhs;
-        ComparisonOperatorEnum op;
-
-        ComparisonExpression(node_ptr<Expression> lhs, ComparisonOperatorEnum op, node_ptr<Expression> rhs)
-        {
-            this->lhs = lhs;
-            this->rhs = rhs;
-            this->op = op;
-        }
-
-        void accept(Visitor *v) override { v->visit(this); }
+    public:
+        virtual void accept(Visitor *v) = 0;
     };
 
-    struct IntLiteral : Expression
+    class IntegerValue : public Value
     {
-        int64_t value;
-
-        IntLiteral(int64_t value)
-        {
-            this->dtype = std::make_shared<IntType>();
-            this->value = value;
-        }
-
-        void accept(Visitor *v) override { v->visit(this); }
+    public:
+        Integer value;
+        IntegerValue(Integer value) : value(value) {}
+        void accept(Visitor *v) override { v->visitIntegerValue(this); }
     };
-    struct DoubleLiteral : Expression
+
+    class RealValue : public Value
     {
-        double value;
-
-        DoubleLiteral(double value)
-        {
-            this->dtype = std::make_shared<DoubleType>();
-            this->value = value;
-        }
-
-        void accept(Visitor *v) override { v->visit(this); }
+    public:
+        Real value;
+        RealValue(Real value) : value(value) {}
+        void accept(Visitor *v) override { v->visitRealValue(this); }
     };
 
-    struct BoolLiteral : Expression
+    class BooleanValue : public Value
     {
-        bool value;
-
-        BoolLiteral(bool value)
-        {
-            this->dtype = std::make_shared<BoolType>();
-            this->value = value;
-        }
-
-        void accept(Visitor *v) override { v->visit(this); }
+    public:
+        Boolean value;
+        BooleanValue(Boolean value) : value(value) {}
+        void accept(Visitor *v) override { v->visitBooleanValue(this); }
     };
 
-    // struct Identifier : Expression
-    // {
-    //     std::string name;
-    //     node_ptr<Expression> idx;
-
-    //     // variable or record field access
-    //     Identifier(std::string name)
-    //     {
-    //         this->name = name;
-    //         this->idx = nullptr;
-    //     }
-
-    //     // array element access
-    //     Identifier(std::string name, node_ptr<Expression> idx)
-    //     {
-    //         this->name = name;
-    //         this->idx = idx;
-    //     }
-
-    //     void accept(Visitor *v) override { v->visit(this); }
-    // };
-
-    // </Expressions>
-    // <Nodes>
-
-    // <Simple Declaration>
-
-    struct VariableDeclaration : Node
+    class RoutineCallValue : public Value
     {
-        std::string name;
-        node_ptr<Type> dtype;
-        node_ptr<Expression> initial_value;
-
-        VariableDeclaration(std::string name, node_ptr<Type> dtype)
-        {
-            this->name = name;
-            this->dtype = dtype;
-            this->initial_value = nullptr;
-        }
-
-        VariableDeclaration(std::string name, node_ptr<Expression> initial_value)
-        {
-            this->name = name;
-            this->dtype = nullptr;
-            this->initial_value = initial_value;
-        }
-
-        VariableDeclaration(std::string name, node_ptr<Type> dtype, node_ptr<Expression> initial_value)
-        {
-            this->name = name;
-            this->dtype = dtype;
-            this->initial_value = initial_value;
-        }
-        void accept(Visitor *v) { v->visit(this); }
+    public:
+        Ident name;
+        ExprList *args = nullptr;
+        RoutineCallValue(Ident name, ExprList *args) : name(name), args(args) {}
+        void accept(Visitor *v) override { v->visitRoutineCallValue(this); }
     };
-    struct TypeDeclaration : Node
+
+    class Var : public Value
     {
-        std::string name;
-        node_ptr<Type> dtype;
-
-        TypeDeclaration(std::string name, node_ptr<Type> dtype)
-        {
-            this->name = name;
-            this->dtype = dtype;
-        }
-        void accept(Visitor *v) { v->visit(this); }
+    public:
+        Ident name;
+        NestedAccessList *accesses;
+        Var(Ident name, NestedAccessList *accesses) : name(name), accesses(accesses) {}
+        void accept(Visitor *v) override { v->visitVar(this); }
     };
-    struct ModifiablePrimary : Expression
+
+    class Type : public Visitable
     {
-        std::string name;
-        std::vector<nestedAccess> accessValues;
-
-        ModifiablePrimary(std::string name, std::vector<nestedAccess> accessValues)
-        {
-            this->name = name;
-            std::reverse(accessValues.begin(), accessValues.end());
-            this->accessValues = accessValues;
-        }
-
-        // ModifiablePrimary(std::string identifier)
-        // {
-        //      this->identifier = identifier;
-        //      this->accessValues = {};
-        // }
-        // ModifiablePrimary(std::string name, node_ptr<Expression> expression)
-        // {
-        //     this->name = name;
-        //     this->expression = expression;
-        //     this->argname = "";
-        // }
-
-        // ModifiablePrimary(std::string name, std::string argname)
-        // {
-        //     this->name = name;
-        //     this->argname = argname;
-        // }
-
-        void accept(Visitor *v) override { v->visit(this); }
+    public:
+        virtual void accept(Visitor *v) = 0;
     };
-    // Base class for Statements
-    struct Statement : virtual Node
+
+    class PrimitiveType : public Type
     {
-        void accept(Visitor *v) override = 0;
+    public:
+        virtual void accept(Visitor *v) = 0;
     };
-    struct Assignment : Statement
+
+    class UserType : public Type
     {
-        node_ptr<ModifiablePrimary> modifiablePrimary;
-        node_ptr<Expression> expression;
-        Assignment(node_ptr<ModifiablePrimary> modifiablePrimary, node_ptr<Expression> expression)
-        {
-            this->modifiablePrimary = modifiablePrimary;
-            this->expression = expression;
-        }
-        void accept(Visitor *v) override { v->visit(this); }
+    public:
+        virtual void accept(Visitor *v) = 0;
     };
-    struct Print : Statement
+
+    class TypeIdentifier : public Type
     {
-        node_ptr<Expression> exp;
-        bool endl;
-
-        Print(node_ptr<Expression> exp)
-        {
-            this->exp = exp;
-            this->endl = false;
-        }
-        Print(bool endl)
-        {
-            this->exp = nullptr;
-            this->endl = endl;
-        }
-
-        void accept(Visitor *v) override { v->visit(this); }
+    public:
+        Ident name;
+        TypeIdentifier(Ident name) : name(name) {}
+        void accept(Visitor *v) override { v->visitTypeIdentifier(this); }
     };
-    struct IfStatement : Statement
+
+    class IntegerType : public PrimitiveType
     {
-        node_ptr<Expression> condition;
-        node_ptr<Body> ifBody, elseBody;
-        IfStatement(node_ptr<Expression> condition, node_ptr<Body> ifBody)
-        {
-            this->condition = condition;
-            this->ifBody = ifBody;
-            this->elseBody = nullptr;
-        }
-        IfStatement(node_ptr<Expression> condition, node_ptr<Body> ifBody, node_ptr<Body> elseBody)
-        {
-            this->condition = condition;
-            this->ifBody = ifBody;
-            this->elseBody = elseBody;
-        }
-        void accept(Visitor *v) override { v->visit(this); }
+    public:
+        void accept(Visitor *v) override { v->visitIntegerType(this); }
     };
-    struct WhileLoop : Statement
+
+    class RealType : public PrimitiveType
     {
-        node_ptr<Expression> condition;
-        node_ptr<Body> loopBody;
-        WhileLoop(node_ptr<Expression> condition, node_ptr<Body> loopBody)
-        {
-            this->condition = condition;
-            this->loopBody = loopBody;
-        }
-        void accept(Visitor *v) override { v->visit(this); }
+    public:
+        void accept(Visitor *v) override { v->visitRealType(this); }
     };
-    struct ForLoop : Statement
+
+    class BooleanType : public PrimitiveType
     {
-        std::string identifier;
-        node_ptr<Expression> from, to;
-        node_ptr<Body> loopBody;
-        ForLoop(std::string identifier, node_ptr<Expression> from, node_ptr<Expression> to, node_ptr<Body> loopBody)
-        {
-            this->identifier = identifier;
-            this->from = from;
-            this->to = to;
-            this->loopBody = loopBody;
-        }
-        void accept(Visitor *v) override { v->visit(this); }
+    public:
+        void accept(Visitor *v) override { v->visitBooleanType(this); }
     };
-    // struct ForeachLoop : Statement
-    // {
-    //     std::string identifier;
-    //     node_ptr<ModifiablePrimary> modifiablePrimary;
-    //     node_ptr<Body> loopBody;
-    //     ForeachLoop(std::string identifier, node_ptr<ModifiablePrimary> modifablePrimary, node_ptr<Body> loopBody)
-    //     {
-    //         this->identifier = identifier;
-    //         this->modifiablePrimary = modifablePrimary;
-    //         this->loopBody = loopBody;
-    //     }
-    //     void accept(Visitor *v) override { v->visit(this); }
-    // };
-    struct Return : Statement
+
+    class ArrayType : public UserType
     {
-        node_ptr<Expression> exp;
-
-        Return()
-        {
-            this->exp = nullptr;
-        }
-
-        Return(node_ptr<Expression> exp)
-        {
-            this->exp = exp;
-        }
-
-        void accept(Visitor *v) override { v->visit(this); }
+    public:
+        Type *type = nullptr;
+        Expr *size = nullptr;
+        ArrayType(Type *type, Expr *size) : type(type), size(size) {}
+        void accept(Visitor *v) override { v->visitArrayType(this); }
     };
-    struct Body : Node
+
+    class RecordType : public UserType
     {
-        std::vector<node_ptr<VariableDeclaration>> variables;
-        std::vector<node_ptr<Statement>> statements;
-
-        Body(std::vector<node_ptr<VariableDeclaration>> variables, std::vector<node_ptr<Statement>> statements)
-        {
-            std::reverse(variables.begin(), variables.end());
-            std::reverse(variables.begin(), variables.end());
-            this->variables = variables;
-            this->statements = statements;
-        }
-
-        void accept(Visitor *v) override { v->visit(this); }
+    public:
+        LocalVarList *decls;
+        RecordType(LocalVarList *decls) : decls(decls) {}
+        void accept(Visitor *v) override { v->visitRecordType(this); }
     };
-    struct RoutineDeclaration : Node
+
+    class ParameterDecl : public Decl
     {
-        std::string name;
-        std::vector<node_ptr<VariableDeclaration>> params;
-        node_ptr<Type> rtype;
-        node_ptr<Body> body;
-
-        RoutineDeclaration(std::string name, std::vector<node_ptr<VariableDeclaration>> params, node_ptr<Type> rtype, node_ptr<Body> body)
-        {
-            this->name = name;
-            this->params = params;
-            this->rtype = rtype;
-            this->body = body;
-        }
-
-        RoutineDeclaration(std::string name, std::vector<node_ptr<VariableDeclaration>> params, node_ptr<Body> body)
-        {
-            this->name = name;
-            this->params = params;
-            this->body = body;
-        }
-
-        void accept(Visitor *v) override { v->visit(this); }
+    public:
+        Ident name;
+        Type *type = nullptr;
+        ParameterDecl(Ident name, Type *type) : name(name), type(type) {}
+        void accept(Visitor *v) override { v->visitParameterDecl(this); }
     };
 
-    struct RoutineCall : Statement, Expression
+    class ParameterList : public Visitable
     {
-        // node_ptr<RoutineDeclaration> routine;
-        std::string name;
-        std::vector<node_ptr<Expression>> args;
-
-        RoutineCall(std::string name, std::vector<node_ptr<Expression>> args)
-        {
-            this->name = name;
-            this->args = args;
-        }
-
-        void accept(Visitor *v) override { v->visit(this); }
+    public:
+        std::vector<ParameterDecl *> decls = {};
+        ParameterList(std::vector<ParameterDecl *> decls) : decls(decls) {}
+        void accept(Visitor *v) override { v->visitParameterList(this); }
     };
-    // </Statements>
+
+    class Body : public Visitable
+    {
+    public:
+        std::vector<BodyEntity *> entities = {};
+        Body(std::vector<BodyEntity *> entities) : entities(entities) {}
+        void accept(Visitor *v) override { v->visitBody(this); }
+    };
+
+    class BodyEntity : public Visitable
+    {
+    public:
+        virtual void accept(Visitor *v) = 0;
+    };
+
+    class LocalVarDecl : public BodyEntity
+    {
+    public:
+        Ident name;
+        Type *type = nullptr;
+        Expr *init = nullptr;
+        LocalVarDecl(Ident name, Type *type, Expr *init) : name(name), type(type), init(init) {}
+        void accept(Visitor *v) override { v->visitLocalVarDecl(this); }
+    };
+
+    class LocalVarList : public Visitable
+    {
+    public:
+        std::vector<LocalVarDecl *> vars = {};
+        LocalVarList(std::vector<LocalVarDecl *> vars) : vars(vars) {}
+        void accept(Visitor *v) override { v->visitLocalVarList(this); }
+    };
+
+    class Statement : public BodyEntity
+    {
+    public:
+        virtual void accept(Visitor *v) = 0;
+    };
+
+    class Assignment : public Statement
+    {
+    public:
+        Var *var = nullptr;
+        Expr *expr = nullptr;
+        Assignment(Var *var, Expr *expr) : var(var), expr(expr) {}
+        void accept(Visitor *v) override { v->visitAssignment(this); }
+    };
+
+    class RoutineCall : public Statement
+    {
+    public:
+        Ident name;
+        ExprList *args = nullptr;
+        RoutineCall(Ident name, ExprList *args) : name(name), args(args) {}
+        void accept(Visitor *v) override { v->visitRoutineCall(this); }
+    };
+
+    class Return : public Statement
+    {
+    public:
+        Expr *expr = nullptr;
+        Return(Expr *expr) : expr(expr) {}
+        void accept(Visitor *v) override { v->visitReturn(this); }
+    };
+
+    class Print : public Statement
+    {
+    public:
+        Expr *expr = nullptr;
+        Print(Expr *expr) : expr(expr) {}
+        void accept(Visitor *v) override { v->visitPrint(this); }
+    };
+
+    class WhileLoop : public Statement
+    {
+    public:
+        Expr *condition = nullptr;
+        Body *body = nullptr;
+        WhileLoop(Expr *condition, Body *body) : condition(condition), body(body) {}
+        void accept(Visitor *v) override { v->visitWhileLoop(this); }
+    };
+
+    class ForLoop : public Statement
+    {
+    public:
+        Ident name;
+        Range *range = nullptr;
+        Body *body = nullptr;
+        ForLoop(Ident name, Range *range, Body *body) : name(name), range(range), body(body) {}
+
+        void accept(Visitor *v) override { v->visitForLoop(this); }
+    };
+
+    class Range : public Visitable
+    {
+    public:
+        Expr *from = nullptr;
+        Expr *to = nullptr;
+        Range(Expr *from, Expr *to) : from(from), to(to) {}
+        void accept(Visitor *v) override { v->visitRange(this); }
+    };
+
+    class If : public Statement
+    {
+    public:
+        Expr *condition = nullptr;
+        Body *then = nullptr;
+        Body *else_ = nullptr;
+        If(Expr *condition, Body *then, Body *else_) : condition(condition), then(then), else_(else_) {}
+        void accept(Visitor *v) override { v->visitIf(this); }
+    };
+
+    class NestedAccess : public Visitable
+    {
+    public:
+        virtual void accept(Visitor *v) = 0;
+    };
+
+    class NestedAccessList : public Visitable
+    {
+    public:
+        std::vector<NestedAccess *> accesses = {};
+        NestedAccessList(std::vector<NestedAccess *> accesses) : accesses(accesses) {}
+        void accept(Visitor *v) override { v->visitNestedAccessList(this); }
+    };
+
+    class ArrayAccess : public NestedAccess
+    {
+    public:
+        Expr *index = nullptr;
+        ArrayAccess(Expr *index) : index(index) {}
+        void accept(Visitor *v) override { v->visitArrayAccess(this); }
+    };
+
+    class RecordAccess : public NestedAccess
+    {
+    public:
+        Ident name;
+        RecordAccess(Ident name) : name(name) {}
+        void accept(Visitor *v) override { v->visitRecordAccess(this); }
+    };
+
 } // namespace ast
 
 #endif // AST_H
