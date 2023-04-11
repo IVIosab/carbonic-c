@@ -1,54 +1,79 @@
 #include "ast.hpp"
 #include <memory>
 #include <unordered_map>
-
+#include "Enums.h"
 namespace analyzer
 {
-
-    template <typename T>
-    using sPtr = std::shared_ptr<T>;
-
+    typedef std::string Ident;
     class Semantic : public ast::Visitor
     {
     public:
-        Semantic(size_t depth = 0) : depth(depth) {}
-        void visit(ast::Program *node) override;
-        void visit(ast::IntType *node) override;
-        void visit(ast::DoubleType *node) override;
-        void visit(ast::BoolType *node) override;
-        void visit(ast::ArrayType *node) override;
-        void visit(ast::RecordType *node) override;
-        void visit(ast::IntLiteral *node) override;
-        void visit(ast::DoubleLiteral *node) override;
-        void visit(ast::BoolLiteral *node) override;
-        void visit(ast::BinaryExpression *node) override;
-        void visit(ast::BitwiseExpression *node) override;
-        void visit(ast::ComparisonExpression *node) override;
-        void visit(ast::VariableDeclaration *node) override;
-        void visit(ast::TypeDeclaration *node) override;
-        void visit(ast::RoutineDeclaration *node) override;
-        void visit(ast::RoutineCall *node) override;
-        void visit(ast::Body *node) override;
-        void visit(ast::Assignment *node) override;
-        void visit(ast::Print *node) override;
-        void visit(ast::Return *node) override;
-        //        void visit(ast::Identifier *node) override;
-        void visit(ast::ModifiablePrimary *node) override;
-        void visit(ast::IfStatement *node) override;
-        void visit(ast::WhileLoop *node) override;
-        void visit(ast::ForLoop *node) override;
-        // void visit(ast::ForeachLoop *node) override;
+        void visitProgram(ast::Program *p);
+        void visitDecl(ast::Decl *p){}
+        void visitTypeDecl(ast::TypeDecl *p);
+        void visitGlobalVarDecl(ast::GlobalVarDecl *p);
+        void visitRoutineDecl(ast::RoutineDecl *p);
+        
+        void visitBody(ast::Body *p);
+        void visitBodyEntity(ast::BodyEntity *p){};
+        void visitLocalVarDecl(ast::LocalVarDecl *p);
+        void visitLocalVarList(ast::LocalVarList *p){};
+        void visitStatement(ast::Statement *p){};
+        void visitAssignment(ast::Assignment *p);
+        void visitRoutineCall(ast::RoutineCall *p);
+        void visitReturn(ast::Return *p);
+        void visitPrint(ast::Print *p);
+        void visitIf(ast::If *p);
+        void visitWhileLoop(ast::WhileLoop *p);
+        void visitForLoop(ast::ForLoop *p);
+        void visitRange(ast::Range *p);
+
+
+        void visitExpr(ast::Expr *p) {}
+        void visitExprList(ast::ExprList *p){}
+        void visitBinaryExpr(ast::BinaryExpr *p);
+        void visitLogicExpr(ast::LogicExpr *p);
+        void visitComparisonExpr(ast::ComparisonExpr *p);
+        void visitValue(ast::Value *p) {}
+        void visitIntegerValue(ast::IntegerValue *p);
+        void visitRealValue(ast::RealValue *p);
+        void visitBooleanValue(ast::BooleanValue *p);
+        void visitRoutineCallValue(ast::RoutineCallValue *p){} // not implemented
+        
+        void visitType(ast::Type *p){}
+        void visitPrimitiveType(ast::PrimitiveType *p){}
+        void visitUserType(ast::UserType *p){}
+        void visitTypeIdentifier(ast::TypeIdentifier *p){} //-> doesn't get visited
+        void visitIntegerType(ast::IntegerType *p);
+        void visitRealType(ast::RealType *p);
+        void visitBooleanType(ast::BooleanType *p);
+        void visitArrayType(ast::ArrayType *p);
+        void visitRecordType(ast::RecordType *p);
+        void visitInteger(ast::Integer x){} //  -> doesn't get visited
+        void visitReal(ast::Real x){} // -> doesn't get visited
+        void visitBoolean(ast::Boolean x){} //  -> doesn't get visited
+        void visitIdent(Ident x){} //  -> doesn't get visited
+        
+        void visitVar(ast::Var *p);
+        void visitNestedAccess(ast::NestedAccess *p) {}
+        void visitNestedAccessList(ast::NestedAccessList *p){}
+        void visitArrayAccess(ast::ArrayAccess *p);
+        void visitRecordAccess(ast::RecordAccess *p);
+        
+        void visitParameterDecl(ast::ParameterDecl *p); //  -> doesn't get visited
+        void visitParameterList(ast::ParameterList *p){}
 
     private:
         size_t depth;
 
         std::unordered_map<std::string, ast::Type *> typeDeclSymbolTable;
         std::unordered_map<std::string, ast::Type *> varDeclSymbolTable;
-        std::unordered_map<std::string, ast::RoutineDeclaration *> routineDeclTable;
+        std::unordered_map<std::string, ast::RoutineDecl *> routineDeclTable;
         std::vector<std::pair<std::string, ast::Type *>> varStack;
         int routine_vars_n = 0;
         ast::Type *actual_type = nullptr;
-        ast::node_ptr<ast::Type> routine_return_type = nullptr;
+        ast::Type* routine_return_type = nullptr;
+        ast::Type* current_var_type = nullptr;
         void err_second_declaration(std::string name){
             std::cout << "Error: second declaration of " << name << " is invalid.\n";
             exit(0);
@@ -74,23 +99,26 @@ namespace analyzer
         }
         std::string type_to_string(ast::Type *type)
         {
-            if (auto type_int = dynamic_cast<ast::IntType *>(type))
-                return "Int";
-            if (auto type_double = dynamic_cast<ast::DoubleType *>(type))
-                return "Double";
-            if (auto type_bool = dynamic_cast<ast::BoolType *>(type))
-                return "Bool";
+            if (type == nullptr){
+                return "nullptr";
+            }
+            if (auto type_int = dynamic_cast<ast::IntegerType *>(type))
+                return "Integer";
+            if (auto type_double = dynamic_cast<ast::RealType *>(type))
+                return "Real";
+            if (auto type_bool = dynamic_cast<ast::BooleanType *>(type))
+                return "Boolean";
             if (auto type_array = dynamic_cast<ast::ArrayType *>(type))
             {
-                return "Array of " + type_to_string(&(*type_array->dtype));
+                return "Array of " + type_to_string(&(*type_array->type));
             }
             if (auto type_record = dynamic_cast<ast::RecordType *>(type))
             {
                 std::string type_string = "Record {";
-                for (auto field : type_record->fields)
+                for (auto decl : type_record->decls->vars)
                 {
                     type_string += '\n';
-                    type_string += type_to_string(&(*field->dtype));
+                    type_string += type_to_string(&(*decl->type));
                 }
                 type_string += "}";
                 return type_string;
@@ -104,23 +132,23 @@ namespace analyzer
             if (first != second)
                 err_expected_got(first, second);
         }
-        ast::node_ptr<ast::Type> TypePointerToShared(ast::Type* type){
-            if (auto type_int = dynamic_cast<ast::IntType *>(type))
-                return std::make_shared<ast::IntType>(*type_int);
-            if (auto type_double = dynamic_cast<ast::DoubleType *>(type))
-                return std::make_shared<ast::DoubleType>(*type_double);
-            if (auto type_bool = dynamic_cast<ast::BoolType *>(type))
-                return std::make_shared<ast::BoolType>(*type_bool);
-            if (auto type_array = dynamic_cast<ast::ArrayType *>(type))
-                return std::make_shared<ast::ArrayType>(*type_array);
-            if (auto type_record = dynamic_cast<ast::RecordType *>(type))
-               return std::make_shared<ast::RecordType>(*type_record);
-            return nullptr;
-        }
+        // ast::Type* TypePointerToShared(ast::Type* type){
+        //     if (auto type_int = dynamic_cast<ast::IntegerType *>(type))
+        //         return new ast::IntegerType(*type_int);
+        //     if (auto type_double = dynamic_cast<ast::RealType *>(type))
+        //         return new ast::RealType(*type_double);
+        //     if (auto type_bool = dynamic_cast<ast::BooleanType *>(type))
+        //         return new ast::BooleanType(*type_bool);
+        //     if (auto type_array = dynamic_cast<ast::ArrayType *>(type))
+        //         return new ast::ArrayType(*type_array);
+        //     if (auto type_record = dynamic_cast<ast::RecordType *>(type))
+        //        return new ast::RecordType(*type_record);
+        //     return nullptr;
+        // }
         void testing()
         {
-            ast::Type *test = new ast::IntType();
-            auto t = dynamic_cast<ast::IntType *>(test);
+            ast::Type *test = new ast::IntegerType();
+            auto t = dynamic_cast<ast::IntegerType *>(test);
             if (t)
             {
                 std::cout << "GOOOD" << std::endl;

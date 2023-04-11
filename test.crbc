@@ -1,8 +1,10 @@
 routine main () : integer is 
-    var x : integer is 0;
-    
-    if true then 
-        var x : integer is 1; //shadowing
+    for i in true .. false loop
+        print(i);
+    end
+
+    for i in reverse 0 .. 3 loop
+        print(i);
     end
 
     return 0;
