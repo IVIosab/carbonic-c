@@ -1,5 +1,9 @@
 routine main () : integer is 
-    var ar : integer is 5;
+    var x : integer is 0;
+    
+    if true then 
+        var x : integer is 1; //shadowing
+    end
 
     return 0;
 end

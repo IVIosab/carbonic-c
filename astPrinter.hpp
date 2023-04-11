@@ -3,39 +3,59 @@
 
 namespace analyzer
 {
-
-    template <typename T>
-    using sPtr = std::shared_ptr<T>;
-
     class AstPrinter : public ast::Visitor
     {
     public:
         AstPrinter(size_t depth = 0) : depth(depth) {}
-        void visit(ast::Program *node) override;
-        void visit(ast::IntType *node) override;
-        void visit(ast::DoubleType *node) override;
-        void visit(ast::BoolType *node) override;
-        void visit(ast::ArrayType *node) override;
-        void visit(ast::RecordType *node) override;
-        void visit(ast::IntLiteral *node) override;
-        void visit(ast::DoubleLiteral *node) override;
-        void visit(ast::BoolLiteral *node) override;
-        void visit(ast::BinaryExpression *node) override;
-        void visit(ast::BitwiseExpression *node) override;
-        void visit(ast::ComparisonExpression *node) override;
-        void visit(ast::VariableDeclaration *node) override;
-        void visit(ast::TypeDeclaration *node) override;
-        void visit(ast::RoutineDeclaration *node) override;
-        void visit(ast::RoutineCall *node) override;
-        void visit(ast::Body *node) override;
-        void visit(ast::Assignment *node) override;
-        void visit(ast::Print *node) override;
-        void visit(ast::Return *node) override;
-        void visit(ast::ModifiablePrimary *node) override;
-        void visit(ast::IfStatement *node) override;
-        void visit(ast::WhileLoop *node) override;
-        void visit(ast::ForLoop *node) override;
-        // void visit(ast::ForeachLoop *node) override;
+        void visitProgram(ast::Program *p) override;
+        void visitDecl(ast::Decl *p) override;
+        void visitRoutineDecl(ast::RoutineDecl *p) override;
+        void visitGlobalVarDecl(ast::GlobalVarDecl *p) override;
+        void visitExpr(ast::Expr *p) override;
+        void visitExprList(ast::ExprList *p) override;
+        void visitBinaryExpr(ast::BinaryExpr *p) override;
+        void visitLogicExpr(ast::LogicExpr *p) override;
+        void visitComparisonExpr(ast::ComparisonExpr *p) override;
+        void visitValue(ast::Value *p) override;
+        void visitIntegerValue(ast::IntegerValue *p) override;
+        void visitRealValue(ast::RealValue *p) override;
+        void visitBooleanValue(ast::BooleanValue *p) override;
+        void visitRoutineCallValue(ast::RoutineCallValue *p) override;
+        void visitVar(ast::Var *p) override;
+        void visitTypeDecl(ast::TypeDecl *p) override;
+        void visitType(ast::Type *p) override;
+        void visitPrimitiveType(ast::PrimitiveType *p) override;
+        void visitUserType(ast::UserType *p) override;
+        void visitTypeIdentifier(ast::TypeIdentifier *p) override;
+        void visitIntegerType(ast::IntegerType *p) override;
+        void visitRealType(ast::RealType *p) override;
+        void visitBooleanType(ast::BooleanType *p) override;
+        void visitArrayType(ast::ArrayType *p) override;
+        void visitRecordType(ast::RecordType *p) override;
+        void visitParameterDecl(ast::ParameterDecl *p) override;
+        void visitParameterList(ast::ParameterList *p) override;
+        void visitBody(ast::Body *p) override;
+        void visitBodyEntity(ast::BodyEntity *p) override;
+        void visitLocalVarDecl(ast::LocalVarDecl *p) override;
+        void visitLocalVarList(ast::LocalVarList *p) override;
+        void visitStatement(ast::Statement *p) override;
+        void visitAssignment(ast::Assignment *p) override;
+        void visitRoutineCall(ast::RoutineCall *p) override;
+        void visitReturn(ast::Return *p) override;
+        void visitPrint(ast::Print *p) override;
+        void visitWhileLoop(ast::WhileLoop *p) override;
+        void visitForLoop(ast::ForLoop *p) override;
+        void visitRange(ast::Range *p) override;
+        void visitIf(ast::If *p) override;
+        void visitNestedAccess(ast::NestedAccess *p) override;
+        void visitNestedAccessList(ast::NestedAccessList *p) override;
+        void visitArrayAccess(ast::ArrayAccess *p) override;
+        void visitRecordAccess(ast::RecordAccess *p) override;
+
+        void visitInteger(ast::Integer x) override;
+        void visitReal(ast::Real x) override;
+        void visitBoolean(ast::Boolean x) override;
+        void visitIdent(ast::Ident x) override;
 
     private:
         size_t depth;

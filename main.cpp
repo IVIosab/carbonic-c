@@ -1,6 +1,10 @@
 #include "lexer.h"
 #include "driver.hpp"
 #include "parser.hpp"
+#include "ast.hpp"
+#include "astPrinter.hpp"
+
+extern ast::Program *program;
 
 int main(int argc, char **argv)
 {
@@ -10,8 +14,8 @@ int main(int argc, char **argv)
     int x = driver.parse_program();
 
     std::cout << std::endl;
-    // analyzer::AstPrinter printer;
-    // program->accept(&printer);
+    analyzer::AstPrinter printer;
+    program->accept(&printer);
     //  analyzer::Semantic analyzer;
     //  program->accept(&analyzer);
     // prettyPrinter::codePrinter printer;
