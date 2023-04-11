@@ -5,6 +5,7 @@
 %define api.value.type variant
 %define api.token.constructor
 %define parse.assert
+%define parse.error detailed
 %define api.parser.class { Parser }
 %define api.namespace    { carbonic_c }
 
@@ -119,14 +120,16 @@
     static carbonic_c::Parser::symbol_type yylex( carbonic_c::Lexer &lexer , carbonic_c::Driver &driver) {
         return lexer.get_next_token();
     }
+    
     ast::Program *program = new ast::Program(std::vector<ast::Decl*>());  // Points to the whole program node.
+    //extern int yylineno;
 }
 
 %start PROGRAM
 %%
 PROGRAM:
     %empty {}
-    | DECLARATION PROGRAM {  program->decls.push_back($1); }
+    | PROGRAM DECLARATION {  program->decls.push_back($2); }
     ;
 DECLARATION:
     TYPE_DECL { $$ = $1; }
@@ -289,6 +292,8 @@ ARRAY_ACCESS:
 %%
 
 
+extern int lineno;
 void carbonic_c::Parser::error(const std::string& msg) {
-    std::cerr << msg << '\n';
+    std::cout << msg<<"\nLine number: "<<lineno;
 }
+

@@ -99,7 +99,6 @@ enum class TokenType
 namespace carbonic_c
 {
     class Driver;
-
     class Lexer : public yyFlexLexer
     {
     public:

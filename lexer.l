@@ -1,5 +1,6 @@
 %option noyywrap c++
 %option yyclass="Lexer"
+%option yylineno
 %{
 #include <string>
 #include <iostream>
@@ -8,12 +9,22 @@
 #include "parser.hpp"
 using namespace std;
 FlexLexer *lexer = new yyFlexLexer;
+
+int lineno = 1 ;
+
+void increase_no(){
+    lineno++;
+}
+int getno(){
+    return lineno;
+}
+
 %}
 
 %%
 
 [ \t]                    ;
-[\n]                    {/*cout << endl;*/}
+[\n]                    {increase_no();}
 "var"                   {return carbonic_c::Parser::make_TK_VAR();} 
 "type"                  {return carbonic_c::Parser::make_TK_TYPE();}
 "integer"               {return carbonic_c::Parser::make_TK_INTEGER();} 
@@ -64,5 +75,6 @@ FlexLexer *lexer = new yyFlexLexer;
 \/\/(.*)                {/*: will ignore and do nothing*/}
 true                    {return carbonic_c::Parser::make_TK_BOOLEAN_LITERAL(true);}
 false                   {return carbonic_c::Parser::make_TK_BOOLEAN_LITERAL(false);}
-[a-zA-Z_][a-zA-Z0-9_]*  {return carbonic_c::Parser::make_TK_IDENTIFIER(yytext);}  
+[a-zA-Z_][a-zA-Z0-9_]*  {return carbonic_c::Parser::make_TK_IDENTIFIER(yytext);}
+.                       {cout<<"Undifined token "<< yytext<< endl <<"Line number: "<< getno() <<endl; exit(1);}  
 %%
