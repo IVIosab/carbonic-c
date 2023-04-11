@@ -11,7 +11,7 @@ full_lexer:
 full_parser:
 	flex -o lexer.cpp -i lexer.l
 	bison -d parser.ypp -o parser.cpp
-	g++ -g main.cpp lexer.cpp parser.cpp driver.cpp astPrinter.cpp -o output.out 
+	g++ -g main.cpp lexer.cpp parser.cpp driver.cpp astPrinter.cpp prettyPrinter.cpp -o output.out 
 	./output.out < test.crbc
 
 # Tests 
