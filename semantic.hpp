@@ -38,7 +38,7 @@ namespace analyzer
         void visitIntegerValue(ast::IntegerValue *p);
         void visitRealValue(ast::RealValue *p);
         void visitBooleanValue(ast::BooleanValue *p);
-        void visitRoutineCallValue(ast::RoutineCallValue *p){} // not implemented
+        void visitRoutineCallValue(ast::RoutineCallValue *p);
         
         void visitType(ast::Type *p){}
         void visitPrimitiveType(ast::PrimitiveType *p){}

@@ -98,7 +98,6 @@ namespace analyzer
             node->type->accept(this);
         }
         ast::Type *var_type = actual_type;
-        //std::cout<<"I'm a param and my name is " << node->name << " and type is " << type_to_string(var_type) << '\n';
         varDeclSymbolTable[node->name] = var_type;
         varStack.push_back({node->name, var_type});
         routine_vars_n ++ ;
@@ -171,8 +170,6 @@ namespace analyzer
         {
             var_type = expr_type;
         }
-        //std::cout<<"I'm a var and my name is " << node->name << " and type is " << type_to_string(var_type) << '\n';
-        //std::cout<<"Expression type is " << type_to_string(expr_type) << '\n';
         varDeclSymbolTable[node->name] = var_type;
         varStack.push_back({node->name, var_type});
         routine_vars_n ++;
@@ -192,8 +189,6 @@ namespace analyzer
         }
         rhs_type = actual_type;
         typecheck_types(lhs_type, rhs_type);
-        std::cout <<node->var->name << '\n';
-        std::cout<<type_to_string(lhs_type) << ' ' << type_to_string(rhs_type) << '\n';
     };
     void Semantic::visitRoutineCall(ast::RoutineCall *node)
     {
@@ -422,7 +417,6 @@ namespace analyzer
             err_undefined_obj(node->name);
         }
         current_var_type = varDeclSymbolTable[node->name];
-        //std::cout<<"I'm current var type: " << type_to_string(current_var_type) << '\n';
         if(node->accesses){
             for (auto AV : node->accesses->accesses)
             {
@@ -430,8 +424,6 @@ namespace analyzer
                     AV->accept(this);
             }
         }
-        //std::cout<< node->name << '\n';
-        //std::cout<<"I'm current var type: " << type_to_string(current_var_type) << '\n';
         actual_type = current_var_type;
     };
     void Semantic::visitArrayAccess(ast::ArrayAccess* node){
@@ -449,7 +441,6 @@ namespace analyzer
             typecheck_types(actual_type, new ast::IntegerType());
             if(auto casted_type = dynamic_cast<ast::ArrayType *>(my_current_type)){
                 current_var_type = casted_type->type;
-                std::cout<<"current var type : " << type_to_string(my_current_type) << '\n';
             }
         }
 
@@ -482,4 +473,43 @@ namespace analyzer
             }
         }
     }
+     void Semantic::visitRoutineCallValue(ast::RoutineCallValue *node)
+    {
+        if (routineDeclTable.find(node->name) == routineDeclTable.end())
+        {
+            err_undefined_obj(node->name);
+        }
+        // for (auto arg : node->args->exprs)
+        // {
+        //     if (arg)
+        //     {
+        //         arg->accept(this);
+                
+        //     }
+        // }
+        auto routine = routineDeclTable[node->name];
+        int size1 = 0, size2 = 0;
+        if(node->args){
+            size1 = node->args->exprs.size();
+        }
+        if(routine->params){
+            size2 = routine->params->decls.size();
+        }
+        if(size1 != size2){
+            err_wrong_params_number(size1, size2);
+        }
+        if(node->args && routine->params){
+            for (int i = 0; i < node->args->exprs.size(); i++){
+                if(routine->params->decls[i]->type && node->args->exprs[i]){
+                    if(node->args->exprs[i]){
+                        actual_type = nullptr;
+                        node->args->exprs[i]->accept(this);
+                    }
+                    if(actual_type){
+                        typecheck_types(actual_type,routine->params->decls[i]->type);
+                    }
+                }
+            }
+        }
+    };
 }
