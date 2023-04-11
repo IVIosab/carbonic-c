@@ -1,0 +1,9 @@
+routine main () : integer is 
+    var x : real is 5.5;
+    var y : integer is 2;
+    var z : integer is x - y;
+
+    print(z);
+
+    return 0;
+end

@@ -6,3 +6,4 @@ parser
 *.o
 lexer.cpp
 *.out
+tests/outputs/

@@ -1,0 +1,7 @@
+routine main () : integer is 
+    
+    var x : real is 2 + 3;
+    var y : boolean is x;
+
+    return 0;
+end

@@ -1,0 +1,9 @@
+routine main () : integer is 
+    var x : integer is 3;
+    var y : boolean is true;
+    var z : integer is x * y;
+
+    print(z);
+
+    return 0;
+end

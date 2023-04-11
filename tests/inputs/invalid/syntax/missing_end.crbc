@@ -1,4 +1,3 @@
 type int is integer;
 routine main () : integer is
-    print("Hello world\n");
     return 0;

@@ -1,0 +1,9 @@
+routine main () : integer is 
+    var ar : array [2] boolean;
+
+    for i in 1 .. 2 loop
+        ar[i] := i;
+    end
+
+    return 0;
+end

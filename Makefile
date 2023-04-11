@@ -21,3 +21,4 @@ test:
 # Cleaning
 clean:
 	rm lexer.cpp parser.cpp parser.hpp output.out
+	rm -rf tests/outputs

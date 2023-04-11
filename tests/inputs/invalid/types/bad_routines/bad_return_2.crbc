@@ -1,0 +1,9 @@
+routine main (): boolean is 
+    var x : integer is 0;
+    
+    if true then 
+        var x : boolean is 1; //shadowing
+    end
+
+    return 0;
+end

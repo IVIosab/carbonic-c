@@ -1,0 +1,20 @@
+routine div (x : real, y : real) is 
+    
+    var z : real;
+    z := x / y;
+
+    return z;
+end
+
+routine main () : integer is 
+    
+    var x : real is div( 4.4 , 2.2 );
+
+    if x > 1.1 then
+        print(1);
+    else
+        print(0);
+    end
+
+    return 0;
+end

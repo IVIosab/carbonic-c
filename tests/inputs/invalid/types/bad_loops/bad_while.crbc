@@ -1,0 +1,9 @@
+routine main () : integer is 
+    var i : integer is 3;
+
+    while 5 loop
+        print(i);
+    end
+
+    return 0;
+end

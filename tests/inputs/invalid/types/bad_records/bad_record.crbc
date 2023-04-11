@@ -1,0 +1,14 @@
+routine main () : integer is 
+    var ar : array [3] integer;
+    var rec : record 
+        var a : boolean is true;
+        var b : integer is false;
+        var c : real is 5.5;
+    end;
+    
+    for i in 1 .. 3 loop
+        ar[i] := i;
+    end
+
+    return 0;
+end
