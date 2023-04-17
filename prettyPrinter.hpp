@@ -57,6 +57,7 @@ namespace prettyPrinter
         void visitBoolean(ast::Boolean x) override;
         void visitIdent(ast::Ident x) override;
 
+        void print(ast::Visitable *v);
     private:
         size_t depth;
         void indent();

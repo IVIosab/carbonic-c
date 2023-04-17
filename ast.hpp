@@ -430,7 +430,8 @@ namespace ast
     public:
         Expr *from = nullptr;
         Expr *to = nullptr;
-        Range(Expr *from, Expr *to) : from(from), to(to) {}
+        bool reverse = false;
+        Range(Expr *from, Expr *to, bool reverse) : from(from), to(to), reverse(reverse) {}
         void accept(Visitor *v) override { v->visitRange(this); }
     };
 
