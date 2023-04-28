@@ -18,7 +18,7 @@ int main(int argc, char **argv)
     // program->accept(&printer);
     analyzer::Semantic analyzer;
     program->accept(&analyzer);
-    // prettyPrinter::codePrinter printer;
-    // program->accept(&printer);
+    //prettyPrinter::codePrinter printer;
+    //program->accept(&printer);
     return 0;
 }

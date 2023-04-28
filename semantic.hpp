@@ -84,12 +84,12 @@ namespace analyzer
             exit(0);
         }
 
-        void err_expected_got(std::string got, std::string expected)
+        void err_expected_got(std::string expected, std::string got)
         {
             std::cout << "Error: Expected: " << expected << ", got: " << got << '\n';
             exit(0);
         }
-        void err_wrong_params_number(int got, int expected){
+        void err_wrong_params_number(int expected, int got){
             std::cout << "Error: Expected number of params: " << expected << " got: " << got << '\n';
             exit(0);
         }

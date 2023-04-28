@@ -213,7 +213,7 @@ namespace analyzer
             size2 = routine->params->decls.size();
         }
         if(size1 != size2){
-            err_wrong_params_number(size1, size2);
+            err_wrong_params_number(size2, size1);
         }
         if(node->args && routine->params){
             for (int i = 0; i < node->args->exprs.size(); i++){
@@ -223,7 +223,7 @@ namespace analyzer
                         node->args->exprs[i]->accept(this);
                     }
                     if(actual_type){
-                        typecheck_types(actual_type,routine->params->decls[i]->type);
+                        typecheck_types(routine->params->decls[i]->type, actual_type);
                     }
                 }
             }
@@ -251,7 +251,7 @@ namespace analyzer
             node->condition->accept(this);
         }
         cond_type = actual_type;
-        typecheck_types(cond_type, new ast::BooleanType());
+        typecheck_types(new ast::BooleanType(), cond_type);
         if (node->then)
         {
             node->then->accept(this);
@@ -269,7 +269,7 @@ namespace analyzer
             node->condition->accept(this);
         }
         cond_type = actual_type;
-        typecheck_types(cond_type, new ast::BooleanType());
+        typecheck_types(new ast::BooleanType(), cond_type);
         if (node->body)
         {
             node->body->accept(this);
@@ -299,8 +299,8 @@ namespace analyzer
             node->to->accept(this);
         }
         toType = actual_type;
-        typecheck_types(fromType, new ast::IntegerType());
-        typecheck_types(toType, new ast::IntegerType());
+        typecheck_types(new ast::IntegerType(), fromType);
+        typecheck_types(new ast::IntegerType(), toType);
     }
     void Semantic::visitPrint(ast::Print *node)
     {
@@ -432,13 +432,13 @@ namespace analyzer
         std::string got_type = type_to_string(my_current_type);
         if (got_type.substr(0, 5) != "Array")
         {
-            err_expected_got(got_type, "Array");
+            err_expected_got("Array", got_type);
         }
         else
         {
             auto access_value = node->index;
             access_value->accept(this);
-            typecheck_types(actual_type, new ast::IntegerType());
+            typecheck_types(new ast::IntegerType(), actual_type);
             if(auto casted_type = dynamic_cast<ast::ArrayType *>(my_current_type)){
                 current_var_type = casted_type->type;
             }
@@ -452,7 +452,7 @@ namespace analyzer
         std::string got_type = type_to_string(my_current_type);
         if (got_type.substr(0, 6) != "Record")
         {
-            err_expected_got(got_type, "Record");
+            err_expected_got("Record", got_type);
         }
         else
         {
@@ -479,14 +479,6 @@ namespace analyzer
         {
             err_undefined_obj(node->name);
         }
-        // for (auto arg : node->args->exprs)
-        // {
-        //     if (arg)
-        //     {
-        //         arg->accept(this);
-                
-        //     }
-        // }
         auto routine = routineDeclTable[node->name];
         int size1 = 0, size2 = 0;
         if(node->args){
@@ -496,7 +488,7 @@ namespace analyzer
             size2 = routine->params->decls.size();
         }
         if(size1 != size2){
-            err_wrong_params_number(size1, size2);
+            err_wrong_params_number(size2, size1);
         }
         if(node->args && routine->params){
             for (int i = 0; i < node->args->exprs.size(); i++){
@@ -506,7 +498,7 @@ namespace analyzer
                         node->args->exprs[i]->accept(this);
                     }
                     if(actual_type){
-                        typecheck_types(actual_type,routine->params->decls[i]->type);
+                        typecheck_types(routine->params->decls[i]->type, actual_type);
                     }
                 }
             }
