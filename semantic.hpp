@@ -86,7 +86,7 @@ namespace analyzer
 
         void err_expected_got(std::string expected, std::string got)
         {
-            std::cout << "Error: Expected: " << expected << ", got: " << got << '\n';
+            std::cout << "Error: Expected:\n" << expected << ",\ngot: \n" << got << '\n';
             exit(0);
         }
         void err_wrong_params_number(int expected, int got){
@@ -97,6 +97,7 @@ namespace analyzer
         {
             std::cout << "Warning: Shadowing object: " << obj << '\n';
         }
+        // Utility function to print expected/got type
         std::string type_to_string(ast::Type *type)
         {
             if (type == nullptr){
@@ -118,6 +119,8 @@ namespace analyzer
                 for (auto decl : type_record->decls->vars)
                 {
                     type_string += '\n';
+                    type_string += decl->name;
+                    type_string += ' ';
                     type_string += type_to_string(&(*decl->type));
                 }
                 type_string += "}";
@@ -127,24 +130,12 @@ namespace analyzer
         }
         void typecheck_types(ast::Type *type1, ast::Type *type2)
         {
+            if((*type1) == (*type2) )
+                return;
             std::string first = type_to_string(type1),
                         second = type_to_string(type2);
-            if (first != second)
-                err_expected_got(first, second);
+            err_expected_got(first, second);
         }
-        // ast::Type* TypePointerToShared(ast::Type* type){
-        //     if (auto type_int = dynamic_cast<ast::IntegerType *>(type))
-        //         return new ast::IntegerType(*type_int);
-        //     if (auto type_double = dynamic_cast<ast::RealType *>(type))
-        //         return new ast::RealType(*type_double);
-        //     if (auto type_bool = dynamic_cast<ast::BooleanType *>(type))
-        //         return new ast::BooleanType(*type_bool);
-        //     if (auto type_array = dynamic_cast<ast::ArrayType *>(type))
-        //         return new ast::ArrayType(*type_array);
-        //     if (auto type_record = dynamic_cast<ast::RecordType *>(type))
-        //        return new ast::RecordType(*type_record);
-        //     return nullptr;
-        // }
         void testing()
         {
             ast::Type *test = new ast::IntegerType();

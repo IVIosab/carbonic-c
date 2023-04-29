@@ -196,14 +196,6 @@ namespace analyzer
         {
             err_undefined_obj(node->name);
         }
-        // for (auto arg : node->args->exprs)
-        // {
-        //     if (arg)
-        //     {
-        //         arg->accept(this);
-                
-        //     }
-        // }
         auto routine = routineDeclTable[node->name];
         int size1 = 0, size2 = 0;
         if(node->args){

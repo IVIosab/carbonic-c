@@ -1,11 +1,15 @@
 routine main () : integer is 
-    for i in true .. false loop
-        print(i);
-    end
-
-    for i in reverse 0 .. 3 loop
-        print(j);
-    end
+    var x : record 
+        var a : integer is 2;
+        var b : integer is 3;
+    end;
+    var y : record 
+        var c : integer is 4;
+        var d : integer is 0;
+    end;
+    x := y;
+    print(x.a);
+    print(x.b);
 
     return 0;
 end
