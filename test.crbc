@@ -1,11 +1,11 @@
 routine main () : integer is 
     var x : record 
-        var a : integer is 2;
+        var a : integer is 5;
         var b : integer is 3;
     end;
     var y : record 
-        var c : integer is 4;
-        var d : integer is 0;
+        var b : integer is 0;
+        var a : integer is 4;
     end;
     x := y;
     print(x.a);

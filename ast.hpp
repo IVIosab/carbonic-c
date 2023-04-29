@@ -398,11 +398,15 @@ namespace ast
                 int found = 0;
                 for(int i = 0; i < this->vars.size(); i++){
                     auto x = (*this->vars[i]);
-                    for(int j = 0; j < local_var_list->vars.size(); j ++){
-                        if(x == *local_var_list->vars[j]){
-                            found++;
-                            break;
-                        }
+                    // for(int j = 0; j < local_var_list->vars.size(); j ++){
+                    //     if(x == *local_var_list->vars[j]){
+                    //         found++;
+                    //         break;
+                    //     }
+                    // }
+                    if(i < local_var_list->vars.size()){
+                        if(x == *local_var_list->vars[i])
+                             found++;
                     }
                 }
                 if(this->vars.size() != local_var_list->vars.size()){
