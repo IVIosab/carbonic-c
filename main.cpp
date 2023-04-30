@@ -4,6 +4,7 @@
 #include "ast.hpp"
 #include "astPrinter.hpp"
 #include "semantic.hpp"
+#include "codeGenerator.hpp"
 #include "llvm/IR/IRBuilder.h"
 extern ast::Program *program;
 
@@ -30,5 +31,7 @@ int main(int argc, char **argv)
     program->accept(&analyzer);
     // prettyPrinter::codePrinter printer;
     // program->accept(&printer);
+    //generator::codeGenerator code_generator;
+    //program->accept(&code_generator);
     return 0;
 }
