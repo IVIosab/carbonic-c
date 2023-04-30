@@ -1,5 +1,0 @@
-
-Error: Expected:
-Boolean,
-got: 
-Integer
