@@ -1,15 +1,9 @@
-routine main () : integer is 
-    var x : record 
-        var a : integer is 5;
-        var b : integer is 3;
+routine  main() : integer is 
+    var x : integer is 5;
+    var y : integer is 3;
+    var z : record
+        var x : boolean is false;
+        var y : integer is 1;
     end;
-    var y : record 
-        var b : integer is 0;
-        var a : integer is 4;
-    end;
-    x := y;
-    print(x.a);
-    print(x.b);
-
-    return 0;
+    return z.x;
 end

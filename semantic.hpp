@@ -76,22 +76,22 @@ namespace analyzer
         ast::Type* current_var_type = nullptr;
         void err_second_declaration(std::string name){
             std::cout << "Error: second declaration of " << name << " is invalid.\n";
-            exit(0);
+            exit(1);
         }
         void err_undefined_obj(std::string obj)
         {
             std::cout << "Error: Undefined object: " << obj << '\n';
-            exit(0);
+            exit(1);
         }
 
         void err_expected_got(std::string expected, std::string got)
         {
             std::cout << "Error: Expected:\n" << expected << ",\ngot: \n" << got << '\n';
-            exit(0);
+            exit(1);
         }
         void err_wrong_params_number(int expected, int got){
             std::cout << "Error: Expected number of params: " << expected << " got: " << got << '\n';
-            exit(0);
+            exit(1);
         }
         void warn_shadow(std::string obj)
         {

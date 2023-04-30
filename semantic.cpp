@@ -65,7 +65,7 @@ namespace analyzer
         node->returnType = ret_type;
         routineDeclTable[node->name] = node;
         if (routine_return_type && ret_type)
-            typecheck_types(routine_return_type, ret_type);
+            typecheck_types(ret_type, routine_return_type);
 
         remove_params_from_scope();
     };
