@@ -1,4 +1,3 @@
-.vscode
 parser.cpp
 parser.hpp
 tokens.cpp
