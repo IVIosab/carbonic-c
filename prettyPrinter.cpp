@@ -34,6 +34,11 @@ namespace prettyPrinter
         }
     }
 
+    void codePrinter::print(ast::Visitable *v)
+    {
+        v->accept(this);
+    }
+
     void codePrinter::visitProgram(ast::Program *p)
     {
         for (auto &decl : p->decls)
@@ -372,6 +377,8 @@ namespace prettyPrinter
 
     void codePrinter::visitRange(ast::Range *p)
     {
+        if (p->reverse)
+            cout << "reverse ";
         if (p->from != nullptr)
             p->from->accept(this);
         cout << " .. ";

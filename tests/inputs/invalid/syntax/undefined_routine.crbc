@@ -1,4 +1,4 @@
-routine div (x : real, y : real) : integer is 
+routine div (x : real, y : real) : real is 
     
     var z : real;
     z := x / y;
@@ -8,7 +8,7 @@ end
 
 routine main () : integer is 
     
-    var x : real is div( 4.4 , 2.2 );
+    var x : real is divide( 4.4 , 2.2 );
 
     if x > 1.1 then
         print(1);

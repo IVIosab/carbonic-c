@@ -195,8 +195,8 @@ FOR_LOOP:
     TK_FOR TK_IDENTIFIER TK_IN RANGE TK_LOOP BODY TK_END{ $$ = new ast::ForLoop($2, $4, $6); }
     ;
 RANGE:
-    EXPR TK_DDOT EXPR { $$ = new ast::Range($1, $3); }
-    | TK_REVERSE EXPR TK_DDOT EXPR { $$ = new ast::Range($4, $2); }
+    EXPR TK_DDOT EXPR { $$ = new ast::Range($1, $3, false); }
+    | TK_REVERSE EXPR TK_DDOT EXPR { $$ = new ast::Range($2, $4, true); }
     ;
 RETURN: 
     TK_RETURN EXPR TK_SEMICOLON { $$ = new ast::Return($2); }

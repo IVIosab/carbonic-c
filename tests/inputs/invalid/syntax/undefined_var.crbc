@@ -1,7 +1,7 @@
-routine div (x : real, y : real) : integer is 
+routine div (x : real, y : real) is 
     
     var z : real;
-    z := x / y;
+    z := x / b;
 
     return z;
 end
