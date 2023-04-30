@@ -29,4 +29,4 @@ build:
 	cd build && cmake .. && make
 
 run: build
-	./build/compile_carbonic > output.txt
+	./build/carbonic_c > output.txt

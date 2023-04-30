@@ -1,7 +1,26 @@
 cmake_minimum_required(VERSION 3.5)
 project(Carbonic-C VERSION 1.0.0)
 
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+
+find_package(FLEX)
+find_package(BISON)
+# find_package(LLVM REQUIRED CONFIG)
+
+# message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
+# message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
+
+# include_directories(${LLVM_INCLUDE_DIRS})
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+# add_definitions(${LLVM_DEFINITIONS})
+
+FLEX_TARGET(CarbonicLexer ${CMAKE_CURRENT_SOURCE_DIR}/lexical_analysis/lexer.l  ${CMAKE_BINARY_DIR}/lexer.cpp)
+BISON_TARGET(CarbonicParser ${CMAKE_CURRENT_SOURCE_DIR}/syntax_analysis/parser.ypp ${CMAKE_BINARY_DIR}/parser.cpp)
+ADD_FLEX_BISON_DEPENDENCY(CarbonicLexer CarbonicParser)
 
 set(SOURCES
     lexer.cpp
@@ -13,35 +32,10 @@ set(SOURCES
     main.cpp
 )
 
-add_custom_command(
-    OUTPUT lexer.cpp
-    COMMAND flex -o lexer.cpp -i ${CMAKE_CURRENT_SOURCE_DIR}/lexical_analysis/lexer.l
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/lexical_analysis/lexer.l
-    COMMENT "Generating lexer.cpp"
-)
+add_executable(carbonic_c ${SOURCES} ${FLEX_CarbonicLexer_OUTPUTS} ${BISON_CarbonicParser_OUTPUTS})
 
-# add bison command
-add_custom_command(
-    OUTPUT parser.cpp parser.hpp
-    COMMAND bison -d ${CMAKE_CURRENT_SOURCE_DIR}/syntax_analysis/parser.ypp -o parser.cpp
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/syntax_analysis/parser.ypp
-    COMMENT "Generating parser.cpp and parser.hpp"
-)
+# llvm_map_components_to_libnames(llvm_libs support core irreader)
 
-# add custom target
-add_custom_target(
-    my_custom_build
-    DEPENDS lexer.cpp parser.cpp parser.hpp
-)
+target_compile_features(carbonic_c PUBLIC cxx_std_17)
 
-add_executable(compile_carbonic ${SOURCES})
-
-add_dependencies(compile_carbonic my_custom_build)
-
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
-
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-
+# target_link_libraries(carbonic_c ${llvm_libs})
