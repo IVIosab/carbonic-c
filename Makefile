@@ -21,3 +21,10 @@ test:
 clean:
 	rm lexer.cpp parser.cpp parser.hpp output.out
 	rm -rf tests/outputs
+
+compile:
+	mkdir build
+	cd build && cmake .. && make
+
+clean_cmake:
+	rm -rf build
