@@ -17,32 +17,33 @@ namespace analyzer
     void Semantic::visitTypeDecl(ast::TypeDecl *node)
     {
         if (typeDeclSymbolTable.count(node->name->name) ||
-        varDeclSymbolTable.count(node->name->name) ||
-        routineDeclTable.count(node->name->name))
+            varDeclSymbolTable.count(node->name->name) ||
+            routineDeclTable.count(node->name->name))
         {
             err_second_declaration(node->name->name);
         }
-        ast::Type *type;
         if (node->type)
         {
             actual_type = nullptr;
             node->type->accept(this);
         }
-        type = actual_type;
-        typeDeclSymbolTable[node->name->name] = type;
+        typeDeclSymbolTable[node->name->name] = actual_type;
     };
     void Semantic::visitRoutineDecl(ast::RoutineDecl *node)
     {
         routine_vars_n = 0;
         routine_return_type = nullptr;
         ast::Type *ret_type = nullptr;
+
         if (routineDeclTable.count(node->name) ||
-        varDeclSymbolTable.count(node->name) ||
-        typeDeclSymbolTable.count(node->name))
+            varDeclSymbolTable.count(node->name) ||
+            typeDeclSymbolTable.count(node->name))
         {
             err_second_declaration(node->name);
         }
-        if(node->params){
+
+        if (node->params)
+        {
             for (auto parameter : node->params->decls)
             {
                 if (parameter)
@@ -61,30 +62,16 @@ namespace analyzer
         {
             node->body->accept(this);
         }
-        node->returnType = ret_type; 
+        node->returnType = ret_type;
         routineDeclTable[node->name] = node;
-        if(routine_return_type && ret_type)
+        if (routine_return_type && ret_type)
             typecheck_types(routine_return_type, ret_type);
-        while(routine_vars_n -- ){
-            if(varStack.size()){
-                std::string delVar = varStack[varStack.size()-1].first;
-                varDeclSymbolTable.erase(delVar);
-                varStack.pop_back();
-                ast::Type* shadowed_i = nullptr;
-                for (auto i : varStack){
-                    if (i.first == delVar){
-                        shadowed_i = i.second;
-                        break;
-                    }
-                }
-                if(shadowed_i)
-                    varDeclSymbolTable[delVar] = shadowed_i;
-            }
-        }
+
+        remove_params_from_scope();
     };
-    void Semantic::visitParameterDecl(ast::ParameterDecl* node){
-        if (typeDeclSymbolTable.count(node->name) 
-                    || routineDeclTable.count(node->name))
+    void Semantic::visitParameterDecl(ast::ParameterDecl *node)
+    {
+        if (typeDeclSymbolTable.count(node->name) || routineDeclTable.count(node->name))
         {
             err_second_declaration(node->name);
         }
@@ -97,16 +84,13 @@ namespace analyzer
             actual_type = nullptr;
             node->type->accept(this);
         }
-        ast::Type *var_type = actual_type;
-        varDeclSymbolTable[node->name] = var_type;
-        varStack.push_back({node->name, var_type});
-        routine_vars_n ++ ;
+        add_param_to_scope(node->name);
     }
     void Semantic::visitGlobalVarDecl(ast::GlobalVarDecl *node)
     {
         if (typeDeclSymbolTable.count(node->name) ||
-         routineDeclTable.count(node->name)|| 
-         varDeclSymbolTable.count(node->name))
+            routineDeclTable.count(node->name) ||
+            varDeclSymbolTable.count(node->name))
         {
             err_second_declaration(node->name);
         }
@@ -133,17 +117,18 @@ namespace analyzer
         varStack.push_back({node->name, var_type});
     };
     void Semantic::visitBody(ast::Body *node)
-    {   
-        for (auto entity : node->entities){
-            if(entity){
+    {
+        for (auto entity : node->entities)
+        {
+            if (entity)
+            {
                 entity->accept(this);
             }
         }
     };
     void Semantic::visitLocalVarDecl(ast::LocalVarDecl *node)
     {
-        if (typeDeclSymbolTable.count(node->name) 
-                    || routineDeclTable.count(node->name))
+        if (typeDeclSymbolTable.count(node->name) || routineDeclTable.count(node->name))
         {
             err_second_declaration(node->name);
         }
@@ -172,7 +157,7 @@ namespace analyzer
         }
         varDeclSymbolTable[node->name] = var_type;
         varStack.push_back({node->name, var_type});
-        routine_vars_n ++;
+        routine_vars_n++;
     };
     void Semantic::visitAssignment(ast::Assignment *node)
     {
@@ -198,23 +183,31 @@ namespace analyzer
         }
         auto routine = routineDeclTable[node->name];
         int size1 = 0, size2 = 0;
-        if(node->args){
+        if (node->args)
+        {
             size1 = node->args->exprs.size();
         }
-        if(routine->params){
+        if (routine->params)
+        {
             size2 = routine->params->decls.size();
         }
-        if(size1 != size2){
+        if (size1 != size2)
+        {
             err_wrong_params_number(size2, size1);
         }
-        if(node->args && routine->params){
-            for (int i = 0; i < node->args->exprs.size(); i++){
-                if(routine->params->decls[i]->type && node->args->exprs[i]){
-                    if(node->args->exprs[i]){
+        if (node->args && routine->params)
+        {
+            for (int i = 0; i < node->args->exprs.size(); i++)
+            {
+                if (routine->params->decls[i]->type && node->args->exprs[i])
+                {
+                    if (node->args->exprs[i])
+                    {
                         actual_type = nullptr;
                         node->args->exprs[i]->accept(this);
                     }
-                    if(actual_type){
+                    if (actual_type)
+                    {
                         typecheck_types(routine->params->decls[i]->type, actual_type);
                     }
                 }
@@ -225,11 +218,13 @@ namespace analyzer
     {
         if (node->expr)
         {
-            if(node->expr){
+            if (node->expr)
+            {
                 actual_type = nullptr;
                 node->expr->accept(this);
             }
-            if(actual_type){
+            if (actual_type)
+            {
                 routine_return_type = actual_type;
             }
         }
@@ -270,7 +265,8 @@ namespace analyzer
     void Semantic::visitForLoop(ast::ForLoop *node)
     {
         varDeclSymbolTable[node->name] = new ast::IntegerType();
-        if(node->range){
+        if (node->range)
+        {
             node->range->accept(this);
         }
         if (node->body)
@@ -278,7 +274,8 @@ namespace analyzer
             node->body->accept(this);
         }
     };
-    void Semantic::visitRange(ast::Range* node){
+    void Semantic::visitRange(ast::Range *node)
+    {
         ast::Type *fromType;
         if (node->from)
         {
@@ -298,7 +295,7 @@ namespace analyzer
     {
         if (node->expr)
         {
-             node->expr->accept(this);
+            node->expr->accept(this);
         }
     };
 
@@ -337,7 +334,7 @@ namespace analyzer
         }
         actual_type = node;
     };
-    
+
     void Semantic::visitBinaryExpr(ast::BinaryExpr *node)
     {
         ast::Type *lhs_type;
@@ -389,15 +386,15 @@ namespace analyzer
         typecheck_types(lhs_type, rhs_type);
         actual_type = new ast::BooleanType();
     };
-    void Semantic::visitIntegerValue(ast::IntegerValue* node)
+    void Semantic::visitIntegerValue(ast::IntegerValue *node)
     {
         actual_type = new ast::IntegerType();
     };
-    void Semantic::visitRealValue(ast::RealValue* node)
+    void Semantic::visitRealValue(ast::RealValue *node)
     {
         actual_type = new ast::RealType();
     };
-    void Semantic::visitBooleanValue(ast::BooleanValue* node)
+    void Semantic::visitBooleanValue(ast::BooleanValue *node)
     {
         actual_type = new ast::BooleanType();
     };
@@ -409,16 +406,18 @@ namespace analyzer
             err_undefined_obj(node->name);
         }
         current_var_type = varDeclSymbolTable[node->name];
-        if(node->accesses){
+        if (node->accesses)
+        {
             for (auto AV : node->accesses->accesses)
             {
-                if(AV)
+                if (AV)
                     AV->accept(this);
             }
         }
         actual_type = current_var_type;
     };
-    void Semantic::visitArrayAccess(ast::ArrayAccess* node){
+    void Semantic::visitArrayAccess(ast::ArrayAccess *node)
+    {
         // check that we're trying to access an array
         auto my_current_type = current_var_type;
         std::string got_type = type_to_string(my_current_type);
@@ -431,13 +430,14 @@ namespace analyzer
             auto access_value = node->index;
             access_value->accept(this);
             typecheck_types(new ast::IntegerType(), actual_type);
-            if(auto casted_type = dynamic_cast<ast::ArrayType *>(my_current_type)){
+            if (auto casted_type = dynamic_cast<ast::ArrayType *>(my_current_type))
+            {
                 current_var_type = casted_type->type;
             }
         }
-
     }
-    void Semantic::visitRecordAccess(ast::RecordAccess* node){
+    void Semantic::visitRecordAccess(ast::RecordAccess *node)
+    {
         // check that we're trying to access a record and that this field exists
         auto my_current_type = current_var_type;
         std::string field_name = node->name;
@@ -448,7 +448,8 @@ namespace analyzer
         }
         else
         {
-            if(auto casted_type = dynamic_cast<ast::RecordType *>(my_current_type)){
+            if (auto casted_type = dynamic_cast<ast::RecordType *>(my_current_type))
+            {
                 bool found_field = false;
                 for (auto field : casted_type->decls->vars)
                 {
@@ -465,7 +466,7 @@ namespace analyzer
             }
         }
     }
-     void Semantic::visitRoutineCallValue(ast::RoutineCallValue *node)
+    void Semantic::visitRoutineCallValue(ast::RoutineCallValue *node)
     {
         if (routineDeclTable.find(node->name) == routineDeclTable.end())
         {
@@ -473,27 +474,21 @@ namespace analyzer
         }
         auto routine = routineDeclTable[node->name];
         int size1 = 0, size2 = 0;
-        if(node->args){
+        if (node->args)
+        {
             size1 = node->args->exprs.size();
         }
-        if(routine->params){
+        if (routine->params)
+        {
             size2 = routine->params->decls.size();
         }
-        if(size1 != size2){
+        if (size1 != size2)
+        {
             err_wrong_params_number(size2, size1);
         }
-        if(node->args && routine->params){
-            for (int i = 0; i < node->args->exprs.size(); i++){
-                if(routine->params->decls[i]->type && node->args->exprs[i]){
-                    if(node->args->exprs[i]){
-                        actual_type = nullptr;
-                        node->args->exprs[i]->accept(this);
-                    }
-                    if(actual_type){
-                        typecheck_types(routine->params->decls[i]->type, actual_type);
-                    }
-                }
-            }
+        if (node->args && routine->params)
+        {
+            routineCallCheck(routine->params, node->args);
         }
     };
 }

@@ -97,7 +97,8 @@ namespace analyzer
         {
             std::cout << "Warning: Shadowing object: " << obj << '\n';
         }
-        // Utility function to print expected/got type
+        // Utility functions
+        // Print expected/got type
         std::string type_to_string(ast::Type *type)
         {
             if (type == nullptr){
@@ -128,6 +129,7 @@ namespace analyzer
             }
             return "undefined";
         }
+        // Typecheck types using the overloaded == operator
         void typecheck_types(ast::Type *type1, ast::Type *type2)
         {
             if((*type1) == (*type2) )
@@ -136,6 +138,31 @@ namespace analyzer
                         second = type_to_string(type2);
             err_expected_got(first, second);
         }
+        void add_param_to_scope(Ident name){
+            ast::Type *var_type = actual_type;
+            varDeclSymbolTable[name] = var_type;
+            varStack.push_back({name, var_type});
+            routine_vars_n ++ ;
+        }
+        // Remove params from scope when exiting a routine declaration
+        void remove_params_from_scope(){
+            while(routine_vars_n -- ){
+                if(varStack.size()){
+                    std::string delVar = varStack[varStack.size()-1].first;
+                    varDeclSymbolTable.erase(delVar);
+                    varStack.pop_back();
+                    ast::Type* shadowed_i = nullptr;
+                    for (auto i : varStack){
+                        if (i.first == delVar){
+                            shadowed_i = i.second;
+                            break;
+                        }
+                    }
+                    if(shadowed_i)
+                        varDeclSymbolTable[delVar] = shadowed_i;
+                }
+            }
+        }
         void testing()
         {
             ast::Type *test = new ast::IntegerType();
@@ -143,6 +170,20 @@ namespace analyzer
             if (t)
             {
                 std::cout << "GOOOD" << std::endl;
+            }
+        }
+        // Check that arguments of routine call match params' types in function decl
+        void routineCallCheck(ast::ParameterList* params, ast::ExprList* args){
+            for (int i = 0; i < args->exprs.size(); i++){
+                if(params->decls[i]->type && args->exprs[i]){
+                    if(args->exprs[i]){
+                        actual_type = nullptr;
+                        args->exprs[i]->accept(this);
+                    }
+                    if(actual_type){
+                        typecheck_types(params->decls[i]->type, actual_type);
+                    }
+                }
             }
         }
     };
