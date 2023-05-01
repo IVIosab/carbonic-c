@@ -1,5 +1,7 @@
 #include <codeGenerator.hpp>
-namespace generator{
+namespace generator
+{
+    // done
     void codeGenerator::visitProgram(ast::Program *node)
     {
         module = std::make_unique<llvm::Module>("Program", context);
@@ -11,7 +13,7 @@ namespace generator{
             }
         }
     };
-    // TODO:
+    // todo:
     void codeGenerator::visitTypeDecl(ast::TypeDecl *node)
     {
         if (node->type)
@@ -19,9 +21,10 @@ namespace generator{
             node->type->accept(this);
         }
     };
+    // TODO: complete
     void codeGenerator::visitRoutineDecl(ast::RoutineDecl *node)
     {
-        std::vector<llvm::Type*> paramsVector;
+        std::vector<llvm::Type *> paramsVector;
         std::vector<std::string> paramNames;
         routine_vars_n = 0;
         if (node->params)
@@ -36,26 +39,28 @@ namespace generator{
                 }
             }
         }
-        llvm::ArrayRef<llvm::Type*> params(paramsVector);
+        llvm::ArrayRef<llvm::Type *> params(paramsVector);
         if (node->returnType)
         {
             node->returnType->accept(this);
         }
-        llvm::Type* ret_type = inferred_type;
+        llvm::Type *ret_type = inferred_type;
         llvm::FunctionType *funcType = llvm::FunctionType::get(ret_type, params, false);
         llvm::Function *func = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, node->name, module.get());
         // add function to table
-        //llvm::AllocaInst *x = builder->CreateAlloca(funcType, nullptr, node->name);
-        //builder->CreateStore(func, x);
+        // llvm::AllocaInst *x = builder->CreateAlloca(funcType, nullptr, node->name);
+        // builder->CreateStore(func, x);
         // create basic block and set insertion point
         llvm::BasicBlock *bb = llvm::BasicBlock::Create(context, "entry", func);
         builder->SetInsertPoint(bb);
         // create function arguments
-        if(node->params){
-            for(int i = 0;i < node->params->decls.size(); i ++){
+        if (node->params)
+        {
+            for (int i = 0; i < node->params->decls.size(); i++)
+            {
                 std::cout << "I'm adding param " << node->params->decls[i]->name << '\n';
-                routine_vars_n ++;
-                llvm::Value *arg = (func->arg_begin()+i);
+                routine_vars_n++;
+                llvm::Value *arg = (func->arg_begin() + i);
                 arg->setName(node->params->decls[i]->name);
                 // Create an alloca for this variable.
                 llvm::AllocaInst *Alloca = CreateEntryBlockAlloca(func, node->params->decls[i]->name);
@@ -74,6 +79,7 @@ namespace generator{
         module->print(llvm::errs(), nullptr);
         remove_decls_from_scope();
     };
+    // done
     void codeGenerator::visitParameterDecl(ast::ParameterDecl *node)
     {
         if (node->type)
@@ -84,7 +90,8 @@ namespace generator{
     // TODO:
     void codeGenerator::visitGlobalVarDecl(ast::GlobalVarDecl *node)
     {
-        if(node->type){
+        if (node->type)
+        {
             node->type->accept(this);
         }
         llvm::AllocaInst *x = builder->CreateAlloca(inferred_type, nullptr, node->name);
@@ -106,11 +113,13 @@ namespace generator{
             }
         }
     };
+    // done
     void codeGenerator::visitLocalVarDecl(ast::LocalVarDecl *node)
-    {   
-        routine_vars_n ++;
+    {
+        routine_vars_n++;
         std::cout << "I'm adding var " << node->name << '\n';
-        if(node->type){
+        if (node->type)
+        {
             node->type->accept(this);
         }
         llvm::AllocaInst *x = builder->CreateAlloca(inferred_type, nullptr, node->name);
@@ -122,30 +131,36 @@ namespace generator{
         varDeclSymbolTable[node->name] = x;
         varStack.push_back({node->name, x});
     };
+    // todo
     void codeGenerator::visitAssignment(ast::Assignment *node)
+    {
+        if (node->var)
+        {
+            node->var->accept(this);
+        }
+        if (node->expr)
+        {
+            node->expr->accept(this);
+        }
+    };
+    void codeGenerator::visitRoutineCall(ast::RoutineCall *node)
+    {
+        if (node->args)
+        {
+            node->args->accept(this);
+        }
+    };
+    // done
+    void codeGenerator::visitReturn(ast::Return *node)
     {
         if (node->expr)
         {
             node->expr->accept(this);
         }
-
-    };
-    void codeGenerator::visitRoutineCall(ast::RoutineCall *node)
-    {
-       if(node->args){
-            node->args->accept(this);
-       }
-    };
-    void codeGenerator::visitReturn(ast::Return *node)
-    {
-        if (node->expr)
-        {
-           node->expr->accept(this);
-        }
         // return input argument
         builder->CreateRet(inferred_value);
     };
-
+    // todo
     void codeGenerator::visitIf(ast::If *node)
     {
         ast::Type *cond_type;
@@ -203,7 +218,7 @@ namespace generator{
             node->expr->accept(this);
         }
     };
-
+    // done
     void codeGenerator::visitIntegerType(ast::IntegerType *node)
     {
         inferred_type = llvm::Type::getInt32Ty(context);
@@ -216,6 +231,7 @@ namespace generator{
     {
         inferred_type = llvm::Type::getInt1Ty(context);
     };
+    // todo:
     void codeGenerator::visitArrayType(ast::ArrayType *node)
     {
         if (node->size)
@@ -237,7 +253,7 @@ namespace generator{
             }
         }
     };
-
+    // done
     void codeGenerator::visitBinaryExpr(ast::BinaryExpr *node)
     {
         if (node->left)
@@ -282,26 +298,26 @@ namespace generator{
     };
     void codeGenerator::visitIntegerValue(ast::IntegerValue *node)
     {
-        std::cout<<"node value " << node->value << '\n';
+        std::cout << "node value " << node->value << '\n';
         inferred_value = llvm::ConstantInt::get(llvm::Type::getInt32Ty(context), node->value);
         expected_type = new ast::IntegerType();
     };
     void codeGenerator::visitRealValue(ast::RealValue *node)
     {
-        std::cout<<"node value " << node->value << '\n';
+        std::cout << "node value " << node->value << '\n';
         inferred_value = llvm::ConstantFP::get(llvm::Type::getDoubleTy(context), node->value);
         expected_type = new ast::RealType();
     };
     void codeGenerator::visitBooleanValue(ast::BooleanValue *node)
     {
-        std::cout<<"node value " << node->value << '\n';
+        std::cout << "node value " << node->value << '\n';
         inferred_value = llvm::ConstantInt::get(llvm::Type::getInt1Ty(context), node->value);
         expected_type = new ast::BooleanType();
     };
-
+    // TODO: complete
     void codeGenerator::visitVar(ast::Var *node)
     {
-        llvm::AllocaInst* varAlloc = varDeclSymbolTable[node->name];
+        llvm::AllocaInst *varAlloc = varDeclSymbolTable[node->name];
         inferred_value = builder->CreateLoad(varAlloc->getAllocatedType(), varAlloc, node->name.c_str());
         // you need to set expected type :)
         if (node->accesses)
@@ -313,168 +329,189 @@ namespace generator{
             }
         }
     };
+    // TODO
     void codeGenerator::visitArrayAccess(ast::ArrayAccess *node)
     {
-        
     }
     void codeGenerator::visitRecordAccess(ast::RecordAccess *node)
     {
     }
-    void codeGenerator::visitRoutineCallValue(ast::RoutineCallValue *node)
-    {
+    void codeGenerator::visitRoutineCallValue(ast::RoutineCallValue *node){
 
     };
-    void codeGenerator::computeBinaryExprValue(llvm::Value* value1, llvm::Value* value2, BinaryOperator oper){
-          if(dynamic_cast<ast::IntegerType*>(expected_type)){
-                computeBinaryIntExprValue(value1, value2, oper);
-          }
-          else
-          if(dynamic_cast<ast::RealType*>(expected_type)){
+    // Utility functions
+    void codeGenerator::computeBinaryExprValue(llvm::Value *value1, llvm::Value *value2, BinaryOperator oper)
+    {
+        if (dynamic_cast<ast::IntegerType *>(expected_type))
+        {
+            computeBinaryIntExprValue(value1, value2, oper);
+        }
+        else if (dynamic_cast<ast::RealType *>(expected_type))
+        {
             computeBinaryRealExprValue(value1, value2, oper);
-          }
-          else{
-            std::cerr<<"ERROR: BOOLEAN EXPRESSION in Binary expression!!\n";
-          }
-    }
-    void codeGenerator::computeBinaryIntExprValue(llvm::Value* value1, llvm::Value* value2, BinaryOperator oper){
-          switch (oper){
-            case BinaryOperator::Plus: 
-                inferred_value = builder->CreateAdd(value1, value2, "result");
-                break;
-            case BinaryOperator::Minus:
-                inferred_value = builder->CreateSub(value1, value2, "result");
-                break;
-            case BinaryOperator::Mul:
-                inferred_value = builder->CreateMul(value1, value2, "result");
-                break;
-            case BinaryOperator::Div:
-                inferred_value = builder->CreateSDiv(value1, value2, "result");
-                break;
-            case BinaryOperator::Mod:
-                inferred_value = builder->CreateSRem(value1, value2, "result");
-                break;
-            default:
-                std::cerr << "Error: Undefiend binary expression!!\n";
-                break;
+        }
+        else
+        {
+            std::cerr << "ERROR: BOOLEAN EXPRESSION in Binary expression!!\n";
         }
     }
-    void codeGenerator::computeBinaryRealExprValue(llvm::Value* value1, llvm::Value* value2, BinaryOperator oper){
-          switch (oper){
-            case BinaryOperator::Plus: 
-                inferred_value = builder->CreateFAdd(value1, value2, "result");
-                break;
-            case BinaryOperator::Minus:
-                inferred_value = builder->CreateFSub(value1, value2, "result");
-                break;
-            case BinaryOperator::Mul:
-                inferred_value = builder->CreateFMul(value1, value2, "result");
-                break;
-            case BinaryOperator::Div:
-                inferred_value = builder->CreateFDiv(value1, value2, "result");
-                break;
-            case BinaryOperator::Mod:
-                inferred_value = builder->CreateFRem(value1, value2, "result");
-                break;
-            default:
-                std::cerr << "Undefiend binary expression!!\n";
-                break;
+    void codeGenerator::computeBinaryIntExprValue(llvm::Value *value1, llvm::Value *value2, BinaryOperator oper)
+    {
+        switch (oper)
+        {
+        case BinaryOperator::Plus:
+            inferred_value = builder->CreateAdd(value1, value2, "result");
+            break;
+        case BinaryOperator::Minus:
+            inferred_value = builder->CreateSub(value1, value2, "result");
+            break;
+        case BinaryOperator::Mul:
+            inferred_value = builder->CreateMul(value1, value2, "result");
+            break;
+        case BinaryOperator::Div:
+            inferred_value = builder->CreateSDiv(value1, value2, "result");
+            break;
+        case BinaryOperator::Mod:
+            inferred_value = builder->CreateSRem(value1, value2, "result");
+            break;
+        default:
+            std::cerr << "Error: Undefiend binary expression!!\n";
+            break;
         }
     }
-    void codeGenerator::computeLogicExprValue(llvm::Value* value1, llvm::Value* value2, LogicOperator oper){
-         switch(oper){
-            case LogicOperator::And:
-                inferred_value = builder->CreateAnd(value1, value2, "result");
-                break;
-            case LogicOperator::Or:
-                inferred_value = builder->CreateOr(value1, value2, "result");
-                break;
-            case LogicOperator::Xor:
-                inferred_value = builder->CreateXor(value1, value2, "result"); 
-                break;
-            default:
-                std::cerr << "Error: Undefined logic expression!!\n";
-                break;
+    void codeGenerator::computeBinaryRealExprValue(llvm::Value *value1, llvm::Value *value2, BinaryOperator oper)
+    {
+        switch (oper)
+        {
+        case BinaryOperator::Plus:
+            inferred_value = builder->CreateFAdd(value1, value2, "result");
+            break;
+        case BinaryOperator::Minus:
+            inferred_value = builder->CreateFSub(value1, value2, "result");
+            break;
+        case BinaryOperator::Mul:
+            inferred_value = builder->CreateFMul(value1, value2, "result");
+            break;
+        case BinaryOperator::Div:
+            inferred_value = builder->CreateFDiv(value1, value2, "result");
+            break;
+        case BinaryOperator::Mod:
+            inferred_value = builder->CreateFRem(value1, value2, "result");
+            break;
+        default:
+            std::cerr << "Undefiend binary expression!!\n";
+            break;
         }
     }
-    void codeGenerator::computeCompExprValue(llvm::Value* value1, llvm::Value* value2, ComparisonOperator oper){
-        if(dynamic_cast<ast::IntegerType*>(expected_type)){
-                computeCompIntExprValue(value1, value2, oper);
-          }
-          else
-          if(dynamic_cast<ast::RealType*>(expected_type)){
+    void codeGenerator::computeLogicExprValue(llvm::Value *value1, llvm::Value *value2, LogicOperator oper)
+    {
+        switch (oper)
+        {
+        case LogicOperator::And:
+            inferred_value = builder->CreateAnd(value1, value2, "result");
+            break;
+        case LogicOperator::Or:
+            inferred_value = builder->CreateOr(value1, value2, "result");
+            break;
+        case LogicOperator::Xor:
+            inferred_value = builder->CreateXor(value1, value2, "result");
+            break;
+        default:
+            std::cerr << "Error: Undefined logic expression!!\n";
+            break;
+        }
+    }
+    void codeGenerator::computeCompExprValue(llvm::Value *value1, llvm::Value *value2, ComparisonOperator oper)
+    {
+        if (dynamic_cast<ast::IntegerType *>(expected_type))
+        {
+            computeCompIntExprValue(value1, value2, oper);
+        }
+        else if (dynamic_cast<ast::RealType *>(expected_type))
+        {
             computeCompRealExprValue(value1, value2, oper);
-          }
-          else{
-            std::cerr<<"ERROR: BOOLEAN EXPRESSION in Binary expression!!\n";
-          }
-    }
-    void codeGenerator::computeCompIntExprValue(llvm::Value* value1, llvm::Value* value2, ComparisonOperator oper){
-        switch(oper){
-            case ComparisonOperator::Equal:
-                inferred_value = builder->CreateICmpEQ(value1, value2, "result");
-                break;
-            case ComparisonOperator::Greater:
-                inferred_value = builder->CreateICmpSGT(value1, value2, "result");
-                break;
-            case ComparisonOperator::GreaterEqual:
-                inferred_value = builder->CreateICmpSGE(value1, value2, "result");
-                break;
-            case ComparisonOperator::Less:
-                inferred_value = builder->CreateICmpSLT(value1, value2, "result");
-                break;
-            case ComparisonOperator::LessEqual:
-                inferred_value = builder->CreateICmpSLE(value1, value2, "result");
-                break;
-            case ComparisonOperator::NotEqual:
-                inferred_value = builder->CreateICmpNE(value1, value2, "result");
-                break;
-            default:
-                std::cerr << "Undefined Comparison expression!!\n";
-                break;
+        }
+        else
+        {
+            std::cerr << "ERROR: BOOLEAN EXPRESSION in Binary expression!!\n";
         }
     }
-    void codeGenerator::computeCompRealExprValue(llvm::Value* value1, llvm::Value* value2, ComparisonOperator oper){
-        switch(oper){
-            case ComparisonOperator::Equal:
-                inferred_value = builder->CreateFCmpOEQ(value1, value2, "result");
-                break;
-            case ComparisonOperator::Greater:
-                inferred_value = builder->CreateFCmpOGT(value1, value2, "result");
-                break;
-            case ComparisonOperator::GreaterEqual:
-                inferred_value = builder->CreateFCmpOGE(value1, value2, "result");
-                break;
-            case ComparisonOperator::Less:
-                inferred_value = builder->CreateFCmpOLT(value1, value2, "result");
-                break;
-            case ComparisonOperator::LessEqual:
-                inferred_value = builder->CreateFCmpOLE(value1, value2, "result");
-                break;
-            case ComparisonOperator::NotEqual:
-                inferred_value = builder->CreateFCmpONE(value1, value2, "result");
-                break;
-            default:
-                std::cerr << "Undefined Comparison expression!!\n";
-                break;
+    void codeGenerator::computeCompIntExprValue(llvm::Value *value1, llvm::Value *value2, ComparisonOperator oper)
+    {
+        switch (oper)
+        {
+        case ComparisonOperator::Equal:
+            inferred_value = builder->CreateICmpEQ(value1, value2, "result");
+            break;
+        case ComparisonOperator::Greater:
+            inferred_value = builder->CreateICmpSGT(value1, value2, "result");
+            break;
+        case ComparisonOperator::GreaterEqual:
+            inferred_value = builder->CreateICmpSGE(value1, value2, "result");
+            break;
+        case ComparisonOperator::Less:
+            inferred_value = builder->CreateICmpSLT(value1, value2, "result");
+            break;
+        case ComparisonOperator::LessEqual:
+            inferred_value = builder->CreateICmpSLE(value1, value2, "result");
+            break;
+        case ComparisonOperator::NotEqual:
+            inferred_value = builder->CreateICmpNE(value1, value2, "result");
+            break;
+        default:
+            std::cerr << "Undefined Comparison expression!!\n";
+            break;
         }
     }
-    void codeGenerator::remove_decls_from_scope(){
-            while(routine_vars_n -- ){
-                if(varStack.size()){
-                    std::string delVar = varStack[varStack.size()-1].first;
-                    std::cout<<"I'm deleting var " << delVar << '\n';
-                    varDeclSymbolTable.erase(delVar);
-                    varStack.pop_back();
-                    llvm::AllocaInst* shadowed_i = nullptr;
-                    for (auto i : varStack){
-                        if (i.first == delVar){
-                            shadowed_i = i.second;
-                            break;
-                        }
+    void codeGenerator::computeCompRealExprValue(llvm::Value *value1, llvm::Value *value2, ComparisonOperator oper)
+    {
+        switch (oper)
+        {
+        case ComparisonOperator::Equal:
+            inferred_value = builder->CreateFCmpOEQ(value1, value2, "result");
+            break;
+        case ComparisonOperator::Greater:
+            inferred_value = builder->CreateFCmpOGT(value1, value2, "result");
+            break;
+        case ComparisonOperator::GreaterEqual:
+            inferred_value = builder->CreateFCmpOGE(value1, value2, "result");
+            break;
+        case ComparisonOperator::Less:
+            inferred_value = builder->CreateFCmpOLT(value1, value2, "result");
+            break;
+        case ComparisonOperator::LessEqual:
+            inferred_value = builder->CreateFCmpOLE(value1, value2, "result");
+            break;
+        case ComparisonOperator::NotEqual:
+            inferred_value = builder->CreateFCmpONE(value1, value2, "result");
+            break;
+        default:
+            std::cerr << "Undefined Comparison expression!!\n";
+            break;
+        }
+    }
+    void codeGenerator::remove_decls_from_scope()
+    {
+        while (routine_vars_n--)
+        {
+            if (varStack.size())
+            {
+                std::string delVar = varStack[varStack.size() - 1].first;
+                std::cout << "I'm deleting var " << delVar << '\n';
+                varDeclSymbolTable.erase(delVar);
+                varStack.pop_back();
+                llvm::AllocaInst *shadowed_i = nullptr;
+                for (auto i : varStack)
+                {
+                    if (i.first == delVar)
+                    {
+                        shadowed_i = i.second;
+                        break;
                     }
-                    if(shadowed_i)
-                        varDeclSymbolTable[delVar] = shadowed_i;
                 }
+                if (shadowed_i)
+                    varDeclSymbolTable[delVar] = shadowed_i;
             }
         }
+    }
 } // namespace generator
