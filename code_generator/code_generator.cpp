@@ -3,6 +3,8 @@ namespace generator{
     void codeGenerator::visitProgram(ast::Program *node)
     {
         module = std::make_unique<llvm::Module>("Program", context);
+        llvm::BasicBlock *bb = llvm::BasicBlock::Create(context, "Program");
+        builder->SetInsertPoint(bb);
         for (auto decl : node->decls)
         {
             if (decl)
@@ -11,6 +13,7 @@ namespace generator{
             }
         }
     };
+    // TODO:
     void codeGenerator::visitTypeDecl(ast::TypeDecl *node)
     {
         if (node->type)
@@ -20,7 +23,6 @@ namespace generator{
     };
     void codeGenerator::visitRoutineDecl(ast::RoutineDecl *node)
     {
-
         std::vector<llvm::Type*> paramsVector;
         if (node->params)
         {
@@ -41,9 +43,11 @@ namespace generator{
         llvm::Type* ret_type = inferred_type;
         llvm::FunctionType *funcType = llvm::FunctionType::get(ret_type, params, false);
         llvm::Function *func = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, node->name, module.get());
+        //llvm::AllocaInst *x = builder->CreateAlloca(funcType, nullptr, node->name);
+        //builder->CreateStore(func, x);
         // create basic block and set insertion point
         llvm::BasicBlock *bb = llvm::BasicBlock::Create(context, "entry", func);
-        builder.SetInsertPoint(bb);
+        builder->SetInsertPoint(bb);
         if (node->body)
         {
             node->body->accept(this);
@@ -62,14 +66,19 @@ namespace generator{
         {
             node->type->accept(this);
         }
+        llvm::AllocaInst *x = builder->CreateAlloca(inferred_type, nullptr, node->name);
     }
     void codeGenerator::visitGlobalVarDecl(ast::GlobalVarDecl *node)
     {
-
+        if(node->type){
+            node->type->accept(this);
+        }
+        llvm::AllocaInst *x = builder->CreateAlloca(inferred_type, nullptr, node->name);
         if (node->init)
         {
             node->init->accept(this);
         }
+        builder->CreateStore(inferred_value, x);
     }
     void codeGenerator::visitBody(ast::Body *node)
     {
@@ -83,11 +92,15 @@ namespace generator{
     };
     void codeGenerator::visitLocalVarDecl(ast::LocalVarDecl *node)
     {
-       
+        if(node->type){
+            node->type->accept(this);
+        }
+        llvm::AllocaInst *x = builder->CreateAlloca(inferred_type, nullptr, node->name);
         if (node->init)
         {
             node->init->accept(this);
         }
+        builder->CreateStore(inferred_value, x);
     };
     void codeGenerator::visitAssignment(ast::Assignment *node)
     {
@@ -110,7 +123,7 @@ namespace generator{
            node->expr->accept(this);
         }
         // return input argument
-        builder.CreateRet(inferred_value);
+        builder->CreateRet(inferred_value);
     };
 
     void codeGenerator::visitIf(ast::If *node)
@@ -297,19 +310,19 @@ namespace generator{
     void codeGenerator::computeIntExprValue(llvm::Value* value1, llvm::Value* value2, BinaryOperator oper){
           switch (oper){
             case BinaryOperator::Plus: 
-                inferred_value = builder.CreateAdd(value1, value2, "result");
+                inferred_value = builder->CreateAdd(value1, value2, "result");
                 break;
             case BinaryOperator::Minus:
-                inferred_value = builder.CreateSub(value1, value2, "result");
+                inferred_value = builder->CreateSub(value1, value2, "result");
                 break;
             case BinaryOperator::Mul:
-                inferred_value = builder.CreateMul(value1, value2, "result");
+                inferred_value = builder->CreateMul(value1, value2, "result");
                 break;
             case BinaryOperator::Div:
-                inferred_value = builder.CreateSDiv(value1, value2, "result");
+                inferred_value = builder->CreateSDiv(value1, value2, "result");
                 break;
             case BinaryOperator::Mod:
-                inferred_value = builder.CreateSRem(value1, value2, "result");
+                inferred_value = builder->CreateSRem(value1, value2, "result");
                 break;
             default:
                 std::cerr << "Undefiend binary expression!!\n";
@@ -319,24 +332,42 @@ namespace generator{
     void codeGenerator::computeRealExprValue(llvm::Value* value1, llvm::Value* value2, BinaryOperator oper){
           switch (oper){
             case BinaryOperator::Plus: 
-                inferred_value = builder.CreateFAdd(value1, value2, "result");
+                inferred_value = builder->CreateFAdd(value1, value2, "result");
                 break;
             case BinaryOperator::Minus:
-                inferred_value = builder.CreateFSub(value1, value2, "result");
+                inferred_value = builder->CreateFSub(value1, value2, "result");
                 break;
             case BinaryOperator::Mul:
-                inferred_value = builder.CreateFMul(value1, value2, "result");
+                inferred_value = builder->CreateFMul(value1, value2, "result");
                 break;
             case BinaryOperator::Div:
-                inferred_value = builder.CreateFDiv(value1, value2, "result");
+                inferred_value = builder->CreateFDiv(value1, value2, "result");
                 break;
             case BinaryOperator::Mod:
-                inferred_value = builder.CreateFRem(value1, value2, "result");
+                inferred_value = builder->CreateFRem(value1, value2, "result");
                 break;
             default:
                 std::cerr << "Undefiend binary expression!!\n";
                 break;
         }
     }
+     void codeGenerator::remove_params_from_scope(){
+            while(routine_vars_n -- ){
+                if(varStack.size()){
+                    std::string delVar = varStack[varStack.size()-1].first;
+                    varDeclSymbolTable.erase(delVar);
+                    varStack.pop_back();
+                    llvm::AllocaInst* shadowed_i = nullptr;
+                    for (auto i : varStack){
+                        if (i.first == delVar){
+                            shadowed_i = i.second;
+                            break;
+                        }
+                    }
+                    if(shadowed_i)
+                        varDeclSymbolTable[delVar] = shadowed_i;
+                }
+            }
+        }
 
 }

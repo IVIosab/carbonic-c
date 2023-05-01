@@ -26,7 +26,7 @@ namespace generator{
     class codeGenerator : public ast::Visitor 
     {
     public:
-        codeGenerator() : builder(context) {}
+        //codeGenerator() : builder(context) {}
         void visitProgram(ast::Program *p);
         void visitDecl(ast::Decl *p){}
         void visitTypeDecl(ast::TypeDecl *p);
@@ -83,17 +83,22 @@ namespace generator{
         void visitParameterList(ast::ParameterList *p){}
     private:
         llvm::LLVMContext context;
-        llvm::IRBuilder<> builder;
         std::unique_ptr<llvm::Module> module;
+        std::unique_ptr<llvm::IRBuilder<>> builder = 
+        std::unique_ptr<llvm::IRBuilder<>>(new llvm::IRBuilder<>(context));
         std::map<std::string, llvm::Value*> m_namedValues;
         llvm::TargetMachine* m_targetMachine;
         llvm::Type* inferred_type = nullptr;
         llvm::Value* inferred_value = nullptr;
         ast::Type* expected_type = nullptr;
+        int routine_vars_n = 0;
+        std::unordered_map<std::string, llvm::AllocaInst*> varDeclSymbolTable;
+        std::vector<std::pair<std::string, llvm::AllocaInst*>> varStack;
         // potentially add getting realtime type function/or realtime_type variable
         void computeExpressionValue(llvm::Value* value1, llvm::Value* value2, BinaryOperator oper);
         void computeIntExprValue(llvm::Value* value1, llvm::Value* value2, BinaryOperator oper);
         void computeRealExprValue(llvm::Value* value1, llvm::Value* value2, BinaryOperator oper);
-
+        // Remove params from scope when exiting a routine declaration
+        void remove_params_from_scope();
     };
 } // namespace generator
