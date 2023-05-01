@@ -95,9 +95,13 @@ namespace generator{
         std::unordered_map<std::string, llvm::AllocaInst*> varDeclSymbolTable;
         std::vector<std::pair<std::string, llvm::AllocaInst*>> varStack;
         // potentially add getting realtime type function/or realtime_type variable
-        void computeExpressionValue(llvm::Value* value1, llvm::Value* value2, BinaryOperator oper);
-        void computeIntExprValue(llvm::Value* value1, llvm::Value* value2, BinaryOperator oper);
-        void computeRealExprValue(llvm::Value* value1, llvm::Value* value2, BinaryOperator oper);
+        void computeBinaryExprValue(llvm::Value* value1, llvm::Value* value2, BinaryOperator oper);
+        void computeBinaryIntExprValue(llvm::Value* value1, llvm::Value* value2, BinaryOperator oper);
+        void computeBinaryRealExprValue(llvm::Value* value1, llvm::Value* value2, BinaryOperator oper);
+        void computeLogicExprValue(llvm::Value* value1, llvm::Value* value2, LogicOperator oper);
+        void computeCompExprValue(llvm::Value* value1, llvm::Value* value2, ComparisonOperator oper);
+        void computeCompIntExprValue(llvm::Value* value1, llvm::Value* value2, ComparisonOperator oper);
+        void computeCompRealExprValue(llvm::Value* value1, llvm::Value* value2, ComparisonOperator oper);
         // Remove params from scope when exiting a routine declaration
         void remove_decls_from_scope();
         // reference: https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/LangImpl07.html

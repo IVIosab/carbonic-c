@@ -81,6 +81,7 @@ namespace generator{
             node->type->accept(this);
         }
     }
+    // TODO:
     void codeGenerator::visitGlobalVarDecl(ast::GlobalVarDecl *node)
     {
         if(node->type){
@@ -249,7 +250,7 @@ namespace generator{
             node->right->accept(this);
         }
         llvm::Value *value2 = inferred_value;
-        computeExpressionValue(value1, value2, node->op);
+        computeBinaryExprValue(value1, value2, node->op);
     };
     void codeGenerator::visitLogicExpr(ast::LogicExpr *node)
     {
@@ -257,10 +258,13 @@ namespace generator{
         {
             node->left->accept(this);
         }
+        llvm::Value *value1 = inferred_value;
         if (node->right)
         {
             node->right->accept(this);
         }
+        llvm::Value *value2 = inferred_value;
+        computeLogicExprValue(value1, value2, node->op);
     };
     void codeGenerator::visitComparisonExpr(ast::ComparisonExpr *node)
     {
@@ -268,10 +272,13 @@ namespace generator{
         {
             node->left->accept(this);
         }
+        llvm::Value *value1 = inferred_value;
         if (node->right)
         {
             node->right->accept(this);
         }
+        llvm::Value *value2 = inferred_value;
+        computeCompExprValue(value1, value2, node->op);
     };
     void codeGenerator::visitIntegerValue(ast::IntegerValue *node)
     {
@@ -317,19 +324,19 @@ namespace generator{
     {
 
     };
-    void codeGenerator::computeExpressionValue(llvm::Value* value1, llvm::Value* value2, BinaryOperator oper){
+    void codeGenerator::computeBinaryExprValue(llvm::Value* value1, llvm::Value* value2, BinaryOperator oper){
           if(dynamic_cast<ast::IntegerType*>(expected_type)){
-                computeIntExprValue(value1, value2, oper);
+                computeBinaryIntExprValue(value1, value2, oper);
           }
           else
           if(dynamic_cast<ast::RealType*>(expected_type)){
-            computeRealExprValue(value1, value2, oper);
+            computeBinaryRealExprValue(value1, value2, oper);
           }
           else{
-            std::cout<<"ERROR: BOOLEAN EXPRESSION\n";
+            std::cerr<<"ERROR: BOOLEAN EXPRESSION in Binary expression!!\n";
           }
     }
-    void codeGenerator::computeIntExprValue(llvm::Value* value1, llvm::Value* value2, BinaryOperator oper){
+    void codeGenerator::computeBinaryIntExprValue(llvm::Value* value1, llvm::Value* value2, BinaryOperator oper){
           switch (oper){
             case BinaryOperator::Plus: 
                 inferred_value = builder->CreateAdd(value1, value2, "result");
@@ -347,11 +354,11 @@ namespace generator{
                 inferred_value = builder->CreateSRem(value1, value2, "result");
                 break;
             default:
-                std::cerr << "Undefiend binary expression!!\n";
+                std::cerr << "Error: Undefiend binary expression!!\n";
                 break;
         }
     }
-    void codeGenerator::computeRealExprValue(llvm::Value* value1, llvm::Value* value2, BinaryOperator oper){
+    void codeGenerator::computeBinaryRealExprValue(llvm::Value* value1, llvm::Value* value2, BinaryOperator oper){
           switch (oper){
             case BinaryOperator::Plus: 
                 inferred_value = builder->CreateFAdd(value1, value2, "result");
@@ -370,6 +377,84 @@ namespace generator{
                 break;
             default:
                 std::cerr << "Undefiend binary expression!!\n";
+                break;
+        }
+    }
+    void codeGenerator::computeLogicExprValue(llvm::Value* value1, llvm::Value* value2, LogicOperator oper){
+         switch(oper){
+            case LogicOperator::And:
+                inferred_value = builder->CreateAnd(value1, value2, "result");
+                break;
+            case LogicOperator::Or:
+                inferred_value = builder->CreateOr(value1, value2, "result");
+                break;
+            case LogicOperator::Xor:
+                inferred_value = builder->CreateXor(value1, value2, "result"); 
+                break;
+            default:
+                std::cerr << "Error: Undefined logic expression!!\n";
+                break;
+        }
+    }
+    void codeGenerator::computeCompExprValue(llvm::Value* value1, llvm::Value* value2, ComparisonOperator oper){
+        if(dynamic_cast<ast::IntegerType*>(expected_type)){
+                computeCompIntExprValue(value1, value2, oper);
+          }
+          else
+          if(dynamic_cast<ast::RealType*>(expected_type)){
+            computeCompRealExprValue(value1, value2, oper);
+          }
+          else{
+            std::cerr<<"ERROR: BOOLEAN EXPRESSION in Binary expression!!\n";
+          }
+    }
+    void codeGenerator::computeCompIntExprValue(llvm::Value* value1, llvm::Value* value2, ComparisonOperator oper){
+        switch(oper){
+            case ComparisonOperator::Equal:
+                inferred_value = builder->CreateICmpEQ(value1, value2, "result");
+                break;
+            case ComparisonOperator::Greater:
+                inferred_value = builder->CreateICmpSGT(value1, value2, "result");
+                break;
+            case ComparisonOperator::GreaterEqual:
+                inferred_value = builder->CreateICmpSGE(value1, value2, "result");
+                break;
+            case ComparisonOperator::Less:
+                inferred_value = builder->CreateICmpSLT(value1, value2, "result");
+                break;
+            case ComparisonOperator::LessEqual:
+                inferred_value = builder->CreateICmpSLE(value1, value2, "result");
+                break;
+            case ComparisonOperator::NotEqual:
+                inferred_value = builder->CreateICmpNE(value1, value2, "result");
+                break;
+            default:
+                std::cerr << "Undefined Comparison expression!!\n";
+                break;
+        }
+    }
+    void codeGenerator::computeCompRealExprValue(llvm::Value* value1, llvm::Value* value2, ComparisonOperator oper){
+        switch(oper){
+            case ComparisonOperator::Equal:
+                inferred_value = builder->CreateFCmpOEQ(value1, value2, "result");
+                break;
+            case ComparisonOperator::Greater:
+                inferred_value = builder->CreateFCmpOGT(value1, value2, "result");
+                break;
+            case ComparisonOperator::GreaterEqual:
+                inferred_value = builder->CreateFCmpOGE(value1, value2, "result");
+                break;
+            case ComparisonOperator::Less:
+                inferred_value = builder->CreateFCmpOLT(value1, value2, "result");
+                break;
+            case ComparisonOperator::LessEqual:
+                inferred_value = builder->CreateFCmpOLE(value1, value2, "result");
+                break;
+            case ComparisonOperator::NotEqual:
+                inferred_value = builder->CreateFCmpONE(value1, value2, "result");
+                break;
+            default:
+                std::cerr << "Undefined Comparison expression!!\n";
                 break;
         }
     }
