@@ -5,6 +5,11 @@ namespace generator
     void codeGenerator::visitProgram(ast::Program *node)
     {
         module = std::make_unique<llvm::Module>("Program", context);
+        printf = module->getOrInsertFunction("printf",
+                                             llvm::FunctionType::get(llvm::IntegerType::getInt32Ty(context), llvm::PointerType::get(llvm::Type::getInt8Ty(context), 0), true /* this is var arg func type*/));
+        intFmtStr = builder->CreateGlobalStringPtr("%d\n", "intFmtString", 0, module.get());
+        doubleFmtStr = builder->CreateGlobalStringPtr("%f\n", "doubleFmtString", 0, module.get());
+
         for (auto decl : node->decls)
         {
             if (decl)
@@ -224,6 +229,23 @@ namespace generator
         {
             node->expr->accept(this);
         }
+
+        llvm::Value *formatStr;
+        auto type = inferred_value->getType();
+        if (type->isIntegerTy())
+        {
+            formatStr = intFmtStr;
+        }
+        else if (type->isDoubleTy())
+        {
+            formatStr = doubleFmtStr;
+        }
+        else
+        {
+            // PANIC
+            throw "Unknown inferred expression type";
+        }
+        builder->CreateCall(printf, {formatStr, inferred_value});
     };
     // done
     void codeGenerator::visitIntegerType(ast::IntegerType *node)
@@ -252,8 +274,8 @@ namespace generator
         llvm::ConstantInt *myConstantInt = llvm::dyn_cast<llvm::ConstantInt>(inferred_value);
         if (myConstantInt)
         {
-          int64_t IntegerValue = myConstantInt->getSExtValue(); 
-          size = IntegerValue;
+            int64_t IntegerValue = myConstantInt->getSExtValue();
+            size = IntegerValue;
         }
         else
         {
@@ -359,8 +381,8 @@ namespace generator
         llvm::ConstantInt *myConstantInt = llvm::dyn_cast<llvm::ConstantInt>(inferred_value);
         if (myConstantInt)
         {
-          int64_t IntegerValue = myConstantInt->getSExtValue(); 
-          index_int = IntegerValue;
+            int64_t IntegerValue = myConstantInt->getSExtValue();
+            index_int = IntegerValue;
         }
         else
         {

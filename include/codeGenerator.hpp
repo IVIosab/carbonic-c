@@ -24,7 +24,7 @@
 typedef std::string Ident;
 namespace generator
 {
-    class codeGenerator : public ast::Visitor 
+    class codeGenerator : public ast::Visitor
     {
     public:
         // codeGenerator() {}
@@ -33,7 +33,7 @@ namespace generator
         void visitTypeDecl(ast::TypeDecl *p);
         void visitGlobalVarDecl(ast::GlobalVarDecl *p);
         void visitRoutineDecl(ast::RoutineDecl *p);
-        
+
         void visitBody(ast::Body *p);
         void visitBodyEntity(ast::BodyEntity *p){};
         void visitLocalVarDecl(ast::LocalVarDecl *p);
@@ -58,7 +58,7 @@ namespace generator
         void visitRealValue(ast::RealValue *p);
         void visitBooleanValue(ast::BooleanValue *p);
         void visitRoutineCallValue(ast::RoutineCallValue *p);
-        
+
         void visitType(ast::Type *p) {}
         void visitPrimitiveType(ast::PrimitiveType *p) {}
         void visitUserType(ast::UserType *p) {}
@@ -72,25 +72,29 @@ namespace generator
         void visitReal(ast::Real x) {}       // -> doesn't get visited
         void visitBoolean(ast::Boolean x) {} //  -> doesn't get visited
         void visitIdent(Ident x) {}          //  -> doesn't get visited
-        
+
         void visitVar(ast::Var *p);
         void visitNestedAccess(ast::NestedAccess *p) {}
         void visitNestedAccessList(ast::NestedAccessList *p) {}
         void visitArrayAccess(ast::ArrayAccess *p);
         void visitRecordAccess(ast::RecordAccess *p);
-        
+
         void visitParameterDecl(ast::ParameterDecl *p); //  -> doesn't get visited
         void visitParameterList(ast::ParameterList *p) {}
 
     private:
         llvm::LLVMContext context;
         std::unique_ptr<llvm::Module> module;
-        std::unique_ptr<llvm::IRBuilder<>> builder = 
-        std::unique_ptr<llvm::IRBuilder<>>(new llvm::IRBuilder<>(context));
+        std::unique_ptr<llvm::IRBuilder<>> builder =
+            std::unique_ptr<llvm::IRBuilder<>>(new llvm::IRBuilder<>(context));
         llvm::TargetMachine *m_targetMachine;
         llvm::Type *inferred_type = nullptr;
         llvm::Value *inferred_value = nullptr;
         ast::Type *expected_type = nullptr;
+
+        llvm::FunctionCallee printf;
+        llvm::Value *intFmtStr;
+        llvm::Value *doubleFmtStr;
 
         int routine_vars_n = 0;
         std::unordered_map<std::string, llvm::AllocaInst *> varAllocSymbolTable;
