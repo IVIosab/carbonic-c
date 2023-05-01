@@ -14,6 +14,8 @@ namespace generator
                 decl->accept(this);
             }
         }
+        // print LLVM IR code
+        module->print(llvm::errs(), nullptr);
     };
     // todo:
     void codeGenerator::visitTypeDecl(ast::TypeDecl *node)
@@ -23,7 +25,7 @@ namespace generator
             node->type->accept(this);
         }
     };
-    // TODO: complete
+    // done
     void codeGenerator::visitRoutineDecl(ast::RoutineDecl *node)
     {
         std::vector<llvm::Type *> paramsVector;
@@ -48,10 +50,9 @@ namespace generator
         }
         llvm::Type *ret_type = inferred_type;
         llvm::FunctionType *funcType = llvm::FunctionType::get(ret_type, params, false);
-        llvm::Function *func = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, node->name, module.get());
+        llvm::Function *func = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, -1, node->name, module.get());
         // add function to table
-        // llvm::AllocaInst *x = builder->CreateAlloca(funcType, nullptr, node->name);
-        // builder->CreateStore(func, x);
+        funTable[node->name] = func;
         // create basic block and set insertion point
         llvm::BasicBlock *bb = llvm::BasicBlock::Create(context, "entry", func);
         builder->SetInsertPoint(bb);
@@ -79,12 +80,8 @@ namespace generator
         {
             node->body->accept(this);
         }
-        // print LLVM IR code
-        module->print(llvm::errs(), nullptr);
-
         remove_decls_from_scope();
     };
-    // done
     void codeGenerator::visitParameterDecl(ast::ParameterDecl *node)
     {
         if (node->type)
@@ -152,14 +149,26 @@ namespace generator
             node->expr->accept(this);
         }
     };
+    // done
     void codeGenerator::visitRoutineCall(ast::RoutineCall *node)
     {
+        llvm::Function *func = funTable[node->name];
+        std::vector<llvm::Value *> args;
         if (node->args)
         {
-            node->args->accept(this);
+            for (int i = 0; i < node->args->exprs.size(); i++)
+            {
+                node->args->exprs[i]->accept(this);
+                args.push_back(inferred_value);
+            }
+            llvm::ArrayRef argsRef(args);
+            llvm::CallInst *call = builder->CreateCall(func, argsRef, func->getName());
+        }
+        else
+        {
+            llvm::CallInst *call = builder->CreateCall(func, {}, func->getName());
         }
     };
-    // done
     void codeGenerator::visitReturn(ast::Return *node)
     {
         if (node->expr)
@@ -220,6 +229,7 @@ namespace generator
             node->to->accept(this);
         }
     }
+    // done
     void codeGenerator::visitPrint(ast::Print *node)
     {
         if (node->expr)
@@ -252,7 +262,6 @@ namespace generator
         }
         builder->CreateCall(printf, {formatStr, inferred_value});
     };
-    // done
     void codeGenerator::visitIntegerType(ast::IntegerType *node)
     {
         inferred_type = llvm::Type::getInt32Ty(context);
@@ -412,9 +421,24 @@ namespace generator
         llvm::Value *fieldValue = builder->CreateExtractValue(recordValue, {index});
         inferred_value = fieldValue;
     }
-    // todo
-    void codeGenerator::visitRoutineCallValue(ast::RoutineCallValue *node){
-
+    void codeGenerator::visitRoutineCallValue(ast::RoutineCallValue *node)
+    {
+        llvm::Function *func = funTable[node->name];
+        std::vector<llvm::Value *> args;
+        if (node->args)
+        {
+            for (int i = 0; i < node->args->exprs.size(); i++)
+            {
+                node->args->exprs[i]->accept(this);
+                args.push_back(inferred_value);
+            }
+            llvm::ArrayRef argsRef(args);
+            llvm::CallInst *call = builder->CreateCall(func, argsRef, func->getName());
+        }
+        else
+        {
+            llvm::CallInst *call = builder->CreateCall(func, {}, func->getName());
+        }
     };
     // Utility functions
     void codeGenerator::computeBinaryExprValue(llvm::Value *value1, llvm::Value *value2, BinaryOperator oper)

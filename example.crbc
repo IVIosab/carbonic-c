@@ -1,6 +1,8 @@
-routine main () : integer is 
-    print(5+7);
-    print(5);
-    print (5.7 + 6.5);
+routine test () : integer is 
+    print(2);
+	return 0;
+end
+routine main () : integer is
+    test();
     return 0;
 end

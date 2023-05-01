@@ -101,6 +101,8 @@ namespace generator
         std::unordered_map<std::string, ast::Type *> varType;
         std::vector<std::pair<std::string, llvm::AllocaInst *>> varStack;
         std::vector<std::pair<std::string, ast::Type *>> varTypeStack;
+        std::unordered_map<std::string, llvm::Function*> funTable;
+
         void computeBinaryExprValue(llvm::Value *value1, llvm::Value *value2, BinaryOperator oper);
         void computeBinaryIntExprValue(llvm::Value *value1, llvm::Value *value2, BinaryOperator oper);
         void computeBinaryRealExprValue(llvm::Value *value1, llvm::Value *value2, BinaryOperator oper);
