@@ -70,7 +70,7 @@ namespace generator
                 varAllocSymbolTable[node->params->decls[i]->name] = Alloca;
                 varType[node->params->decls[i]->name] = node->params->decls[i]->type;
                 varStack.push_back({node->params->decls[i]->name, Alloca});
-                varTypeStack.push_back({node->params->decls[i]->name,  node->params->decls[i]->type});
+                varTypeStack.push_back({node->params->decls[i]->name, node->params->decls[i]->type});
             }
         }
         if (node->body)
@@ -79,6 +79,7 @@ namespace generator
         }
         // print LLVM IR code
         module->print(llvm::errs(), nullptr);
+
         remove_decls_from_scope();
     };
     // done
@@ -248,19 +249,21 @@ namespace generator
             node->type->accept(this);
         }
         int size = 0;
-        llvm::ConstantInt* myConstantInt = llvm::dyn_cast<llvm::ConstantInt>(inferred_value);
-        if (myConstantInt) {
+        llvm::ConstantInt *myConstantInt = llvm::dyn_cast<llvm::ConstantInt>(inferred_value);
+        if (myConstantInt)
+        {
           int64_t IntegerValue = myConstantInt->getSExtValue(); 
           size = IntegerValue;
         }
-        else {
+        else
+        {
             std::cerr << "Error: Unable to resolve array size to a constant int\n";
         }
         inferred_type = llvm::ArrayType::get(inferred_type, size);
     };
     void codeGenerator::visitRecordType(ast::RecordType *node)
     {
-        std::vector<llvm::Type*> recordFields;
+        std::vector<llvm::Type *> recordFields;
         for (auto field : node->decls->vars)
         {
             if (field)
@@ -269,7 +272,7 @@ namespace generator
                 recordFields.push_back(inferred_type);
             }
         }
-        llvm::StructType* recordType = llvm::StructType::create(recordFields, "recordFields");
+        llvm::StructType *recordType = llvm::StructType::create(recordFields, "recordFields");
         inferred_type = recordType;
     };
     void codeGenerator::visitBinaryExpr(ast::BinaryExpr *node)
@@ -316,19 +319,16 @@ namespace generator
     };
     void codeGenerator::visitIntegerValue(ast::IntegerValue *node)
     {
-        std::cout << "node value " << node->value << '\n';
         inferred_value = llvm::ConstantInt::get(llvm::Type::getInt32Ty(context), node->value);
         expected_type = new ast::IntegerType();
     };
     void codeGenerator::visitRealValue(ast::RealValue *node)
     {
-        std::cout << "node value " << node->value << '\n';
         inferred_value = llvm::ConstantFP::get(llvm::Type::getDoubleTy(context), node->value);
         expected_type = new ast::RealType();
     };
     void codeGenerator::visitBooleanValue(ast::BooleanValue *node)
     {
-        std::cout << "node value " << node->value << '\n';
         inferred_value = llvm::ConstantInt::get(llvm::Type::getInt1Ty(context), node->value);
         expected_type = new ast::BooleanType();
     };
@@ -348,36 +348,41 @@ namespace generator
     };
     void codeGenerator::visitArrayAccess(ast::ArrayAccess *node)
     {
-        auto arr_type = dynamic_cast<ast::ArrayType*>(expected_type);
+        auto arr_type = dynamic_cast<ast::ArrayType *>(expected_type);
         expected_type = arr_type->type;
-        llvm::Value* array = inferred_value; 
-        if(node->index){
+        llvm::Value *array = inferred_value;
+        if (node->index)
+        {
             node->index->accept(this);
         }
         int index_int = 0;
-        llvm::ConstantInt* myConstantInt = llvm::dyn_cast<llvm::ConstantInt>(inferred_value);
-        if (myConstantInt) {
+        llvm::ConstantInt *myConstantInt = llvm::dyn_cast<llvm::ConstantInt>(inferred_value);
+        if (myConstantInt)
+        {
           int64_t IntegerValue = myConstantInt->getSExtValue(); 
           index_int = IntegerValue;
         }
-        else {
+        else
+        {
             std::cerr << "Error: Unable to resolve array index to a constant int\n";
         }
-        llvm::Value* elementValue = builder->CreateExtractValue(array, index_int);
+        llvm::Value *elementValue = builder->CreateExtractValue(array, index_int);
         inferred_value = elementValue;
     }
     void codeGenerator::visitRecordAccess(ast::RecordAccess *node)
     {
-        auto record_type = dynamic_cast<ast::RecordType*>(expected_type);
-        llvm::Value* recordValue = inferred_value;
+        auto record_type = dynamic_cast<ast::RecordType *>(expected_type);
+        llvm::Value *recordValue = inferred_value;
         unsigned int index = 0;
-        for(int i = 0; i < record_type->decls->vars.size(); i++){
-            if(record_type->decls->vars[i]->name == node->name){
+        for (int i = 0; i < record_type->decls->vars.size(); i++)
+        {
+            if (record_type->decls->vars[i]->name == node->name)
+            {
                 index = i;
                 break;
             }
         }
-        llvm::Value* fieldValue = builder->CreateExtractValue(recordValue, {index});
+        llvm::Value *fieldValue = builder->CreateExtractValue(recordValue, {index});
         inferred_value = fieldValue;
     }
     // todo
@@ -557,15 +562,17 @@ namespace generator
                 }
                 if (shadowed_i)
                     varAllocSymbolTable[delVar] = shadowed_i;
-                ast::Type* shadowed_type = nullptr;
-                for(auto i : varTypeStack){
+                ast::Type *shadowed_type = nullptr;
+                for (auto i : varTypeStack)
+                {
                     if (i.first == delVar)
                     {
                         shadowed_type = i.second;
                         break;
                     }
                 }
-                if(shadowed_type){
+                if (shadowed_type)
+                {
                     varType[delVar] = shadowed_type;
                 }
             }
