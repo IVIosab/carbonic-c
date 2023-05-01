@@ -126,8 +126,8 @@ namespace generator
         if (node->init)
         {
             node->init->accept(this);
+            builder->CreateStore(inferred_value, x);
         }
-        builder->CreateStore(inferred_value, x);
         varDeclSymbolTable[node->name] = x;
         varStack.push_back({node->name, x});
     };
@@ -231,7 +231,6 @@ namespace generator
     {
         inferred_type = llvm::Type::getInt1Ty(context);
     };
-    // todo: WIP
     void codeGenerator::visitArrayType(ast::ArrayType *node)
     {
         if (node->size)
@@ -263,7 +262,6 @@ namespace generator
             }
         }
     };
-    // done
     void codeGenerator::visitBinaryExpr(ast::BinaryExpr *node)
     {
         if (node->left)
@@ -339,9 +337,23 @@ namespace generator
             }
         }
     };
-    // TODO
     void codeGenerator::visitArrayAccess(ast::ArrayAccess *node)
     {
+        llvm::Value* array = inferred_value; 
+        if(node->index){
+            node->index->accept(this);
+        }
+        int index_int = 0;
+        llvm::ConstantInt* myConstantInt = llvm::dyn_cast<llvm::ConstantInt>(inferred_value);
+        if (myConstantInt) {
+          int64_t IntegerValue = myConstantInt->getSExtValue(); 
+          index_int = IntegerValue;
+        }
+        else {
+            std::cerr << "Error: Unable to resolve array index to a constant int\n";
+        }
+        llvm::Value* elementValue = builder->CreateExtractValue(array, index_int);
+        inferred_value = elementValue;
     }
     void codeGenerator::visitRecordAccess(ast::RecordAccess *node)
     {
