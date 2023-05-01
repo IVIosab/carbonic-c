@@ -1,0 +1,6 @@
+routine main () : integer is 
+    print(5+7);
+    print(5);
+    print (5.7 + 6.5);
+    return 0;
+end
