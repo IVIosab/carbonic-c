@@ -93,8 +93,8 @@ namespace generator
         ast::Type *expected_type = nullptr;
 
         llvm::FunctionCallee printf;
-        llvm::Value *intFmtStr;
-        llvm::Value *doubleFmtStr;
+        llvm::Value *intFmtStr = nullptr;
+        llvm::Value *doubleFmtStr = nullptr;
 
         int routine_vars_n = 0;
         std::unordered_map<std::string, llvm::AllocaInst *> varAllocSymbolTable;

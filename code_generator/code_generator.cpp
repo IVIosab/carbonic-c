@@ -7,9 +7,6 @@ namespace generator
         module = std::make_unique<llvm::Module>("Program", context);
         printf = module->getOrInsertFunction("printf",
                                              llvm::FunctionType::get(llvm::IntegerType::getInt32Ty(context), llvm::PointerType::get(llvm::Type::getInt8Ty(context), 0), true /* this is var arg func type*/));
-        intFmtStr = builder->CreateGlobalStringPtr("%d\n", "intFmtString", 0, module.get());
-        doubleFmtStr = builder->CreateGlobalStringPtr("%f\n", "doubleFmtString", 0, module.get());
-
         for (auto decl : node->decls)
         {
             if (decl)
@@ -234,10 +231,18 @@ namespace generator
         auto type = inferred_value->getType();
         if (type->isIntegerTy())
         {
+            if (intFmtStr == nullptr)
+            {
+                intFmtStr = builder->CreateGlobalStringPtr("%d\n", "intFmtString");
+            }
             formatStr = intFmtStr;
         }
         else if (type->isDoubleTy())
         {
+            if (doubleFmtStr == nullptr)
+            {
+                doubleFmtStr = builder->CreateGlobalStringPtr("%f\n", "doubleFmtString");
+            }
             formatStr = doubleFmtStr;
         }
         else
