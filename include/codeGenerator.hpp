@@ -98,7 +98,5 @@ namespace generator{
         void computeExpressionValue(llvm::Value* value1, llvm::Value* value2, BinaryOperator oper);
         void computeIntExprValue(llvm::Value* value1, llvm::Value* value2, BinaryOperator oper);
         void computeRealExprValue(llvm::Value* value1, llvm::Value* value2, BinaryOperator oper);
-        // Remove params from scope when exiting a routine declaration
-        void remove_params_from_scope();
     };
 } // namespace generator

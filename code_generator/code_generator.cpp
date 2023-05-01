@@ -3,8 +3,6 @@ namespace generator{
     void codeGenerator::visitProgram(ast::Program *node)
     {
         module = std::make_unique<llvm::Module>("Program", context);
-        llvm::BasicBlock *bb = llvm::BasicBlock::Create(context, "Program");
-        builder->SetInsertPoint(bb);
         for (auto decl : node->decls)
         {
             if (decl)
@@ -24,6 +22,7 @@ namespace generator{
     void codeGenerator::visitRoutineDecl(ast::RoutineDecl *node)
     {
         std::vector<llvm::Type*> paramsVector;
+        std::vector<std::string> paramNames;
         if (node->params)
         {
             for (auto parameter : node->params->decls)
@@ -32,6 +31,7 @@ namespace generator{
                 {
                     parameter->accept(this);
                     paramsVector.push_back(inferred_type);
+                    paramNames.push_back(parameter->name);
                 }
             }
         }
@@ -53,9 +53,11 @@ namespace generator{
             node->body->accept(this);
         }
         // create function arguments
-        for(int i = 0;i < node->params->decls.size(); i ++){
-            llvm::Value *arg = (func->arg_begin()+i);
-            arg->setName(node->params->decls[i]->name);
+        if(node->params){
+            for(int i = 0;i < node->params->decls.size(); i ++){
+                llvm::Value *arg = (func->arg_begin()+i);
+                arg->setName(node->params->decls[i]->name);
+            }
         }
         // print LLVM IR code
         module->print(llvm::errs(), nullptr);
@@ -66,7 +68,6 @@ namespace generator{
         {
             node->type->accept(this);
         }
-        llvm::AllocaInst *x = builder->CreateAlloca(inferred_type, nullptr, node->name);
     }
     void codeGenerator::visitGlobalVarDecl(ast::GlobalVarDecl *node)
     {
@@ -101,6 +102,8 @@ namespace generator{
             node->init->accept(this);
         }
         builder->CreateStore(inferred_value, x);
+        varDeclSymbolTable[node->name] = x;
+        varStack.push_back({node->name, x});
     };
     void codeGenerator::visitAssignment(ast::Assignment *node)
     {
@@ -275,6 +278,9 @@ namespace generator{
 
     void codeGenerator::visitVar(ast::Var *node)
     {
+        llvm::AllocaInst* varAlloc = varDeclSymbolTable[node->name];
+        inferred_value = builder->CreateLoad(varAlloc->getAllocatedType(), varAlloc, node->name.c_str());
+        // you need to set expected type :)
         if (node->accesses)
         {
             for (auto AV : node->accesses->accesses)
@@ -351,23 +357,4 @@ namespace generator{
                 break;
         }
     }
-     void codeGenerator::remove_params_from_scope(){
-            while(routine_vars_n -- ){
-                if(varStack.size()){
-                    std::string delVar = varStack[varStack.size()-1].first;
-                    varDeclSymbolTable.erase(delVar);
-                    varStack.pop_back();
-                    llvm::AllocaInst* shadowed_i = nullptr;
-                    for (auto i : varStack){
-                        if (i.first == delVar){
-                            shadowed_i = i.second;
-                            break;
-                        }
-                    }
-                    if(shadowed_i)
-                        varDeclSymbolTable[delVar] = shadowed_i;
-                }
-            }
-        }
-
 }
