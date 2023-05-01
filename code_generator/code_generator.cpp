@@ -70,6 +70,7 @@ namespace generator
                 varAllocSymbolTable[node->params->decls[i]->name] = Alloca;
                 varType[node->params->decls[i]->name] = node->params->decls[i]->type;
                 varStack.push_back({node->params->decls[i]->name, Alloca});
+                varTypeStack.push_back({node->params->decls[i]->name,  node->params->decls[i]->type});
             }
         }
         if (node->body)
@@ -104,6 +105,7 @@ namespace generator
         varAllocSymbolTable[node->name] = x;
         varType[node->name] = node->type;
         varStack.push_back({node->name, x});
+        varTypeStack.push_back({node->name, node->type});
     }
     void codeGenerator::visitBody(ast::Body *node)
     {
@@ -133,6 +135,7 @@ namespace generator
         varAllocSymbolTable[node->name] = x;
         varType[node->name] = node->type;
         varStack.push_back({node->name, x});
+        varTypeStack.push_back({node->name, node->type});
     };
     // todo
     void codeGenerator::visitAssignment(ast::Assignment *node)
@@ -329,7 +332,6 @@ namespace generator
         inferred_value = llvm::ConstantInt::get(llvm::Type::getInt1Ty(context), node->value);
         expected_type = new ast::BooleanType();
     };
-    // TODO: complete
     void codeGenerator::visitVar(ast::Var *node)
     {
         llvm::AllocaInst *varAlloc = varAllocSymbolTable[node->name];
@@ -555,7 +557,17 @@ namespace generator
                 }
                 if (shadowed_i)
                     varAllocSymbolTable[delVar] = shadowed_i;
-                    // BIG TODO: ADD SHADOWED TYPE BACK TO VARTYPE MAP, ADD STACK FOR THAT.
+                ast::Type* shadowed_type = nullptr;
+                for(auto i : varTypeStack){
+                    if (i.first == delVar)
+                    {
+                        shadowed_type = i.second;
+                        break;
+                    }
+                }
+                if(shadowed_type){
+                    varType[delVar] = shadowed_type;
+                }
             }
         }
     }

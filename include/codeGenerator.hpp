@@ -94,7 +94,7 @@ namespace generator{
         std::unordered_map<std::string, llvm::AllocaInst*> varAllocSymbolTable;
         std::unordered_map<std::string, ast::Type*> varType;
         std::vector<std::pair<std::string, llvm::AllocaInst*>> varStack;
-        // potentially add getting realtime type function/or realtime_type variable
+        std::vector<std::pair<std::string, ast::Type*>> varTypeStack;
         void computeBinaryExprValue(llvm::Value* value1, llvm::Value* value2, BinaryOperator oper);
         void computeBinaryIntExprValue(llvm::Value* value1, llvm::Value* value2, BinaryOperator oper);
         void computeBinaryRealExprValue(llvm::Value* value1, llvm::Value* value2, BinaryOperator oper);
