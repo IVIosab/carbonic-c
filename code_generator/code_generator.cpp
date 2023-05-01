@@ -19,24 +19,19 @@ namespace generator{
     };
     void codeGenerator::visitRoutineDecl(ast::RoutineDecl *node)
     {
-        // create function signature
+        module = std::make_unique<llvm::Module>("name", context);
         llvm::FunctionType *funcType = llvm::FunctionType::get(llvm::Type::getInt32Ty(context), {llvm::Type::getInt32Ty(context)}, false);
         llvm::Function *func = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, "return_input", module.get());
-
         // create basic block and set insertion point
         llvm::BasicBlock *bb = llvm::BasicBlock::Create(context, "entry", func);
-        llvm::IRBuilder<> builder(bb);
-
+        builder.SetInsertPoint(bb);
         // create function argument
         llvm::Value *arg = func->arg_begin();
         arg->setName("input");
-
         // return input argument
         builder.CreateRet(arg);
-
         // print LLVM IR code
         module->print(llvm::errs(), nullptr);
-
         
         if (node->params)
         {
@@ -45,6 +40,7 @@ namespace generator{
                 if (parameter)
                 {
                     parameter->accept(this);
+                    
                 }
             }
         }
@@ -153,7 +149,6 @@ namespace generator{
     };
     void codeGenerator::visitRange(ast::Range *node)
     {
-        ast::Type *fromType;
         if (node->from)
         {
             node->from->accept(this);

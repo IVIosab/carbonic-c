@@ -29,6 +29,7 @@ set(SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/printers/astPrinter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/printers/prettyPrinter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/semantic_analysis/semantic.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/code_generator/code_generator.cpp
     main.cpp
 )
 

@@ -87,6 +87,7 @@ namespace generator{
         std::unique_ptr<llvm::Module> module;
         std::map<std::string, llvm::Value*> m_namedValues;
         llvm::TargetMachine* m_targetMachine;
+        llvm::Type* realtime_type = nullptr;
         // potentially add getting realtime type function/or realtime_type variable
     };
 } // namespace generator
