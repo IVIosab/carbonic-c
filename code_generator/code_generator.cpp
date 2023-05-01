@@ -231,7 +231,7 @@ namespace generator
     {
         inferred_type = llvm::Type::getInt1Ty(context);
     };
-    // todo:
+    // todo: WIP
     void codeGenerator::visitArrayType(ast::ArrayType *node)
     {
         if (node->size)
@@ -242,6 +242,16 @@ namespace generator
         {
             node->type->accept(this);
         }
+        int size = 0;
+        llvm::ConstantInt* myConstantInt = llvm::dyn_cast<llvm::ConstantInt>(inferred_value);
+        if (myConstantInt) {
+          int64_t IntegerValue = myConstantInt->getSExtValue(); 
+          size = IntegerValue;
+        }
+        else {
+            std::cerr << "Error: Unable to resolve array size to a constant int\n";
+        }
+        inferred_type = llvm::ArrayType::get(inferred_type, size);
     };
     void codeGenerator::visitRecordType(ast::RecordType *node)
     {
