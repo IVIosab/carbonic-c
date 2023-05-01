@@ -67,7 +67,8 @@ namespace generator
                 // Store the initial value into the alloca.
                 builder->CreateStore(arg, Alloca);
                 // Add arguments to variable symbol table.
-                varDeclSymbolTable[node->params->decls[i]->name] = Alloca;
+                varAllocSymbolTable[node->params->decls[i]->name] = Alloca;
+                varType[node->params->decls[i]->name] = node->params->decls[i]->type;
                 varStack.push_back({node->params->decls[i]->name, Alloca});
             }
         }
@@ -100,7 +101,8 @@ namespace generator
             node->init->accept(this);
         }
         builder->CreateStore(inferred_value, x);
-        varDeclSymbolTable[node->name] = x;
+        varAllocSymbolTable[node->name] = x;
+        varType[node->name] = node->type;
         varStack.push_back({node->name, x});
     }
     void codeGenerator::visitBody(ast::Body *node)
@@ -128,7 +130,8 @@ namespace generator
             node->init->accept(this);
             builder->CreateStore(inferred_value, x);
         }
-        varDeclSymbolTable[node->name] = x;
+        varAllocSymbolTable[node->name] = x;
+        varType[node->name] = node->type;
         varStack.push_back({node->name, x});
     };
     // todo
@@ -254,13 +257,17 @@ namespace generator
     };
     void codeGenerator::visitRecordType(ast::RecordType *node)
     {
+        std::vector<llvm::Type*> recordFields;
         for (auto field : node->decls->vars)
         {
             if (field)
             {
                 field->accept(this);
+                recordFields.push_back(inferred_type);
             }
         }
+        llvm::StructType* recordType = llvm::StructType::create(recordFields, "recordFields");
+        inferred_type = recordType;
     };
     void codeGenerator::visitBinaryExpr(ast::BinaryExpr *node)
     {
@@ -325,9 +332,9 @@ namespace generator
     // TODO: complete
     void codeGenerator::visitVar(ast::Var *node)
     {
-        llvm::AllocaInst *varAlloc = varDeclSymbolTable[node->name];
+        llvm::AllocaInst *varAlloc = varAllocSymbolTable[node->name];
         inferred_value = builder->CreateLoad(varAlloc->getAllocatedType(), varAlloc, node->name.c_str());
-        // you need to set expected type :)
+        expected_type = varType[node->name];
         if (node->accesses)
         {
             for (auto AV : node->accesses->accesses)
@@ -339,6 +346,8 @@ namespace generator
     };
     void codeGenerator::visitArrayAccess(ast::ArrayAccess *node)
     {
+        auto arr_type = dynamic_cast<ast::ArrayType*>(expected_type);
+        expected_type = arr_type->type;
         llvm::Value* array = inferred_value; 
         if(node->index){
             node->index->accept(this);
@@ -357,7 +366,19 @@ namespace generator
     }
     void codeGenerator::visitRecordAccess(ast::RecordAccess *node)
     {
+        auto record_type = dynamic_cast<ast::RecordType*>(expected_type);
+        llvm::Value* recordValue = inferred_value;
+        unsigned int index = 0;
+        for(int i = 0; i < record_type->decls->vars.size(); i++){
+            if(record_type->decls->vars[i]->name == node->name){
+                index = i;
+                break;
+            }
+        }
+        llvm::Value* fieldValue = builder->CreateExtractValue(recordValue, {index});
+        inferred_value = fieldValue;
     }
+    // todo
     void codeGenerator::visitRoutineCallValue(ast::RoutineCallValue *node){
 
     };
@@ -520,7 +541,8 @@ namespace generator
             {
                 std::string delVar = varStack[varStack.size() - 1].first;
                 std::cout << "I'm deleting var " << delVar << '\n';
-                varDeclSymbolTable.erase(delVar);
+                varAllocSymbolTable.erase(delVar);
+                varType.erase(delVar);
                 varStack.pop_back();
                 llvm::AllocaInst *shadowed_i = nullptr;
                 for (auto i : varStack)
@@ -532,7 +554,8 @@ namespace generator
                     }
                 }
                 if (shadowed_i)
-                    varDeclSymbolTable[delVar] = shadowed_i;
+                    varAllocSymbolTable[delVar] = shadowed_i;
+                    // BIG TODO: ADD SHADOWED TYPE BACK TO VARTYPE MAP, ADD STACK FOR THAT.
             }
         }
     }

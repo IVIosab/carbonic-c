@@ -86,13 +86,13 @@ namespace generator{
         std::unique_ptr<llvm::Module> module;
         std::unique_ptr<llvm::IRBuilder<>> builder = 
         std::unique_ptr<llvm::IRBuilder<>>(new llvm::IRBuilder<>(context));
-        std::map<std::string, llvm::Value*> m_namedValues;
         llvm::TargetMachine* m_targetMachine;
         llvm::Type* inferred_type = nullptr;
         llvm::Value* inferred_value = nullptr;
         ast::Type* expected_type = nullptr;
         int routine_vars_n = 0;
-        std::unordered_map<std::string, llvm::AllocaInst*> varDeclSymbolTable;
+        std::unordered_map<std::string, llvm::AllocaInst*> varAllocSymbolTable;
+        std::unordered_map<std::string, ast::Type*> varType;
         std::vector<std::pair<std::string, llvm::AllocaInst*>> varStack;
         // potentially add getting realtime type function/or realtime_type variable
         void computeBinaryExprValue(llvm::Value* value1, llvm::Value* value2, BinaryOperator oper);
