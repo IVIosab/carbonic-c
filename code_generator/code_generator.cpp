@@ -23,6 +23,7 @@ namespace generator{
     {
         std::vector<llvm::Type*> paramsVector;
         std::vector<std::string> paramNames;
+        routine_vars_n = 0;
         if (node->params)
         {
             for (auto parameter : node->params->decls)
@@ -43,24 +44,35 @@ namespace generator{
         llvm::Type* ret_type = inferred_type;
         llvm::FunctionType *funcType = llvm::FunctionType::get(ret_type, params, false);
         llvm::Function *func = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, node->name, module.get());
+        // add function to table
         //llvm::AllocaInst *x = builder->CreateAlloca(funcType, nullptr, node->name);
         //builder->CreateStore(func, x);
         // create basic block and set insertion point
         llvm::BasicBlock *bb = llvm::BasicBlock::Create(context, "entry", func);
         builder->SetInsertPoint(bb);
+        // create function arguments
+        if(node->params){
+            for(int i = 0;i < node->params->decls.size(); i ++){
+                std::cout << "I'm adding param " << node->params->decls[i]->name << '\n';
+                routine_vars_n ++;
+                llvm::Value *arg = (func->arg_begin()+i);
+                arg->setName(node->params->decls[i]->name);
+                // Create an alloca for this variable.
+                llvm::AllocaInst *Alloca = CreateEntryBlockAlloca(func, node->params->decls[i]->name);
+                // Store the initial value into the alloca.
+                builder->CreateStore(arg, Alloca);
+                // Add arguments to variable symbol table.
+                varDeclSymbolTable[node->params->decls[i]->name] = Alloca;
+                varStack.push_back({node->params->decls[i]->name, Alloca});
+            }
+        }
         if (node->body)
         {
             node->body->accept(this);
         }
-        // create function arguments
-        if(node->params){
-            for(int i = 0;i < node->params->decls.size(); i ++){
-                llvm::Value *arg = (func->arg_begin()+i);
-                arg->setName(node->params->decls[i]->name);
-            }
-        }
         // print LLVM IR code
         module->print(llvm::errs(), nullptr);
+        remove_decls_from_scope();
     };
     void codeGenerator::visitParameterDecl(ast::ParameterDecl *node)
     {
@@ -80,6 +92,8 @@ namespace generator{
             node->init->accept(this);
         }
         builder->CreateStore(inferred_value, x);
+        varDeclSymbolTable[node->name] = x;
+        varStack.push_back({node->name, x});
     }
     void codeGenerator::visitBody(ast::Body *node)
     {
@@ -92,7 +106,9 @@ namespace generator{
         }
     };
     void codeGenerator::visitLocalVarDecl(ast::LocalVarDecl *node)
-    {
+    {   
+        routine_vars_n ++;
+        std::cout << "I'm adding var " << node->name << '\n';
         if(node->type){
             node->type->accept(this);
         }
@@ -357,4 +373,23 @@ namespace generator{
                 break;
         }
     }
-}
+    void codeGenerator::remove_decls_from_scope(){
+            while(routine_vars_n -- ){
+                if(varStack.size()){
+                    std::string delVar = varStack[varStack.size()-1].first;
+                    std::cout<<"I'm deleting var " << delVar << '\n';
+                    varDeclSymbolTable.erase(delVar);
+                    varStack.pop_back();
+                    llvm::AllocaInst* shadowed_i = nullptr;
+                    for (auto i : varStack){
+                        if (i.first == delVar){
+                            shadowed_i = i.second;
+                            break;
+                        }
+                    }
+                    if(shadowed_i)
+                        varDeclSymbolTable[delVar] = shadowed_i;
+                }
+            }
+        }
+} // namespace generator
