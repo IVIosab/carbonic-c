@@ -87,7 +87,13 @@ namespace generator{
         std::unique_ptr<llvm::Module> module;
         std::map<std::string, llvm::Value*> m_namedValues;
         llvm::TargetMachine* m_targetMachine;
-        llvm::Type* realtime_type = nullptr;
+        llvm::Type* inferred_type = nullptr;
+        llvm::Value* inferred_value = nullptr;
+        ast::Type* expected_type = nullptr;
         // potentially add getting realtime type function/or realtime_type variable
+        void computeExpressionValue(llvm::Value* value1, llvm::Value* value2, BinaryOperator oper);
+        void computeIntExprValue(llvm::Value* value1, llvm::Value* value2, BinaryOperator oper);
+        void computeRealExprValue(llvm::Value* value1, llvm::Value* value2, BinaryOperator oper);
+
     };
 } // namespace generator
