@@ -1,5 +1,11 @@
 routine test () : integer is 
-    print(2);
+    var y : record 
+        var a : integer is 7;
+        var b : integer is 3;
+    end;
+    var x : integer is 5;
+    y.a := (5+7);
+    print(y.a);
 	return 0;
 end
 routine main () : integer is

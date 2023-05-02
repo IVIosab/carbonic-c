@@ -121,6 +121,7 @@ namespace generator
     void codeGenerator::visitLocalVarDecl(ast::LocalVarDecl *node)
     {
         routine_vars_n++;
+        curr_local_name = node->name;
         std::cout << "I'm adding var " << node->name << '\n';
         if (node->type)
         {
@@ -148,6 +149,9 @@ namespace generator
         {
             node->expr->accept(this);
         }
+
+        llvm::AllocaInst *curr_alloca = varAllocSymbolTable[node->var->name];
+        builder->CreateStore(inferred_value, curr_alloca);
     };
     // done
     void codeGenerator::visitRoutineCall(ast::RoutineCall *node)
@@ -300,14 +304,25 @@ namespace generator
     void codeGenerator::visitRecordType(ast::RecordType *node)
     {
         std::vector<llvm::Type *> recordFields;
+        std::vector<llvm::Value *> recValues;
         for (auto field : node->decls->vars)
         {
+            llvm::Value *inf;
             if (field)
             {
                 field->accept(this);
                 recordFields.push_back(inferred_type);
+
+                if (field->init)
+                {
+                    recValues.push_back(inferred_value);
+                    continue;
+                }
+                recValues.push_back(nullptr);
             }
         }
+        llvm::StructType *rec = llvm::StructType::create(context, recordFields, curr_local_name);
+        nameToRecordValues[curr_local_name] = recValues;
         llvm::StructType *recordType = llvm::StructType::create(recordFields, "recordFields");
         inferred_type = recordType;
     };
@@ -373,6 +388,7 @@ namespace generator
         llvm::AllocaInst *varAlloc = varAllocSymbolTable[node->name];
         inferred_value = builder->CreateLoad(varAlloc->getAllocatedType(), varAlloc, node->name.c_str());
         expected_type = varType[node->name];
+        curr_access_name = node->name;
         if (node->accesses)
         {
             for (auto AV : node->accesses->accesses)
@@ -419,6 +435,7 @@ namespace generator
             }
         }
         llvm::Value *fieldValue = builder->CreateExtractValue(recordValue, {index});
+        // std::cout << "Curr: " << curr_access_name;
         inferred_value = fieldValue;
     }
     void codeGenerator::visitRoutineCallValue(ast::RoutineCallValue *node)

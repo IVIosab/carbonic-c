@@ -97,11 +97,17 @@ namespace generator
         llvm::Value *doubleFmtStr = nullptr;
 
         int routine_vars_n = 0;
+        std::string curr_local_name;
+        std::string curr_access_name = "";
+
         std::unordered_map<std::string, llvm::AllocaInst *> varAllocSymbolTable;
         std::unordered_map<std::string, ast::Type *> varType;
-        std::vector<std::pair<std::string, llvm::AllocaInst *>> varStack;
+        // /std::unordered_map<std::string, std::unordered_map<std::string, std::pair<llvm::Type*, llvm::Value*>>> recordMemembers;
+        std::unordered_map<std::string, std::vector<llvm::Value *>> nameToRecordValues;
+        std::vector<std::pair<std::string, llvm::AllocaInst *>>
+            varStack;
         std::vector<std::pair<std::string, ast::Type *>> varTypeStack;
-        std::unordered_map<std::string, llvm::Function*> funTable;
+        std::unordered_map<std::string, llvm::Function *> funTable;
 
         void computeBinaryExprValue(llvm::Value *value1, llvm::Value *value2, BinaryOperator oper);
         void computeBinaryIntExprValue(llvm::Value *value1, llvm::Value *value2, BinaryOperator oper);
