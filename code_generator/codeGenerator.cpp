@@ -213,9 +213,9 @@ namespace generator
         }
 
         builder->SetInsertPoint(endBlock);
-        llvm::PHINode *phiNode = builder->CreatePHI(func->getReturnType(), 2, "return_value");
-        phiNode->addIncoming(inferred_if, thenBlock);
-        phiNode->addIncoming(inferred_else, elseBlock);
+        // llvm::PHINode *phiNode = builder->CreatePHI(func->getReturnType(), 2, "return_value");
+        // phiNode->addIncoming(inferred_if, thenBlock);
+        // phiNode->addIncoming(inferred_else, elseBlock);
         // builder->CreateRet(phiNode);
     };
     void codeGenerator::visitWhileLoop(ast::WhileLoop *node)
@@ -224,12 +224,12 @@ namespace generator
         llvm::BasicBlock *loopCondBB = llvm::BasicBlock::Create(context, "loopCond", func);
         llvm::BasicBlock *loopBodyBB = llvm::BasicBlock::Create(context, "loopBody", func);
         llvm::BasicBlock *loopExitBB = llvm::BasicBlock::Create(context, "loopExit", func);
-        
+
         builder->CreateBr(loopCondBB);
         builder->SetInsertPoint(loopCondBB);
         if (node->condition)
         {
-             node->condition->accept(this);
+            node->condition->accept(this);
         }
         llvm::Value *loopCond = inferred_value;
         builder->CreateCondBr(loopCond, loopBodyBB, loopExitBB);
@@ -237,7 +237,7 @@ namespace generator
         builder->SetInsertPoint(loopBodyBB);
         if (node->body)
         {
-             node->body->accept(this);
+            node->body->accept(this);
         }
 
         builder->CreateBr(loopCondBB);
@@ -249,12 +249,13 @@ namespace generator
         llvm::BasicBlock *loopCondBB = llvm::BasicBlock::Create(context, "loopCond", func);
         llvm::BasicBlock *loopBodyBB = llvm::BasicBlock::Create(context, "loopBody", func);
         llvm::BasicBlock *loopExitBB = llvm::BasicBlock::Create(context, "loopExit", func);
-        llvm::BasicBlock* loopInc = llvm::BasicBlock::Create(context, "loopInc", func);
-        
-        llvm::AllocaInst* iInst = builder->CreateAlloca(builder->getInt32Ty(), nullptr, node->name);
-        llvm::Value* i = iInst;
-        llvm::Value* cond = nullptr;
-        if(!node->range->reverse){
+        llvm::BasicBlock *loopInc = llvm::BasicBlock::Create(context, "loopInc", func);
+
+        llvm::AllocaInst *iInst = builder->CreateAlloca(builder->getInt32Ty(), nullptr, node->name);
+        llvm::Value *i = iInst;
+        llvm::Value *cond = nullptr;
+        if (!node->range->reverse)
+        {
             node->range->from->accept(this);
             builder->CreateStore(inferred_value, i);
             builder->CreateBr(loopCondBB);
@@ -262,7 +263,8 @@ namespace generator
             node->range->to->accept(this);
             cond = builder->CreateICmpSLT(builder->CreateLoad(iInst->getAllocatedType(), i, node->name.c_str()), inferred_value, "loopCond");
         }
-        else{
+        else
+        {
             node->range->to->accept(this);
             builder->CreateStore(inferred_value, i);
             builder->CreateBr(loopCondBB);
@@ -270,21 +272,23 @@ namespace generator
             node->range->from->accept(this);
             cond = builder->CreateICmpSGT(builder->CreateLoad(iInst->getAllocatedType(), i, node->name.c_str()), inferred_value, "loopCondReverse");
         }
-        
+
         builder->CreateCondBr(cond, loopBodyBB, loopExitBB);
         builder->SetInsertPoint(loopBodyBB);
         if (node->body)
         {
-             node->body->accept(this);
+            node->body->accept(this);
         }
         builder->CreateBr(loopInc);
         builder->SetInsertPoint(loopInc);
-        llvm::Value* bodyI = builder->CreateLoad(iInst->getAllocatedType(), i, node->name.c_str());
-        llvm::Value* iRes = nullptr;
-        if(!node->range->reverse){
+        llvm::Value *bodyI = builder->CreateLoad(iInst->getAllocatedType(), i, node->name.c_str());
+        llvm::Value *iRes = nullptr;
+        if (!node->range->reverse)
+        {
             iRes = builder->CreateAdd(bodyI, builder->getInt32(1), "bodyRes");
         }
-        else{
+        else
+        {
             iRes = builder->CreateSub(bodyI, builder->getInt32(1), "bodyRes");
         }
         builder->CreateStore(iRes, i);
