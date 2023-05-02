@@ -1,14 +1,7 @@
-routine test () : integer is 
-    var y : record 
-        var a : integer is 7;
-        var b : integer is 3;
-    end;
-    var x : integer is 5;
-    y.a := (5+7);
-    print(y.a);
-	return 0;
-end
-routine main () : integer is
-    test();
-    return 0;
+routine main () : integer is 
+    var a : integer is 0;
+    while (a < 2) loop
+        a := 2;
+    end
+    return (a - 2);
 end

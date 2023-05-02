@@ -199,17 +199,31 @@ namespace generator
             node->else_->accept(this);
         }
     };
-    void codeGenerator::visitWhileLoop(ast::WhileLoop *node)
+   void codeGenerator::visitWhileLoop(ast::WhileLoop *node)
     {
-        ast::Type *cond_type;
+        llvm::Function *func = builder->GetInsertBlock()->getParent();
+        llvm::BasicBlock *loopCondBB = llvm::BasicBlock::Create(context, "loopCond", func);
+        llvm::BasicBlock *loopBodyBB = llvm::BasicBlock::Create(context, "loopBody", func);
+        llvm::BasicBlock *loopExitBB = llvm::BasicBlock::Create(context, "loopExit", func);
+        
+        builder->CreateBr(loopCondBB);
+        builder->SetInsertPoint(loopCondBB);
         if (node->condition)
         {
-            node->condition->accept(this);
+             node->condition->accept(this);
         }
+        llvm::Value *loopCond = inferred_value;
+        builder->CreateCondBr(loopCond, loopBodyBB, loopExitBB);
+
+        builder->CreateBr(loopBodyBB);
+        builder->SetInsertPoint(loopBodyBB);
         if (node->body)
         {
-            node->body->accept(this);
+             node->body->accept(this);
         }
+
+        builder->CreateBr(loopCondBB);
+        builder->SetInsertPoint(loopExitBB);
     };
     void codeGenerator::visitForLoop(ast::ForLoop *node)
     {
@@ -619,6 +633,7 @@ namespace generator
                 varAllocSymbolTable.erase(delVar);
                 varType.erase(delVar);
                 varStack.pop_back();
+                varTypeStack.pop_back();
                 llvm::AllocaInst *shadowed_i = nullptr;
                 for (auto i : varStack)
                 {
