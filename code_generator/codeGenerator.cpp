@@ -110,6 +110,7 @@ namespace generator
     // done
     void codeGenerator::visitBody(ast::Body *node)
     {
+        std::cout << "Inside body\n";
         for (auto entity : node->entities)
         {
             if (entity)
@@ -182,19 +183,40 @@ namespace generator
     };
     void codeGenerator::visitIf(ast::If *node)
     {
-        ast::Type *cond_type;
+        llvm::Function *func = builder->GetInsertBlock()->getParent();
+        llvm::BasicBlock *thenBlock = llvm::BasicBlock::Create(context, "then", func);
+        llvm::BasicBlock *elseBlock = llvm::BasicBlock::Create(context, "else", func);
+        llvm::BasicBlock *endBlock = llvm::BasicBlock::Create(context, "end", func);
+
         if (node->condition)
         {
             node->condition->accept(this);
         }
+
+        llvm::Value *cmp = inferred_value;
+        llvm::Value *inferred_if;
+        llvm::Value *inferred_else;
+        builder->CreateCondBr(cmp, thenBlock, elseBlock);
         if (node->then)
         {
+            builder->SetInsertPoint(thenBlock);
             node->then->accept(this);
+            builder->CreateBr(endBlock);
+            inferred_if = inferred_value;
         }
         if (node->else_)
         {
+            builder->SetInsertPoint(elseBlock);
             node->else_->accept(this);
+            builder->CreateBr(endBlock);
+            inferred_else = inferred_value;
         }
+
+        builder->SetInsertPoint(endBlock);
+        llvm::PHINode *phiNode = builder->CreatePHI(func->getReturnType(), 2, "return_value");
+        phiNode->addIncoming(inferred_if, thenBlock);
+        phiNode->addIncoming(inferred_else, elseBlock);
+        // builder->CreateRet(phiNode);
     };
     void codeGenerator::visitWhileLoop(ast::WhileLoop *node)
     {
@@ -435,6 +457,10 @@ namespace generator
         llvm::AllocaInst *varAlloc = varAllocSymbolTable[node->name];
         inferred_value = builder->CreateLoad(varAlloc->getAllocatedType(), varAlloc, node->name.c_str());
         expected_type = varType[node->name];
+        if (auto x = dynamic_cast<ast::IntegerType *>(expected_type))
+        {
+            std::cout << "X is integer";
+        }
         curr_access_name = node->name;
         if (node->accesses)
         {
@@ -482,7 +508,7 @@ namespace generator
             }
         }
         llvm::Value *fieldValue = builder->CreateExtractValue(recordValue, {index});
-        // std::cout << "Curr: " << curr_access_name;
+        // std::cout << "Curr: " << curr_access_name
         inferred_value = fieldValue;
     }
     void codeGenerator::visitRoutineCallValue(ast::RoutineCallValue *node)
@@ -498,10 +524,12 @@ namespace generator
             }
             llvm::ArrayRef argsRef(args);
             llvm::CallInst *call = builder->CreateCall(func, argsRef, func->getName());
+            inferred_value = call;
         }
         else
         {
             llvm::CallInst *call = builder->CreateCall(func, {}, func->getName());
+            inferred_value = call;
         }
     };
     // Utility functions
