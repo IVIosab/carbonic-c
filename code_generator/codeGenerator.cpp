@@ -134,17 +134,28 @@ namespace generator
     };
     void codeGenerator::visitAssignment(ast::Assignment *node)
     {
-        if (node->var)
-        {
-            node->var->accept(this);
-        }
+
         if (node->expr)
         {
             node->expr->accept(this);
         }
+        if (node->var->accesses)
+        {
 
-        llvm::AllocaInst *curr_alloca = varAllocSymbolTable[node->var->name];
-        builder->CreateStore(inferred_value, curr_alloca);
+            if (node->var->accesses->accesses.size())
+            {
+
+                if (auto recAccess = dynamic_cast<ast::RecordAccess *>(node->var->accesses->accesses[0]))
+                {
+
+                    recordMemembers[node->var->name][recAccess->name].second = inferred_value;
+                    return;
+                }
+            }
+
+            llvm::AllocaInst *curr_alloca = varAllocSymbolTable[node->var->name];
+            builder->CreateStore(inferred_value, curr_alloca);
+        }
     };
     void codeGenerator::visitRoutineCall(ast::RoutineCall *node)
     {
@@ -374,6 +385,7 @@ namespace generator
     {
         std::vector<llvm::Type *> recordFields;
         std::vector<llvm::Value *> recValues;
+        std::string recName = curr_local_name;
         for (auto field : node->decls->vars)
         {
             llvm::Value *inf;
@@ -381,18 +393,15 @@ namespace generator
             {
                 field->accept(this);
                 recordFields.push_back(inferred_type);
-
-                if (field->init)
-                {
-                    recValues.push_back(inferred_value);
-                    continue;
-                }
-                recValues.push_back(nullptr);
+                recordMemembers[recName][field->name].first = inferred_type;
+                recordMemembers[recName][field->name].second = inferred_value;
             }
         }
+
         llvm::StructType *rec = llvm::StructType::create(context, recordFields, curr_local_name);
-        nameToRecordValues[curr_local_name] = recValues;
+        nameToRecordValues[recName] = recValues;
         llvm::StructType *recordType = llvm::StructType::create(recordFields, "recordFields");
+
         inferred_type = recordType;
     };
     void codeGenerator::visitBinaryExpr(ast::BinaryExpr *node)
@@ -468,9 +477,9 @@ namespace generator
         }
         expected_type = varType[node->name];
 
-        curr_access_name = node->name;
         if (node->accesses)
         {
+            curr_access_name = node->name;
             for (auto AV : node->accesses->accesses)
             {
                 if (AV)
@@ -515,8 +524,7 @@ namespace generator
             }
         }
         llvm::Value *fieldValue = builder->CreateExtractValue(recordValue, {index});
-        // std::cout << "Curr: " << curr_access_name
-        inferred_value = fieldValue;
+        inferred_value = recordMemembers[curr_access_name][node->name].second;
     }
     void codeGenerator::visitRoutineCallValue(ast::RoutineCallValue *node)
     {
