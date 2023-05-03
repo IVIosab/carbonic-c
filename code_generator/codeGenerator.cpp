@@ -61,7 +61,6 @@ namespace generator
         {
             for (int i = 0; i < node->params->decls.size(); i++)
             {
-                std::cout << "I'm adding param " << node->params->decls[i]->name << '\n';
                 routine_vars_n++;
                 llvm::Value *arg = (func->arg_begin() + i);
                 arg->setName(node->params->decls[i]->name);
@@ -96,21 +95,16 @@ namespace generator
         {
             node->type->accept(this);
         }
-        llvm::AllocaInst *x = builder->CreateAlloca(inferred_type, nullptr, node->name);
         if (node->init)
         {
             node->init->accept(this);
         }
-        builder->CreateStore(inferred_value, x);
-        varAllocSymbolTable[node->name] = x;
         varType[node->name] = node->type;
-        varStack.push_back({node->name, x});
-        varTypeStack.push_back({node->name, node->type});
+        llvm::GlobalVariable *globalVar = new llvm::GlobalVariable(*module, inferred_type, false, llvm::GlobalValue::ExternalLinkage, llvm::dyn_cast<llvm::Constant>(inferred_value), node->name);
     }
     // done
     void codeGenerator::visitBody(ast::Body *node)
     {
-        std::cout << "Inside body\n";
         for (auto entity : node->entities)
         {
             if (entity)
@@ -123,7 +117,6 @@ namespace generator
     {
         routine_vars_n++;
         curr_local_name = node->name;
-        std::cout << "I'm adding var " << node->name << '\n';
         if (node->type)
         {
             node->type->accept(this);
@@ -335,6 +328,9 @@ namespace generator
         else
         {
             // PANIC
+            std::cout << "Panicking -- Unkown expression type" << std::endl;
+            type->print(llvm::outs(), true);
+            std::cout << std::endl;
             throw "Unknown inferred expression type";
         }
         builder->CreateCall(printf, {formatStr, inferred_value});
@@ -459,12 +455,19 @@ namespace generator
     void codeGenerator::visitVar(ast::Var *node)
     {
         llvm::AllocaInst *varAlloc = varAllocSymbolTable[node->name];
-        inferred_value = builder->CreateLoad(varAlloc->getAllocatedType(), varAlloc, node->name.c_str());
-        expected_type = varType[node->name];
-        if (auto x = dynamic_cast<ast::IntegerType *>(expected_type))
+
+        if (!varAlloc)
         {
-            std::cout << "X is integer";
+            llvm::GlobalVariable *var = module->getNamedGlobal(node->name);
+            inferred_value = builder->CreateLoad(var->getValueType(), var, node->name.c_str());
         }
+
+        else
+        {
+            inferred_value = builder->CreateLoad(varAlloc->getAllocatedType(), varAlloc, node->name.c_str());
+        }
+        expected_type = varType[node->name];
+
         curr_access_name = node->name;
         if (node->accesses)
         {
@@ -694,7 +697,6 @@ namespace generator
             if (varStack.size())
             {
                 std::string delVar = varStack[varStack.size() - 1].first;
-                std::cout << "I'm deleting var " << delVar << '\n';
                 varAllocSymbolTable.erase(delVar);
                 varType.erase(delVar);
                 varStack.pop_back();
