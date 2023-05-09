@@ -10,7 +10,7 @@
 namespace ast
 {
     typedef long long Integer;
-    typedef long double Real;
+    typedef double Real;
     typedef bool Boolean;
     typedef std::string Ident;
 

@@ -10,9 +10,9 @@ full_lexer:
 	g++ lexer.cpp -o output.out
 	
 full_parser:
-	flex -o lexer.cpp -i lexer.l
-	bison -d parser.ypp -o parser.cpp
-	g++ -g main.cpp lexer.cpp parser.cpp driver.cpp astPrinter.cpp prettyPrinter.cpp semantic.cpp -o output.out 
+	flex -o ./build/lexer.cpp -i ./lexical_analysis/lexer.l
+	bison -d ./parser/parser.ypp -o ./build/parser.cpp
+	g++ -g main.cpp ./build/lexer.cpp ./build/parser.cpp ./driver/driver.cpp ./printer/astPrinter.cpp ./printer/prettyPrinter.cpp ./semantic/semantic.cpp ./code_generator/code_generator.cpp -o output.out 
 	./output.out < test.crbc
 # Tests 
 test: build
@@ -29,4 +29,5 @@ build:
 	cd build && cmake .. && make
 
 run: build
-	./build/carbonic_c > output.txt
+	./build/carbonic_c < example.crbc 2> output.ll
+	lli output.ll
