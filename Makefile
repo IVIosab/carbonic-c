@@ -29,5 +29,8 @@ build:
 	cd build && cmake .. && make
 
 run: build
+	./build/carbonic_c 2> output.out
+
+run/file: build
 	./build/carbonic_c < example.crbc 2> output.ll
 	lli output.ll

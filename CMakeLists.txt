@@ -40,3 +40,19 @@ llvm_map_components_to_libnames(llvm_libs support core irreader)
 target_compile_features(carbonic_c PUBLIC cxx_std_17)
 
 target_link_libraries(carbonic_c ${llvm_libs})
+
+# Testing
+enable_testing()
+
+file(GLOB_RECURSE invalid_tests "tests/inputs/invalid/*.crbc")
+foreach(test ${invalid_tests})
+    get_filename_component(testname ${test} NAME_WE)
+    add_test(NAME ${testname} COMMAND sh -c "./carbonic_c < ${test}"; exit $?)
+    set_tests_properties(${testname} PROPERTIES WILL_FAIL true)
+endforeach()
+
+file(GLOB_RECURSE component_tests "tests/inputs/components/*.crbc")
+foreach(test ${component_tests})
+    get_filename_component(testname ${test} NAME_WE)
+    add_test(NAME ${testname} COMMAND sh -c "./carbonic_c < ${test}"; exit $?)
+endforeach()
