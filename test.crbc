@@ -1,9 +1,0 @@
-routine  main() : integer is 
-    var x : integer is 5;
-    var y : integer is 3;
-    var z : record
-        var x : boolean is false;
-        var y : integer is 1;
-    end;
-    return z.x;
-end

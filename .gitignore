@@ -1,10 +1,9 @@
-.vscode
 parser.cpp
 parser.hpp
 tokens.cpp
-parser
 *.o
 lexer.cpp
 *.out
 tests/outputs/
 build/
+output.txt
