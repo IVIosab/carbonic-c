@@ -18,6 +18,9 @@ full_parser:
 test: build
 	bash ./test.sh
 
+test/ctest: build
+	cd build && ctest
+
 # Cleaning
 clean:
 	rm -rf build

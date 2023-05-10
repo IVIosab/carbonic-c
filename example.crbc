@@ -1,7 +1,9 @@
 routine main () : integer is 
-    var a : integer is 0;
-    while (a < 2) loop
-        a := 2;
-    end
-    return (a - 2);
+    var x : integer is 7;
+    var y : integer is 4;
+    var z : integer is x % y;
+
+    print(z);
+
+    return 0;
 end
