@@ -24,8 +24,11 @@ clean:
 	rm -rf tests/outputs
 	rm -f output.txt
 
-build:
-	mkdir build
+build: build/all
+	cd build && make
+
+build/all:
+	mkdir -p build
 	cd build && cmake .. && make
 
 run: build
