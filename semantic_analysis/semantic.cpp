@@ -298,7 +298,12 @@ namespace analyzer
             node->expr->accept(this);
         }
     };
-
+    void Semantic::visitTypeIdentifier(ast::TypeIdentifier *p){
+        if(!typeDeclSymbolTable.count(p->name)){
+            err_undefined_obj(p->name);
+        }
+        actual_type = typeDeclSymbolTable[p->name];
+    }
     void Semantic::visitIntegerType(ast::IntegerType *node)
     {
         actual_type = node;

@@ -43,7 +43,7 @@ namespace analyzer
         void visitType(ast::Type *p){}
         void visitPrimitiveType(ast::PrimitiveType *p){}
         void visitUserType(ast::UserType *p){}
-        void visitTypeIdentifier(ast::TypeIdentifier *p){} //-> doesn't get visited
+        void visitTypeIdentifier(ast::TypeIdentifier *p);
         void visitIntegerType(ast::IntegerType *p);
         void visitRealType(ast::RealType *p);
         void visitBooleanType(ast::BooleanType *p);
