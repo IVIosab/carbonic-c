@@ -1,9 +1,11 @@
 routine main () : integer is 
-    var ar : array [2] integer;
-
-    for i in 1 .. 2 loop
-        ar[i] := i;
+    if false then 
+        print(1);
+        return 0;
+    else
+        print(6);
+        return 1;
     end
-
+    print(5);
     return 0;
 end
