@@ -9,15 +9,6 @@
 // #include "llvm/IR/IRBuilder.h"
 extern ast::Program *program;
 
-namespace generator
-{
-    class CodeGenerator : public ast::Visitor
-    {
-    public:
-        llvm::IRBuilder<> m_builder;
-    };
-}
-
 int main(int argc, char **argv)
 {
     carbonic_c::Driver driver;
