@@ -47,12 +47,38 @@ enable_testing()
 file(GLOB_RECURSE invalid_tests "tests/inputs/invalid/*.crbc")
 foreach(test ${invalid_tests})
     get_filename_component(testname ${test} NAME_WE)
-    add_test(NAME invalid/${testname} COMMAND sh -c "./carbonic_c < ${test}"; exit $?)
+    get_filename_component(testdir ${test} DIRECTORY)
+    string(REPLACE "inputs" "outputs" output_dir ${testdir})
+    set(output_file "${output_dir}/${testname}.out")
+    add_test(NAME invalid/${testname} COMMAND sh -c "mkdir -p ${output_dir} && ./carbonic_c < ${test} > ${output_file}")
     set_tests_properties(invalid/${testname} PROPERTIES WILL_FAIL true)
 endforeach()
 
 file(GLOB_RECURSE component_tests "tests/inputs/components/*.crbc")
 foreach(test ${component_tests})
     get_filename_component(testname ${test} NAME_WE)
-    add_test(NAME valid/${testname} COMMAND sh -c "./carbonic_c < ${test}"; exit $?)
+    get_filename_component(testdir ${test} DIRECTORY)
+    string(REPLACE "inputs" "outputs" output_dir ${testdir})
+    set(output_file "${output_dir}/${testname}.out")
+    add_test(NAME ${testdir}/${testname} COMMAND sh -c "mkdir -p ${output_dir} && ./carbonic_c < ${test} > ${output_file}")
+endforeach()
+
+file(GLOB_RECURSE component_tests "tests/inputs/code_generation/*.crbc")
+foreach(test ${component_tests})
+    get_filename_component(testname ${test} NAME_WE)
+    get_filename_component(testdir ${test} DIRECTORY)
+    string(REPLACE "inputs" "outputs" output_dir ${testdir})
+    set(expected_output_init "${testdir}/${testname}.txt")
+    string(REPLACE "programs" "expected_outputs" expected_output_file ${expected_output_init})
+    set(output_file "${output_dir}/${testname}.out")
+    set(generated_code_file "${output_dir}/${testname}.ll")
+    add_test(NAME ${testdir}/${testname}
+        COMMAND sh -c "mkdir -p ${output_dir} && ./carbonic_c < ${test} > ${output_file} 2> ${generated_code_file} && lli ${generated_code_file} | tee ${output_file}"
+    )
+    file(READ ${expected_output_file} expected_output)
+    set_tests_properties(${testdir}/${testname}
+        PROPERTIES PASS_REGULAR_EXPRESSION ${expected_output}
+        OUTPUT_VARIABLE test_output
+    )
+
 endforeach()
