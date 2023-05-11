@@ -87,11 +87,11 @@ Below are some of the main characteristics of the language:
 
 * The langugae is static. Object types are fixed at object declarations and cannot change during program execution.
 * There are three predefined data types: integer, real, boolean.
-* There are two predefined data structures: structs, arrays.
-* Full expression syntax with usual set of operators.
+* There are two predefined data structures: records, arrays.
+* Full expression syntax with usual set of binary, logical, and comparison operators.
 * The language is compiled, `LLVM` bytecode being the target.
-* The structure of the program is a sequence of data and routine declarations.
-* The language features a standard set of statements: Assignment, if/while, return, output.
+* The structure of the program is a sequence of data and routine (function)declarations.
+* The language features a standard set of statements: Assignment, if, for, while, return, print.
 
 
 ### Built With
@@ -137,6 +137,11 @@ Below are the instructions for setting up the project locally on a Linux machine
   sudo apt install cmake=2.6.4
   ```
 
+* llvm 14.0.0
+  ```sh
+  sudo apt install llvm-14
+  ```
+
 <!-- USAGE EXAMPLES -->
 ## Usage
 
@@ -176,24 +181,7 @@ The project uses `CMake` as a build tool and contains a `Makefile` to provide an
   make build/all
   ```
 
-
-
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
-<!-- ROADMAP -->
-## Roadmap
-
-- [ ] Feature 1
-- [ ] Feature 2
-- [ ] Feature 3
-    - [ ] Nested Feature
-
-See the [open issues](https://github.com/IVIosab/carbonic-c/issues) for a full list of proposed features (and known issues).
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 
 
 <!-- CONTRIBUTING -->
@@ -207,7 +195,8 @@ Don't forget to give the project a star! Thanks again!
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
 3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
+4. Push to the Branch (`git puge is compiled, `LLVM` bytecode being the target.
+* The strucsh origin feature/AmazingFeature`)
 5. Open a Pull Request
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -217,21 +206,9 @@ Don't forget to give the project a star! Thanks again!
 <!-- LICENSE -->
 ## License
 
-Distributed under the MIT License. See `LICENSE.txt` for more information.
+Distributed under the 3-Clause BSD License. See `LICENSE.txt` for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
-<!-- CONTACT -->
-## Contact
-
-Your Name - [@twitter_handle](https://twitter.com/twitter_handle) - email@email_client.com
-
-Project Link: [https://github.com/IVIosab/carbonic-c](https://github.com/IVIosab/carbonic-c)
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 
 
 <!-- ACKNOWLEDGMENTS -->
