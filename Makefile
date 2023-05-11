@@ -26,7 +26,9 @@ build/all: clean
 	cd build && cmake .. && make
 
 run: build
-	./build/carbonic_c 2> output.out
+	./build/carbonic_c 2> output.ll
+	lli output.ll
+	mv -f output.ll build
 
 run/file: build
 	./build/carbonic_c < input.crbc 2> output.ll

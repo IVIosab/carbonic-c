@@ -29,7 +29,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/IVIosab/carbonic-c">
-    <img src="assets/Carbonic_C_icon.png" alt="Logo" width="80" height="80">
+    <img src="assets/Carbonic_C_icon_white_bg.png" alt="Logo" width="80" height="80">
   </a>
 
 <h3 align="center">Carbonic-C</h3>
@@ -47,7 +47,10 @@
   <summary>Table of Contents</summary>
   <ol>
     <li>
-      <a href="#about-the-project">About The Project</a>
+      <ul>
+      <li><a href="#about-the-project">About The Project</a></li>
+      <li><a href="#about-the-project">Visual Studio Code Extension</a></li>
+      </ul>
       <ul>
         <li><a href="#built-with">Built With</a></li>
       </ul>
@@ -56,7 +59,6 @@
       <a href="#getting-started">Getting Started</a>
       <ul>
         <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
       </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
@@ -83,6 +85,12 @@ Below are some of the main characteristics of the language:
 - The language is compiled, `LLVM` bytecode being the target.
 - The structure of the program is a sequence of data and routine (function)declarations.
 - The language features a standard set of statements: Assignment, if, for, while, return, print.
+
+## Visual Studio Code Extension
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+Carbonic-C has a VS Code extension that offers syntax highlighting and auto-completion. You can check it out [here](https://marketplace.visualstudio.com/items?itemName=AsemAbdelhady.CarbonicC)
 
 ### Built With
 
@@ -182,7 +190,6 @@ The project uses `CMake` as a build tool and contains a `Makefile` to provide an
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- CONTRIBUTING -->
-
 ## Contributing
 
 Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
@@ -193,13 +200,11 @@ Don't forget to give the project a star! Thanks again!
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
 3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git puge is compiled, `LLVM` bytecode being the target.
-
-- The strucsh origin feature/AmazingFeature`)
-
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 
 <!-- LICENSE -->
 

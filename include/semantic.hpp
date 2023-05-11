@@ -38,10 +38,10 @@ namespace analyzer
         void visitRealValue(ast::RealValue *p);
         void visitBooleanValue(ast::BooleanValue *p);
         void visitRoutineCallValue(ast::RoutineCallValue *p);
-        
-        void visitType(ast::Type *p){}
-        void visitPrimitiveType(ast::PrimitiveType *p){}
-        void visitUserType(ast::UserType *p){}
+
+        void visitType(ast::Type *p) {}
+        void visitPrimitiveType(ast::PrimitiveType *p) {}
+        void visitUserType(ast::UserType *p) {}
         void visitTypeIdentifier(ast::TypeIdentifier *p);
         void visitIntegerType(ast::IntegerType *p);
         void visitRealType(ast::RealType *p);
@@ -150,23 +150,28 @@ namespace analyzer
             routine_vars_n++;
         }
         // Remove params from scope when exiting a routine declaration
-        void removeVarFromScope(){
-            if(varStack.size()){
-                std::string delVar = varStack[varStack.size()-1].first;
+        void removeVarFromScope()
+        {
+            if (varStack.size())
+            {
+                std::string delVar = varStack[varStack.size() - 1].first;
                 varDeclSymbolTable.erase(delVar);
                 varStack.pop_back();
-                ast::Type* shadowed_i = nullptr;
-                for (auto i : varStack){
-                    if (i.first == delVar){
+                ast::Type *shadowed_i = nullptr;
+                for (auto i : varStack)
+                {
+                    if (i.first == delVar)
+                    {
                         shadowed_i = i.second;
                         break;
                     }
                 }
-                if(shadowed_i)
+                if (shadowed_i)
                     varDeclSymbolTable[delVar] = shadowed_i;
             }
         }
-        void testing()
+        // Check that arguments of routine call match params' types in function decl
+        void routineCallCheck(ast::ParameterList *params, ast::ExprList *args)
         {
             for (int i = 0; i < args->exprs.size(); i++)
             {
