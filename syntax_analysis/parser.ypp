@@ -64,9 +64,9 @@
 %type <ast::LogicExpr*> LOGIC;
 %type <ast::ComparisonExpr*> COMPARISON;
 %type <ast::Value*> VALUE;
-%type <ast::IntegerValue*> INTEGER_VALUE;
+/* %type <ast::IntegerValue*> INTEGER_VALUE;
 %type <ast::RealValue*> REAL_VALUE;
-%type <ast::BooleanValue*> BOOLEAN_VALUE;
+%type <ast::BooleanValue*> BOOLEAN_VALUE; */
 %type <ast::Var*> VAR;
 %type <ast::RoutineCallValue*> ROUTINE_CALL_VALUE;
 %type <ast::TypeDecl*> TYPE_DECL;
@@ -74,9 +74,9 @@
 %type <ast::PrimitiveType*> PRIMITIVE_TYPE;
 %type <ast::UserType*> USER_TYPE;
 %type <ast::TypeIdentifier*> TYPE_IDENTIFIER;
-%type <ast::IntegerType*> INTEGER_TYPE;
+/* %type <ast::IntegerType*> INTEGER_TYPE;
 %type <ast::RealType*> REAL_TYPE;
-%type <ast::BooleanType*> BOOLEAN_TYPE;
+%type <ast::BooleanType*> BOOLEAN_TYPE; */
 %type <ast::ArrayType*> ARRAY_TYPE;
 %type <ast::RecordType*> RECORD_TYPE;
 %type <ast::ParameterDecl*> PARAMETER_DECL;
@@ -93,7 +93,7 @@
 %type <ast::ForLoop*> FOR_LOOP;
 %type <ast::Range*> RANGE;
 %type <ast::If*> IF;
-%type <ast::NestedAccess*> NESTED_ACCESS;
+/* %type <ast::NestedAccess*> NESTED_ACCESS; */
 %type <ast::NestedAccessList*> NESTED_ACCESS_LIST;
 %type <ast::ArrayAccess*> ARRAY_ACCESS;
 %type <ast::RecordAccess*> RECORD_ACCESS;
