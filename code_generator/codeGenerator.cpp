@@ -224,11 +224,8 @@ namespace generator
         {
             builder->SetInsertPoint(thenBlock);
             node->then->accept(this);
-            if (!node->else_)
-            {
-                builder->CreateBr(endBlock);
-                builder->GetInsertBlock();
-            }
+            builder->CreateBr(endBlock);
+            builder->GetInsertBlock();
         }
         builder->SetInsertPoint(elseBlock);
         if (node->else_)
