@@ -7,6 +7,7 @@ routine rec (x : real) : real is
     end
     return x;
 end
+
 routine main () : integer is 
     var z : real is rec(7.0);
     print(z);

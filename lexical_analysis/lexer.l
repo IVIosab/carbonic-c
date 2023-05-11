@@ -72,6 +72,8 @@ int getno(){
 "xor"                   {return carbonic_c::Parser::make_TK_XOR();}
 [0-9]+\.[0-9]+          {return carbonic_c::Parser::make_TK_REAL_LITERAL(atof(yytext));} 
 [0-9]+                  {return carbonic_c::Parser::make_TK_INTEGER_LITERAL(atoi(yytext));}
+-[0-9]+\.[0-9]+          {return carbonic_c::Parser::make_TK_REAL_LITERAL(atof(yytext));} 
+-[0-9]+                  {return carbonic_c::Parser::make_TK_INTEGER_LITERAL(atoi(yytext));}
 \/\/(.*)                {/*: will ignore and do nothing*/}
 true                    {return carbonic_c::Parser::make_TK_BOOLEAN_LITERAL(true);}
 false                   {return carbonic_c::Parser::make_TK_BOOLEAN_LITERAL(false);}

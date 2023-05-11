@@ -9,11 +9,11 @@ namespace analyzer
     {
     public:
         void visitProgram(ast::Program *p);
-        void visitDecl(ast::Decl *p){}
+        void visitDecl(ast::Decl *p) {}
         void visitTypeDecl(ast::TypeDecl *p);
         void visitGlobalVarDecl(ast::GlobalVarDecl *p);
         void visitRoutineDecl(ast::RoutineDecl *p);
-        
+
         void visitBody(ast::Body *p);
         void visitBodyEntity(ast::BodyEntity *p){};
         void visitLocalVarDecl(ast::LocalVarDecl *p);
@@ -28,9 +28,8 @@ namespace analyzer
         void visitForLoop(ast::ForLoop *p);
         void visitRange(ast::Range *p);
 
-
         void visitExpr(ast::Expr *p) {}
-        void visitExprList(ast::ExprList *p){}
+        void visitExprList(ast::ExprList *p) {}
         void visitBinaryExpr(ast::BinaryExpr *p);
         void visitLogicExpr(ast::LogicExpr *p);
         void visitComparisonExpr(ast::ComparisonExpr *p);
@@ -49,19 +48,19 @@ namespace analyzer
         void visitBooleanType(ast::BooleanType *p);
         void visitArrayType(ast::ArrayType *p);
         void visitRecordType(ast::RecordType *p);
-        void visitInteger(ast::Integer x){} //  -> doesn't get visited
-        void visitReal(ast::Real x){} // -> doesn't get visited
-        void visitBoolean(ast::Boolean x){} //  -> doesn't get visited
-        void visitIdent(Ident x){} //  -> doesn't get visited
-        
+        void visitInteger(ast::Integer x) {} //  -> doesn't get visited
+        void visitReal(ast::Real x) {}       // -> doesn't get visited
+        void visitBoolean(ast::Boolean x) {} //  -> doesn't get visited
+        void visitIdent(Ident x) {}          //  -> doesn't get visited
+
         void visitVar(ast::Var *p);
         void visitNestedAccess(ast::NestedAccess *p) {}
-        void visitNestedAccessList(ast::NestedAccessList *p){}
+        void visitNestedAccessList(ast::NestedAccessList *p) {}
         void visitArrayAccess(ast::ArrayAccess *p);
         void visitRecordAccess(ast::RecordAccess *p);
-        
+
         void visitParameterDecl(ast::ParameterDecl *p); //  -> doesn't get visited
-        void visitParameterList(ast::ParameterList *p){}
+        void visitParameterList(ast::ParameterList *p) {}
 
     private:
         size_t depth;
@@ -72,9 +71,10 @@ namespace analyzer
         std::vector<std::pair<std::string, ast::Type *>> varStack;
         int routine_vars_n = 0;
         ast::Type *actual_type = nullptr;
-        ast::Type* routine_return_type = nullptr;
-        ast::Type* current_var_type = nullptr;
-        void err_second_declaration(std::string name){
+        ast::Type *routine_return_type = nullptr;
+        ast::Type *current_var_type = nullptr;
+        void err_second_declaration(std::string name)
+        {
             std::cout << "Error: second declaration of " << name << " is invalid.\n";
             exit(1);
         }
@@ -86,10 +86,13 @@ namespace analyzer
 
         void err_expected_got(std::string expected, std::string got)
         {
-            std::cout << "Error: Expected:\n" << expected << ",\ngot: \n" << got << '\n';
+            std::cout << "Error: Expected:\n"
+                      << expected << ",\ngot: \n"
+                      << got << '\n';
             exit(1);
         }
-        void err_wrong_params_number(int expected, int got){
+        void err_wrong_params_number(int expected, int got)
+        {
             std::cout << "Error: Expected number of params: " << expected << " got: " << got << '\n';
             exit(1);
         }
@@ -101,7 +104,8 @@ namespace analyzer
         // Print expected/got type
         std::string type_to_string(ast::Type *type)
         {
-            if (type == nullptr){
+            if (type == nullptr)
+            {
                 return "nullptr";
             }
             if (auto type_int = dynamic_cast<ast::IntegerType *>(type))
@@ -132,17 +136,18 @@ namespace analyzer
         // Typecheck types using the overloaded == operator
         void typecheck_types(ast::Type *type1, ast::Type *type2)
         {
-            if((*type1) == (*type2) )
+            if ((*type1) == (*type2))
                 return;
             std::string first = type_to_string(type1),
                         second = type_to_string(type2);
             err_expected_got(first, second);
         }
-        void add_param_to_scope(Ident name){
+        void add_param_to_scope(Ident name)
+        {
             ast::Type *var_type = actual_type;
             varDeclSymbolTable[name] = var_type;
             varStack.push_back({name, var_type});
-            routine_vars_n ++ ;
+            routine_vars_n++;
         }
         // Remove params from scope when exiting a routine declaration
         void removeVarFromScope(){
@@ -163,22 +168,17 @@ namespace analyzer
         }
         void testing()
         {
-            ast::Type *test = new ast::IntegerType();
-            auto t = dynamic_cast<ast::IntegerType *>(test);
-            if (t)
+            for (int i = 0; i < args->exprs.size(); i++)
             {
-                std::cout << "GOOOD" << std::endl;
-            }
-        }
-        // Check that arguments of routine call match params' types in function decl
-        void routineCallCheck(ast::ParameterList* params, ast::ExprList* args){
-            for (int i = 0; i < args->exprs.size(); i++){
-                if(params->decls[i]->type && args->exprs[i]){
-                    if(args->exprs[i]){
+                if (params->decls[i]->type && args->exprs[i])
+                {
+                    if (args->exprs[i])
+                    {
                         actual_type = nullptr;
                         args->exprs[i]->accept(this);
                     }
-                    if(actual_type){
+                    if (actual_type)
+                    {
                         typecheck_types(params->decls[i]->type, actual_type);
                     }
                 }
