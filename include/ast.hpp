@@ -117,9 +117,9 @@ namespace ast
     {
     public:
         virtual void accept(Visitor *v) = 0;
-        virtual bool operator==(const Visitable& rhs) const
+        virtual bool operator==(const Visitable &rhs) const
         {
-            std::cout<<"This should never run\n";
+            std::cout << "This should never run\n";
             return false;
         }
     };
@@ -290,9 +290,9 @@ namespace ast
     {
     public:
         void accept(Visitor *v) override { v->visitIntegerType(this); }
-        virtual bool operator==(const Visitable& rhs) const override
+        virtual bool operator==(const Visitable &rhs) const override
         {
-            if(dynamic_cast<const IntegerType*>(&rhs))
+            if (dynamic_cast<const IntegerType *>(&rhs))
                 return true;
             return false;
         }
@@ -301,9 +301,9 @@ namespace ast
     {
     public:
         void accept(Visitor *v) override { v->visitRealType(this); }
-        virtual bool operator==(const Visitable& rhs) const override
+        virtual bool operator==(const Visitable &rhs) const override
         {
-            if(dynamic_cast<const RealType*>(&rhs))
+            if (dynamic_cast<const RealType *>(&rhs))
                 return true;
             return false;
         }
@@ -312,9 +312,9 @@ namespace ast
     {
     public:
         void accept(Visitor *v) override { v->visitBooleanType(this); }
-        virtual bool operator==(const Visitable& rhs) const override
+        virtual bool operator==(const Visitable &rhs) const override
         {
-            if(dynamic_cast<const BooleanType*>(&rhs))
+            if (dynamic_cast<const BooleanType *>(&rhs))
                 return true;
             return false;
         }
@@ -326,10 +326,11 @@ namespace ast
         Expr *size = nullptr;
         ArrayType(Type *type, Expr *size) : type(type), size(size) {}
         void accept(Visitor *v) override { v->visitArrayType(this); }
-        virtual bool operator==(const Visitable& rhs) const override
+        virtual bool operator==(const Visitable &rhs) const override
         {
-            if(auto array_type = dynamic_cast<const ArrayType*>(&rhs)){
-                if(array_type->size == this->size && (*array_type->type) == (*this->type) )
+            if (auto array_type = dynamic_cast<const ArrayType *>(&rhs))
+            {
+                if (array_type->size == this->size && (*array_type->type) == (*this->type))
                     return true;
             }
             return false;
@@ -375,10 +376,12 @@ namespace ast
         Expr *init = nullptr;
         LocalVarDecl(Ident name, Type *type, Expr *init) : name(name), type(type), init(init) {}
         void accept(Visitor *v) override { v->visitLocalVarDecl(this); }
-        virtual bool operator==(const Visitable& rhs) const override
+        virtual bool operator==(const Visitable &rhs) const override
         {
-            if(auto local_var_decl = dynamic_cast<const LocalVarDecl*>(&rhs)){  
-                if(local_var_decl->name == this->name && (*local_var_decl->type) == (*this->type) ){
+            if (auto local_var_decl = dynamic_cast<const LocalVarDecl *>(&rhs))
+            {
+                if (local_var_decl->name == this->name && (*local_var_decl->type) == (*this->type))
+                {
                     return true;
                 }
             }
@@ -392,11 +395,13 @@ namespace ast
         std::vector<LocalVarDecl *> vars = {};
         LocalVarList(std::vector<LocalVarDecl *> vars) : vars(vars) {}
         void accept(Visitor *v) override { v->visitLocalVarList(this); }
-        virtual bool operator==(const Visitable& rhs) const override
+        virtual bool operator==(const Visitable &rhs) const override
         {
-            if(auto local_var_list = dynamic_cast<const LocalVarList*>(&rhs)){
+            if (auto local_var_list = dynamic_cast<const LocalVarList *>(&rhs))
+            {
                 int found = 0;
-                for(int i = 0; i < this->vars.size(); i++){
+                for (int i = 0; i < this->vars.size(); i++)
+                {
                     auto x = (*this->vars[i]);
                     // for(int j = 0; j < local_var_list->vars.size(); j ++){
                     //     if(x == *local_var_list->vars[j]){
@@ -404,19 +409,20 @@ namespace ast
                     //         break;
                     //     }
                     // }
-                    if(i < local_var_list->vars.size()){
-                        if(x == *local_var_list->vars[i])
-                             found++;
+                    if (i < local_var_list->vars.size())
+                    {
+                        if (x == *local_var_list->vars[i])
+                            found++;
                     }
                 }
-                if(this->vars.size() != local_var_list->vars.size()){
+                if (this->vars.size() != local_var_list->vars.size())
+                {
                     return false;
                 }
                 return (found == this->vars.size());
             }
             return false;
         }
-            
     };
     class RecordType : public UserType
     {
@@ -424,10 +430,11 @@ namespace ast
         LocalVarList *decls;
         RecordType(LocalVarList *decls) : decls(decls) {}
         void accept(Visitor *v) override { v->visitRecordType(this); }
-        virtual bool operator==(const Visitable& rhs) const override
+        virtual bool operator==(const Visitable &rhs) const override
         {
-            if(auto record_type = dynamic_cast<const RecordType*>(&rhs)){
-                if( (*(record_type->decls)) == (*(this->decls)) )
+            if (auto record_type = dynamic_cast<const RecordType *>(&rhs))
+            {
+                if ((*(record_type->decls)) == (*(this->decls)))
                     return true;
             }
             return false;

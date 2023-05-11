@@ -148,9 +148,26 @@ namespace generator
                 if (auto recAccess = dynamic_cast<ast::RecordAccess *>(node->var->accesses->accesses[0]))
                 {
 
-                    recordMemembers[node->var->name][recAccess->name].second = inferred_value;
+                    recordMembers[node->var->name][recAccess->name].second = inferred_value;
                     return;
                 }
+
+                auto arrAccess = dynamic_cast<ast::ArrayAccess *>(node->var->accesses->accesses[0]);
+                llvm::Value *rhs = inferred_value;
+                arrAccess->index->accept(this);
+                int index_int = 0;
+                llvm::ConstantInt *myConstantInt = llvm::dyn_cast<llvm::ConstantInt>(inferred_value);
+                if (myConstantInt)
+                {
+                    int64_t IntegerValue = myConstantInt->getSExtValue();
+                    index_int = IntegerValue;
+                }
+                else
+                {
+                    std::cerr << "Error: Unable to resolve array index to a constant int\n";
+                }
+                nameToArray[node->var->name][index_int] = rhs;
+                return;
             }
 
             llvm::AllocaInst *curr_alloca = varAllocSymbolTable[node->var->name];
@@ -360,6 +377,7 @@ namespace generator
     };
     void codeGenerator::visitArrayType(ast::ArrayType *node)
     {
+        std::string array_name = curr_local_name;
         if (node->size)
         {
             node->size->accept(this);
@@ -380,6 +398,7 @@ namespace generator
             std::cerr << "Error: Unable to resolve array size to a constant int\n";
         }
         inferred_type = llvm::ArrayType::get(inferred_type, size);
+        nameToArray[array_name] = {};
     };
     void codeGenerator::visitRecordType(ast::RecordType *node)
     {
@@ -393,8 +412,8 @@ namespace generator
             {
                 field->accept(this);
                 recordFields.push_back(inferred_type);
-                recordMemembers[recName][field->name].first = inferred_type;
-                recordMemembers[recName][field->name].second = inferred_value;
+                recordMembers[recName][field->name].first = inferred_type;
+                recordMembers[recName][field->name].second = inferred_value;
             }
         }
 
@@ -489,6 +508,7 @@ namespace generator
     };
     void codeGenerator::visitArrayAccess(ast::ArrayAccess *node)
     {
+        std::string arr_access_name = curr_access_name;
         auto arr_type = dynamic_cast<ast::ArrayType *>(expected_type);
         expected_type = arr_type->type;
         llvm::Value *array = inferred_value;
@@ -507,8 +527,9 @@ namespace generator
         {
             std::cerr << "Error: Unable to resolve array index to a constant int\n";
         }
+
         llvm::Value *elementValue = builder->CreateExtractValue(array, index_int);
-        inferred_value = elementValue;
+        inferred_value = nameToArray[arr_access_name][index_int];
     }
     void codeGenerator::visitRecordAccess(ast::RecordAccess *node)
     {
@@ -524,7 +545,7 @@ namespace generator
             }
         }
         llvm::Value *fieldValue = builder->CreateExtractValue(recordValue, {index});
-        inferred_value = recordMemembers[curr_access_name][node->name].second;
+        inferred_value = recordMembers[curr_access_name][node->name].second;
     }
     void codeGenerator::visitRoutineCallValue(ast::RoutineCallValue *node)
     {

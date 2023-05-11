@@ -102,7 +102,8 @@ namespace generator
 
         std::unordered_map<std::string, llvm::AllocaInst *> varAllocSymbolTable;
         std::unordered_map<std::string, ast::Type *> varType;
-        std::unordered_map<std::string, std::unordered_map<std::string, std::pair<llvm::Type *, llvm::Value *>>> recordMemembers;
+        std::unordered_map<std::string, std::unordered_map<std::string, std::pair<llvm::Type *, llvm::Value *>>> recordMembers;
+        std::unordered_map<std::string, std::unordered_map<int64_t, llvm::Value *>> nameToArray;
         std::unordered_map<std::string, std::vector<llvm::Value *>> nameToRecordValues;
         std::vector<std::pair<std::string, llvm::AllocaInst *>>
             varStack;

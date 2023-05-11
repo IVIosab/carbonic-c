@@ -1,0 +1,10 @@
+routine SayHello () : integer is 
+    print(1);
+    return 1; 
+end
+
+routine main () : integer is 
+    var x : integer is SayHello();
+    print(x);
+    return 0;
+end
