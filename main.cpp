@@ -1,22 +1,12 @@
 #include "llvm/Support/raw_ostream.h"
- #include "lexer.h"
- #include "driver.hpp"
- #include "parser.hpp"
- #include "ast.hpp"
- #include "astPrinter.hpp"
- #include "semantic.hpp"
- #include "codeGenerator.hpp"
-// #include "llvm/IR/IRBuilder.h"
+#include "lexer.h"
+#include "driver.hpp"
+#include "parser.hpp"
+#include "ast.hpp"
+#include "astPrinter.hpp"
+#include "semantic.hpp"
+#include "codeGenerator.hpp"
 extern ast::Program *program;
-
-namespace generator
-{
-    class CodeGenerator : public ast::Visitor
-    {
-    public:
-        llvm::IRBuilder<> m_builder;
-    };
-}
 
 int main(int argc, char **argv)
 {
@@ -28,8 +18,8 @@ int main(int argc, char **argv)
     std::cout << std::endl;
     // // analyzer::AstPrinter printer;
     // // program->accept(&printer);
-    // analyzer::Semantic analyzer;
-    // program->accept(&analyzer);
+    analyzer::Semantic analyzer;
+    program->accept(&analyzer);
     // prettyPrinter::codePrinter printer;
     // program->accept(&printer);
 
