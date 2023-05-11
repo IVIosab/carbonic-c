@@ -72,7 +72,7 @@ namespace generator
                 //  Add arguments to variable symbol table.
                 varAllocSymbolTable[paramNames[i]] = Alloca;
                 varType[paramNames[i]] = node->params->decls[i]->type;
-                // varStack.push_back({paramNames[i], Alloca});
+                varStack.push_back({paramNames[i], Alloca});
                 varTypeStack.push_back({paramNames[i], node->params->decls[i]->type});
             }
         }
