@@ -1,20 +1,21 @@
-routine div (x : real, y : real) : real is 
-    
-    var z : real;
-    z := x / y;
-
-    return z;
-end
-
 routine main () : integer is 
-    
-    var x : real is div( 4.4 , 2.2 );
+    var target : integer is 135;
+    print(target);
+    var steps : integer is 0;
+    var left : integer is 0;
+    print(left);
+    var right : integer is 100000;
+    print(right);
 
-    if x > 1.1 then
-        print(1);
-    else
-        print(0);
+    while left < right loop
+        steps := steps + 1;
+        var middle : integer is (left + (right-left)/2);
+        if middle > target then
+            right := middle;
+        else 
+            left := middle+1;
+        end
     end
-
+    print(steps);
     return 0;
 end

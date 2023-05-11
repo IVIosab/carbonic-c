@@ -1,0 +1,15 @@
+routine main () : integer is 
+    var input : integer is 5;
+    var prev1 : integer is 1;
+    var prev2 : integer is 0;
+
+    while input > 0 loop   
+        var temp : integer is prev1+prev2;
+        prev2 := prev1;
+        prev1 := temp;
+        input := input - 1;
+    end
+
+    print(prev1);
+    return 0;
+end
