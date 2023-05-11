@@ -210,7 +210,7 @@ namespace generator
     {
         llvm::Function *func = builder->GetInsertBlock()->getParent();
         llvm::BasicBlock *thenBlock = llvm::BasicBlock::Create(context, "then", func);
-        llvm::BasicBlock *elseBlock;
+        llvm::BasicBlock *elseBlock = llvm::BasicBlock::Create(context, "else", func);
         llvm::BasicBlock *endBlock = llvm::BasicBlock::Create(context, "end", func);
         if (node->condition)
         {
@@ -219,29 +219,24 @@ namespace generator
 
         llvm::Value *cmp = inferred_value;
 
-        if(node->else_){
-            elseBlock = llvm::BasicBlock::Create(context, "else", func);
-            builder->CreateCondBr(cmp, thenBlock, elseBlock);
-        }
-        else{
-            builder->CreateCondBr(cmp, thenBlock, endBlock);
-        }
+        builder->CreateCondBr(cmp, thenBlock, elseBlock);
         if (node->then)
         {
             builder->SetInsertPoint(thenBlock);
             node->then->accept(this);
-            if(! node->else_){
+            if (!node->else_)
+            {
                 builder->CreateBr(endBlock);
                 builder->GetInsertBlock();
             }
         }
+        builder->SetInsertPoint(elseBlock);
         if (node->else_)
         {
-            builder->SetInsertPoint(elseBlock);
             node->else_->accept(this);
-            builder->CreateBr(endBlock);
-            builder->GetInsertBlock();
         }
+        builder->CreateBr(endBlock);
+        builder->GetInsertBlock();
         builder->SetInsertPoint(endBlock);
     };
     void codeGenerator::visitWhileLoop(ast::WhileLoop *node)
@@ -372,7 +367,7 @@ namespace generator
             std::cout << std::endl;
             throw "Unknown inferred expression type";
         }
-        builder->CreateCall(printf, {formatStr, inferred_value});
+        builder->CreateCall(printf, {formatStr, inferred_value}, "printfCall");
     };
     void codeGenerator::visitIntegerType(ast::IntegerType *node)
     {
