@@ -120,10 +120,6 @@ namespace generator
         // Remove params from scope when exiting a routine declaration
         void remove_decls_from_scope();
         // reference: https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/LangImpl07.html
-        llvm::AllocaInst *CreateEntryBlockAlloca(llvm::Function *TheFunction, std::string &VarName)
-        {
-            llvm::IRBuilder<> TmpB(&TheFunction->getEntryBlock(), TheFunction->getEntryBlock().begin());
-            return TmpB.CreateAlloca(llvm::Type::getDoubleTy(this->context), nullptr, VarName);
-        }
+        llvm::AllocaInst *CreateEntryBlockAlloca(llvm::Function *TheFunction, std::string &VarName);
     };
 } // namespace generator

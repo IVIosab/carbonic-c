@@ -63,16 +63,17 @@ namespace generator
             {
                 routine_vars_n++;
                 llvm::Value *arg = (func->arg_begin() + i);
-                arg->setName(node->params->decls[i]->name);
-                // Create an alloca for this variable.
-                llvm::AllocaInst *Alloca = CreateEntryBlockAlloca(func, node->params->decls[i]->name);
-                // Store the initial value into the alloca.
+                arg->setName(paramNames[i]);
+                //  Create an alloca for this variable.
+                node->params->decls[i]->accept(this);
+                llvm::AllocaInst *Alloca = CreateEntryBlockAlloca(func, paramNames[i]);
+                //  Store the initial value into the alloca.
                 builder->CreateStore(arg, Alloca);
-                // Add arguments to variable symbol table.
-                varAllocSymbolTable[node->params->decls[i]->name] = Alloca;
-                varType[node->params->decls[i]->name] = node->params->decls[i]->type;
-                varStack.push_back({node->params->decls[i]->name, Alloca});
-                varTypeStack.push_back({node->params->decls[i]->name, node->params->decls[i]->type});
+                //  Add arguments to variable symbol table.
+                varAllocSymbolTable[paramNames[i]] = Alloca;
+                varType[paramNames[i]] = node->params->decls[i]->type;
+                // varStack.push_back({paramNames[i], Alloca});
+                varTypeStack.push_back({paramNames[i], node->params->decls[i]->type});
             }
         }
         if (node->body)
@@ -756,5 +757,11 @@ namespace generator
                 }
             }
         }
+    }
+
+    llvm::AllocaInst *codeGenerator::CreateEntryBlockAlloca(llvm::Function *TheFunction, std::string &VarName)
+    {
+        llvm::IRBuilder<> TmpB(&TheFunction->getEntryBlock(), TheFunction->getEntryBlock().begin());
+        return TmpB.CreateAlloca(inferred_type, nullptr, VarName);
     }
 } // namespace generator
