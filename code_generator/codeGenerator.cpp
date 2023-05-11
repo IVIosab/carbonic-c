@@ -159,19 +159,10 @@ namespace generator
 
                 auto arrAccess = dynamic_cast<ast::ArrayAccess *>(node->var->accesses->accesses[0]);
                 llvm::Value *rhs = inferred_value;
+                llvm::AllocaInst *arrAlloca = varAllocSymbolTable[node->var->name];
                 arrAccess->index->accept(this);
-                int index_int = 0;
-                llvm::ConstantInt *myConstantInt = llvm::dyn_cast<llvm::ConstantInt>(inferred_value);
-                if (myConstantInt)
-                {
-                    int64_t IntegerValue = myConstantInt->getSExtValue();
-                    index_int = IntegerValue;
-                }
-                else 
-                {
-                    std::cerr<<"Error: Unable to resolve array index to a constant int\n";
-                }
-                nameToArray[node->var->name][index_int] = rhs;
+                llvm::Value *p = builder->CreateGEP(arrAlloca->getAllocatedType(), arrAlloca, {const_0, inferred_value}, node->var->name + "_el_access");
+                builder->CreateStore(rhs, p);
                 return;
             }
 
@@ -402,7 +393,6 @@ namespace generator
             std::cerr << "Error: Unable to resolve array size to a constant int\n";
         }
         inferred_type = llvm::ArrayType::get(inferred_type, size);
-        nameToArray[array_name] = {};
     };
     void codeGenerator::visitRecordType(ast::RecordType *node)
     {
@@ -512,6 +502,8 @@ namespace generator
     void codeGenerator::visitArrayAccess(ast::ArrayAccess *node)
     {
         std::string arr_access_name = curr_access_name;
+        llvm::AllocaInst *arrAlloca = varAllocSymbolTable[arr_access_name];
+
         auto arr_type = dynamic_cast<ast::ArrayType *>(expected_type);
         expected_type = arr_type->type;
         llvm::Value *array = inferred_value;
@@ -519,19 +511,10 @@ namespace generator
         {
             node->index->accept(this);
         }
-        int index_int = 0;
-        llvm::ConstantInt *myConstantInt = llvm::dyn_cast<llvm::ConstantInt>(inferred_value);
-        if (myConstantInt)
-        {
-            int64_t IntegerValue = myConstantInt->getSExtValue();
-            index_int = IntegerValue;
-        }
-        else
-        {
-            std::cerr << "Error: Unable to resolve array index to a constant int\n";
-        }       
-        llvm::Value *elementValue = builder->CreateExtractValue(array, index_int);
-        inferred_value = nameToArray[arr_access_name][index_int];
+        llvm::Value *elementPtr = builder->CreateGEP(arrAlloca->getAllocatedType(), arrAlloca, {const_0, inferred_value});
+
+        llvm::Value *loadedValue = builder->CreateLoad(arrAlloca->getAllocatedType()->getArrayElementType(), elementPtr);
+        inferred_value = loadedValue;
     }
     void codeGenerator::visitRecordAccess(ast::RecordAccess *node)
     {
@@ -724,37 +707,37 @@ namespace generator
     void codeGenerator::removeDeclFromScope(std::string delVar)
     {
 
-            if (varStack.size())
+        if (varStack.size())
+        {
+            varAllocSymbolTable.erase(delVar);
+            varType.erase(delVar);
+            varStack.pop_back();
+            varTypeStack.pop_back();
+            llvm::AllocaInst *shadowed_i = nullptr;
+            for (auto i : varStack)
             {
-                varAllocSymbolTable.erase(delVar);
-                varType.erase(delVar);
-                varStack.pop_back();
-                varTypeStack.pop_back();
-                llvm::AllocaInst *shadowed_i = nullptr;
-                for (auto i : varStack)
+                if (i.first == delVar)
                 {
-                    if (i.first == delVar)
-                    {
-                        shadowed_i = i.second;
-                        break;
-                    }
-                }
-                if (shadowed_i)
-                    varAllocSymbolTable[delVar] = shadowed_i;
-                ast::Type *shadowed_type = nullptr;
-                for (auto i : varTypeStack)
-                {
-                    if (i.first == delVar)
-                    {
-                        shadowed_type = i.second;
-                        break;
-                    }
-                }
-                if (shadowed_type)
-                {
-                    varType[delVar] = shadowed_type;
+                    shadowed_i = i.second;
+                    break;
                 }
             }
+            if (shadowed_i)
+                varAllocSymbolTable[delVar] = shadowed_i;
+            ast::Type *shadowed_type = nullptr;
+            for (auto i : varTypeStack)
+            {
+                if (i.first == delVar)
+                {
+                    shadowed_type = i.second;
+                    break;
+                }
+            }
+            if (shadowed_type)
+            {
+                varType[delVar] = shadowed_type;
+            }
+        }
     }
 
     llvm::AllocaInst *codeGenerator::CreateEntryBlockAlloca(llvm::Function *TheFunction, std::string &VarName)

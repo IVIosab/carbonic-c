@@ -100,6 +100,8 @@ namespace generator
         std::string curr_local_name;
         std::string curr_access_name = "";
 
+        llvm::ConstantInt *const_0 = llvm::ConstantInt::get(llvm::Type::getInt32Ty(context), 0);
+
         std::unordered_map<std::string, llvm::AllocaInst *> varAllocSymbolTable;
         std::unordered_map<std::string, ast::Type *> varType;
         std::unordered_map<std::string, std::unordered_map<std::string, std::pair<llvm::Type *, llvm::Value *>>> recordMembers;
