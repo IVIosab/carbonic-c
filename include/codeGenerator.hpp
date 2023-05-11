@@ -118,7 +118,7 @@ namespace generator
         void computeCompIntExprValue(llvm::Value *value1, llvm::Value *value2, ComparisonOperator oper);
         void computeCompRealExprValue(llvm::Value *value1, llvm::Value *value2, ComparisonOperator oper);
         // Remove params from scope when exiting a routine declaration
-        void remove_decls_from_scope();
+        void removeDeclFromScope(std::string delVar);
         // reference: https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/LangImpl07.html
         llvm::AllocaInst *CreateEntryBlockAlloca(llvm::Function *TheFunction, std::string &VarName);
     };

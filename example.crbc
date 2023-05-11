@@ -1,7 +1,9 @@
 routine main () : integer is 
-    var a : integer is 0;
-    while (a < 2) loop
-        a := 2;
+    var ar : array [2] integer;
+
+    for i in 1 .. 2 loop
+        ar[i] := i;
     end
-    return (a - 2);
+
+    return 0;
 end
