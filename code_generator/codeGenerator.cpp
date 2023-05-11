@@ -80,7 +80,10 @@ namespace generator
         {
             node->body->accept(this);
         }
-        remove_decls_from_scope();
+        while(routine_vars_n -- ){
+            if(varStack.size())
+                removeDeclFromScope(varStack[varStack.size()-1].first);
+        }
     };
     void codeGenerator::visitParameterDecl(ast::ParameterDecl *node)
     {
@@ -163,9 +166,9 @@ namespace generator
                     int64_t IntegerValue = myConstantInt->getSExtValue();
                     index_int = IntegerValue;
                 }
-                else
+                else 
                 {
-                    std::cerr << "Error: Unable to resolve array index to a constant int\n";
+                    std::cerr<<"Error: Unable to resolve array index to a constant int\n";
                 }
                 nameToArray[node->var->name][index_int] = rhs;
                 return;
@@ -207,38 +210,39 @@ namespace generator
     {
         llvm::Function *func = builder->GetInsertBlock()->getParent();
         llvm::BasicBlock *thenBlock = llvm::BasicBlock::Create(context, "then", func);
-        llvm::BasicBlock *elseBlock = llvm::BasicBlock::Create(context, "else", func);
+        llvm::BasicBlock *elseBlock;
         llvm::BasicBlock *endBlock = llvm::BasicBlock::Create(context, "end", func);
-
         if (node->condition)
         {
             node->condition->accept(this);
         }
 
         llvm::Value *cmp = inferred_value;
-        llvm::Value *inferred_if;
-        llvm::Value *inferred_else;
-        builder->CreateCondBr(cmp, thenBlock, elseBlock);
+
+        if(node->else_){
+            elseBlock = llvm::BasicBlock::Create(context, "else", func);
+            builder->CreateCondBr(cmp, thenBlock, elseBlock);
+        }
+        else{
+            builder->CreateCondBr(cmp, thenBlock, endBlock);
+        }
         if (node->then)
         {
             builder->SetInsertPoint(thenBlock);
             node->then->accept(this);
-            builder->CreateBr(endBlock);
-            inferred_if = inferred_value;
+            if(! node->else_){
+                builder->CreateBr(endBlock);
+                builder->GetInsertBlock();
+            }
         }
         if (node->else_)
         {
             builder->SetInsertPoint(elseBlock);
             node->else_->accept(this);
             builder->CreateBr(endBlock);
-            inferred_else = inferred_value;
+            builder->GetInsertBlock();
         }
-
         builder->SetInsertPoint(endBlock);
-        // llvm::PHINode *phiNode = builder->CreatePHI(func->getReturnType(), 2, "return_value");
-        // phiNode->addIncoming(inferred_if, thenBlock);
-        // phiNode->addIncoming(inferred_else, elseBlock);
-        // builder->CreateRet(phiNode);
     };
     void codeGenerator::visitWhileLoop(ast::WhileLoop *node)
     {
@@ -272,8 +276,12 @@ namespace generator
         llvm::BasicBlock *loopBodyBB = llvm::BasicBlock::Create(context, "loopBody", func);
         llvm::BasicBlock *loopExitBB = llvm::BasicBlock::Create(context, "loopExit", func);
         llvm::BasicBlock *loopInc = llvm::BasicBlock::Create(context, "loopInc", func);
-
+        ast::Type* intType = new ast::IntegerType(); 
         llvm::AllocaInst *iInst = builder->CreateAlloca(builder->getInt32Ty(), nullptr, node->name);
+        varAllocSymbolTable[node->name] = iInst;
+        varType[node->name] = intType;
+        varStack.push_back({node->name, iInst});
+        varTypeStack.push_back({node->name, intType});
         llvm::Value *i = iInst;
         llvm::Value *cond = nullptr;
         if (!node->range->reverse)
@@ -317,6 +325,8 @@ namespace generator
 
         builder->CreateBr(loopCondBB);
         builder->SetInsertPoint(loopExitBB);
+        // remove i declaration from scope;
+        removeDeclFromScope(node->name);
     };
     void codeGenerator::visitRange(ast::Range *node)
     {
@@ -483,6 +493,7 @@ namespace generator
     };
     void codeGenerator::visitVar(ast::Var *node)
     {
+
         llvm::AllocaInst *varAlloc = varAllocSymbolTable[node->name];
 
         if (!varAlloc)
@@ -496,6 +507,7 @@ namespace generator
             inferred_value = builder->CreateLoad(varAlloc->getAllocatedType(), varAlloc, node->name.c_str());
         }
         expected_type = varType[node->name];
+
 
         if (node->accesses)
         {
@@ -527,8 +539,7 @@ namespace generator
         else
         {
             std::cerr << "Error: Unable to resolve array index to a constant int\n";
-        }
-
+        }       
         llvm::Value *elementValue = builder->CreateExtractValue(array, index_int);
         inferred_value = nameToArray[arr_access_name][index_int];
     }
@@ -720,13 +731,11 @@ namespace generator
             break;
         }
     }
-    void codeGenerator::remove_decls_from_scope()
+    void codeGenerator::removeDeclFromScope(std::string delVar)
     {
-        while (routine_vars_n--)
-        {
+
             if (varStack.size())
             {
-                std::string delVar = varStack[varStack.size() - 1].first;
                 varAllocSymbolTable.erase(delVar);
                 varType.erase(delVar);
                 varStack.pop_back();
@@ -756,7 +765,6 @@ namespace generator
                     varType[delVar] = shadowed_type;
                 }
             }
-        }
     }
 
     llvm::AllocaInst *codeGenerator::CreateEntryBlockAlloca(llvm::Function *TheFunction, std::string &VarName)

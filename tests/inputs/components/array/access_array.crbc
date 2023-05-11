@@ -1,9 +1,5 @@
 routine main () : integer is 
     var ar : array [2] integer;
-
-    for i in 1 .. 2 loop
-        ar[i] := i;
-    end
-
+    ar[1] := 5;
     return 0;
 end

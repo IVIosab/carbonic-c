@@ -41,7 +41,7 @@ namespace analyzer
         {
             err_second_declaration(node->name);
         }
-
+        routineDeclTable[node->name] = node;
         if (node->params)
         {
             for (auto parameter : node->params->decls)
@@ -63,11 +63,11 @@ namespace analyzer
             node->body->accept(this);
         }
         node->returnType = ret_type;
-        routineDeclTable[node->name] = node;
         if (routine_return_type && ret_type)
             typecheck_types(ret_type, routine_return_type);
-
-        remove_params_from_scope();
+        while(routine_vars_n -- ){
+            removeVarFromScope();
+        }
     };
     void Semantic::visitParameterDecl(ast::ParameterDecl *node)
     {
@@ -232,6 +232,7 @@ namespace analyzer
 
     void Semantic::visitIf(ast::If *node)
     {
+        int current_vars_n = routine_vars_n;
         ast::Type *cond_type;
         if (node->condition)
         {
@@ -247,9 +248,14 @@ namespace analyzer
         {
             node->else_->accept(this);
         }
+        while(routine_vars_n > current_vars_n){
+            routine_vars_n --;
+            removeVarFromScope();
+        }
     };
     void Semantic::visitWhileLoop(ast::WhileLoop *node)
     {
+        int current_vars_n = routine_vars_n;
         ast::Type *cond_type;
         if (node->condition)
         {
@@ -261,10 +267,17 @@ namespace analyzer
         {
             node->body->accept(this);
         }
+        while(routine_vars_n > current_vars_n){
+            routine_vars_n --;
+            removeVarFromScope();
+        }
     };
     void Semantic::visitForLoop(ast::ForLoop *node)
     {
+        int current_vars_n = routine_vars_n;
         varDeclSymbolTable[node->name] = new ast::IntegerType();
+        varStack.push_back({node->name, varDeclSymbolTable[node->name]});
+        routine_vars_n ++;
         if (node->range)
         {
             node->range->accept(this);
@@ -272,6 +285,10 @@ namespace analyzer
         if (node->body)
         {
             node->body->accept(this);
+        }
+        while(routine_vars_n > current_vars_n){
+            routine_vars_n --;
+            removeVarFromScope();
         }
     };
     void Semantic::visitRange(ast::Range *node)

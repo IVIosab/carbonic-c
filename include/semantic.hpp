@@ -150,31 +150,23 @@ namespace analyzer
             routine_vars_n++;
         }
         // Remove params from scope when exiting a routine declaration
-        void remove_params_from_scope()
-        {
-            while (routine_vars_n--)
-            {
-                if (varStack.size())
-                {
-                    std::string delVar = varStack[varStack.size() - 1].first;
-                    varDeclSymbolTable.erase(delVar);
-                    varStack.pop_back();
-                    ast::Type *shadowed_i = nullptr;
-                    for (auto i : varStack)
-                    {
-                        if (i.first == delVar)
-                        {
-                            shadowed_i = i.second;
-                            break;
-                        }
+        void removeVarFromScope(){
+            if(varStack.size()){
+                std::string delVar = varStack[varStack.size()-1].first;
+                varDeclSymbolTable.erase(delVar);
+                varStack.pop_back();
+                ast::Type* shadowed_i = nullptr;
+                for (auto i : varStack){
+                    if (i.first == delVar){
+                        shadowed_i = i.second;
+                        break;
                     }
-                    if (shadowed_i)
-                        varDeclSymbolTable[delVar] = shadowed_i;
                 }
+                if(shadowed_i)
+                    varDeclSymbolTable[delVar] = shadowed_i;
             }
         }
-        // Check that arguments of routine call match params' types in function decl
-        void routineCallCheck(ast::ParameterList *params, ast::ExprList *args)
+        void testing()
         {
             for (int i = 0; i < args->exprs.size(); i++)
             {
