@@ -102,7 +102,8 @@ namespace generator
 
         std::unordered_map<std::string, llvm::AllocaInst *> varAllocSymbolTable;
         std::unordered_map<std::string, ast::Type *> varType;
-        std::unordered_map<std::string, std::unordered_map<std::string, std::pair<llvm::Type *, llvm::Value *>>> recordMemembers;
+        std::unordered_map<std::string, std::unordered_map<std::string, std::pair<llvm::Type *, llvm::Value *>>> recordMembers;
+        std::unordered_map<std::string, std::unordered_map<int64_t, llvm::Value *>> nameToArray;
         std::unordered_map<std::string, std::vector<llvm::Value *>> nameToRecordValues;
         std::vector<std::pair<std::string, llvm::AllocaInst *>>
             varStack;
@@ -119,10 +120,6 @@ namespace generator
         // Remove params from scope when exiting a routine declaration
         void remove_decls_from_scope();
         // reference: https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/LangImpl07.html
-        llvm::AllocaInst *CreateEntryBlockAlloca(llvm::Function *TheFunction, std::string &VarName)
-        {
-            llvm::IRBuilder<> TmpB(&TheFunction->getEntryBlock(), TheFunction->getEntryBlock().begin());
-            return TmpB.CreateAlloca(llvm::Type::getDoubleTy(this->context), nullptr, VarName);
-        }
+        llvm::AllocaInst *CreateEntryBlockAlloca(llvm::Function *TheFunction, std::string &VarName);
     };
 } // namespace generator

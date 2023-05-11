@@ -38,11 +38,11 @@ namespace analyzer
         void visitRealValue(ast::RealValue *p);
         void visitBooleanValue(ast::BooleanValue *p);
         void visitRoutineCallValue(ast::RoutineCallValue *p);
-
-        void visitType(ast::Type *p) {}
-        void visitPrimitiveType(ast::PrimitiveType *p) {}
-        void visitUserType(ast::UserType *p) {}
-        void visitTypeIdentifier(ast::TypeIdentifier *p) {} //-> doesn't get visited
+        
+        void visitType(ast::Type *p){}
+        void visitPrimitiveType(ast::PrimitiveType *p){}
+        void visitUserType(ast::UserType *p){}
+        void visitTypeIdentifier(ast::TypeIdentifier *p);
         void visitIntegerType(ast::IntegerType *p);
         void visitRealType(ast::RealType *p);
         void visitBooleanType(ast::BooleanType *p);
