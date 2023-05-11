@@ -1,0 +1,11 @@
+routine fib (x : integer) : integer is
+    if (x = 0) or (x = 1) then 
+        return 1;
+    end
+    return fib(x-1) + fib(x-2);
+end
+
+routine main () : integer is 
+    print(fib(20));
+    return 0;
+end

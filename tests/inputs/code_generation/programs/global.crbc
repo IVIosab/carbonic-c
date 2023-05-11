@@ -1,0 +1,7 @@
+var z : integer is 7;
+routine main () : integer is 
+    var x : integer is 5;
+    print(z + x);
+
+    return 0;
+end

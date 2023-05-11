@@ -1,0 +1,21 @@
+routine main () : integer is 
+    var target : integer is 135;
+    print(target);
+    var steps : integer is 0;
+    var left : integer is 0;
+    print(left);
+    var right : integer is 100000;
+    print(right);
+
+    while left < right loop
+        steps := steps + 1;
+        var middle : integer is (left + (right-left)/2);
+        if middle > target then
+            right := middle;
+        else 
+            left := middle+1;
+        end
+    end
+    print(steps);
+    return 0;
+end

@@ -1,0 +1,16 @@
+routine main () : integer is 
+    var arr : array [5] integer;
+    arr[0] := 0;
+    arr[1] := 1;
+    arr[2] := 4;
+    arr[3] := 9;
+    arr[4] := 16;
+    
+    print(arr[0]);
+    print(arr[1]);
+    print(arr[2]);
+    print(arr[3]);
+    print(arr[4]);
+    
+    return 0;
+end
