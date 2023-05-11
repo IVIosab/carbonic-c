@@ -1,7 +1,7 @@
 routine main () : integer is 
     var ar : array [5] integer;
     for i in 0 .. 5 loop
-        ar[i] = i;
+        ar[i] := i;
     end
     for i in 0 .. 5 loop
         print(ar[i]);

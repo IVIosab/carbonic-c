@@ -1,4 +1,4 @@
-routine DoNothing () is 
+routine DoNothing (): integer is 
     //empty
     return 0; 
 end
