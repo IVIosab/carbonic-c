@@ -1,22 +1,6 @@
-# Stages 
-lexer: 
-	flex -o lexer.cpp -i lexer.l
-parser:
-	bison -d parser.ypp -o parser.cpp
-
-# Full execution
-full_lexer:
-	flex -o lexer.cpp -i lexer.l
-	g++ lexer.cpp -o output.out
-	
-full_parser:
-	flex -o lexer.cpp -i lexer.l
-	bison -d parser.ypp -o parser.cpp
-	g++ -g main.cpp lexer.cpp parser.cpp driver.cpp astPrinter.cpp prettyPrinter.cpp semantic.cpp -o output.out 
-	./output.out < test.crbc
 # Tests 
 test: build
-	bash ./test.sh
+	cd build && ctest
 
 # Cleaning
 clean:
@@ -42,4 +26,9 @@ build/all: clean
 	cd build && cmake .. && make
 
 run: build
-	./build/carbonic_c > output.txt
+	./build/carbonic_c 2> output.out
+
+run/file: build
+	./build/carbonic_c < input.crbc 2> output.ll
+	lli output.ll > output.out
+	mv -f output.ll build

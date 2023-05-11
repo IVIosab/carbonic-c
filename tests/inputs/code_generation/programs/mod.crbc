@@ -1,0 +1,9 @@
+routine main () : integer is 
+    var x : integer is 7;
+    var y : integer is 4;
+    var z : integer is x % y;
+
+    print(z);
+
+    return 0;
+end

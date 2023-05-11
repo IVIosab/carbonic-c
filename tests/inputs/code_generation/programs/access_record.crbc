@@ -1,0 +1,18 @@
+routine main () : integer is 
+    var z : integer is 8;
+    var x : record 
+        var a : integer is 3;
+        var b : integer is 7;
+    end;
+
+    print(x.a);
+    print(x.b);
+    x.a := 9;
+    print(x.a);
+    print(z);
+    x.b := z;
+    z := z + 10;
+    print(x.b + z);
+
+    return 0;
+end

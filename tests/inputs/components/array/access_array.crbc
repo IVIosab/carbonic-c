@@ -1,8 +1,10 @@
 routine main () : integer is 
-    var ar : array [2] integer;
-
-    for i in 1 .. 2 loop
-        ar[i] := i;
+    var ar : array [5] integer;
+    for i in 0 .. 5 loop
+        ar[i] = i;
+    end
+    for i in 0 .. 5 loop
+        print(ar[i]);
     end
 
     return 0;

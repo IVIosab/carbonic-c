@@ -6,4 +6,4 @@ lexer.cpp
 *.out
 tests/outputs/
 build/
-output.txt
+output.ll
