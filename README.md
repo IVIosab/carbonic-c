@@ -220,8 +220,8 @@ Distributed under the 3-Clause BSD License. See `LICENSE.txt` for more informati
 [stars-url]: https://github.com/IVIosab/carbonic-c/stargazers
 [issues-shield]: https://img.shields.io/github/issues/IVIosab/carbonic-c.svg?style=for-the-badge
 [issues-url]: https://github.com/IVIosab/carbonic-c/issues
-[license-shield]: https://img.shields.io/github/license/IVIosab/carbonic-c.svg?style=for-the-badge
-[license-url]: https://github.com/IVIosab/carbonic-c/blob/master/LICENSE.txt
+[license-shield]: https://img.shields.io/github/license/IVIosab/carbonic-c?style=for-the-badge
+[license-url]: https://github.com/IVIosab/carbonic-c/blob/main/LICENSE
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/linkedin_username
 [CPlusPlus]: https://img.shields.io/badge/C++-004C99?style=for-the-badge&logo=cplusplus&logoColor=white
