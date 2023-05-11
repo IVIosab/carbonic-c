@@ -295,5 +295,6 @@ ARRAY_ACCESS:
 extern int lineno;
 void carbonic_c::Parser::error(const std::string& msg) {
     std::cout << msg<<"\nLine number: "<<lineno;
+    exit(1);
 }
 

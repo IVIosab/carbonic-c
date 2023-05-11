@@ -10,7 +10,7 @@ test_files () {
         # Create output file if not exists
         [ ! -f $2${file_base}.txt ] && touch $2${file_base}.txt
 
-        ./build/carbonic_c < $file > $2${file_base}.txt
+        ./build/carbonic_c < $file > $2${file_base}.txt 2> /dev/null
         echo -e "\t\tCompleted!"
     done
 }

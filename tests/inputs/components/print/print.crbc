@@ -1,8 +1,6 @@
 routine main () : integer is 
     
     print(5);
-
-    print(newline);
     
     return 0;
 end
