@@ -80,9 +80,10 @@ namespace generator
         {
             node->body->accept(this);
         }
-        while(routine_vars_n -- ){
-            if(varStack.size())
-                removeDeclFromScope(varStack[varStack.size()-1].first);
+        while (routine_vars_n--)
+        {
+            if (varStack.size())
+                removeDeclFromScope(varStack[varStack.size() - 1].first);
         }
     };
     void codeGenerator::visitParameterDecl(ast::ParameterDecl *node)
@@ -268,7 +269,7 @@ namespace generator
         llvm::BasicBlock *loopBodyBB = llvm::BasicBlock::Create(context, "loopBody", func);
         llvm::BasicBlock *loopExitBB = llvm::BasicBlock::Create(context, "loopExit", func);
         llvm::BasicBlock *loopInc = llvm::BasicBlock::Create(context, "loopInc", func);
-        ast::Type* intType = new ast::IntegerType(); 
+        ast::Type *intType = new ast::IntegerType();
         llvm::AllocaInst *iInst = builder->CreateAlloca(builder->getInt32Ty(), nullptr, node->name);
         varAllocSymbolTable[node->name] = iInst;
         varType[node->name] = intType;
@@ -485,7 +486,6 @@ namespace generator
     };
     void codeGenerator::visitVar(ast::Var *node)
     {
-
         llvm::AllocaInst *varAlloc = varAllocSymbolTable[node->name];
 
         if (!varAlloc)
@@ -499,8 +499,6 @@ namespace generator
             inferred_value = builder->CreateLoad(varAlloc->getAllocatedType(), varAlloc, node->name.c_str());
         }
         expected_type = varType[node->name];
-
-
         if (node->accesses)
         {
             curr_access_name = node->name;
