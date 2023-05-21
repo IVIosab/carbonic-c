@@ -78,5 +78,5 @@ int getno(){
 true                    {return carbonic_c::Parser::make_TK_BOOLEAN_LITERAL(true);}
 false                   {return carbonic_c::Parser::make_TK_BOOLEAN_LITERAL(false);}
 [a-zA-Z_][a-zA-Z0-9_]*  {return carbonic_c::Parser::make_TK_IDENTIFIER(yytext);}
-.                       {cout<<"Undifined token "<< yytext<< endl <<"Line number: "<< getno() <<endl; exit(1);}  
+.                       {cout<<"Undefined token "<< yytext<< endl <<"Line number: "<< getno() <<endl; exit(1);}  
 %%
